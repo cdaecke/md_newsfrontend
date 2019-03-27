@@ -1,0 +1,105 @@
+<html xmlns:f="https://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+
+    <fieldset>
+        <legend>News</legend>
+
+        <div class="form-group">
+            <label for="title">Titel</label>
+            <f:form.textfield
+                    property="title"
+                    id="title"
+                    class="form-control"
+                    additionalAttributes="{data-parsley-trigger:'change focusout', required:''}" />
+        </div>
+
+        <div class="form-group">
+            <label for="teaser">Teaser</label>
+            <f:form.textarea
+                property="teaser"
+                id="teaser"
+                class="form-control"
+                rows="2" />
+        </div>
+
+        <div class="form-group">
+            <label for="bodytext">Text</label>
+            <f:form.textarea
+                property="bodytext"
+                id="bodytext"
+                class="form-control tinymce"
+                rows="5"
+                additionalAttributes="{data-parsley-trigger:'change focusout', required:''}" />
+        </div>
+
+        <div class="form-group">
+            <label for="falMedia">Bild</label>
+            <f:form.upload name="falMedia" id="falMedia" class="form-control-file" />
+
+            <f:if condition="{news.firstImage}">
+                <br />
+                <f:form.checkbox name="deleteimage" value="1" id="deleteimage" class="form-check-input" />
+                <label for="deleteimage">Bild löschen</label>
+                <f:image image="{news.firstImage}" alt="" maxWidth="100"/>
+            </f:if>
+        </div>
+
+        <div class="form-group">
+            <label for="falRelatedFiles">falRelatedFiles</label>
+            <f:form.upload name="falRelatedFiles" id="falRelatedFiles" class="form-control-file" />
+
+            <f:if condition="{news.firstImage}">
+                <br />
+                <f:form.checkbox name="deleteimage" value="1" id="deleteimage" class="form-check-input" />
+                <label for="deleteimage">Bild löschen</label>
+                <f:image image="{news.firstImage}" alt="" maxWidth="100"/>
+            </f:if>
+        </div>
+
+        <div class="form-group">
+            <label for="categories">Categories</label>
+
+            <f:form.select 
+                property="categories" 
+                options="{categories}" 
+                optionValueField="uid" 
+                optionLabelField="title"
+                id="categories"
+                class="form-control"
+                multiple="multiple"
+                size="3" />
+        </div>
+
+        <div class="form-group">
+            <label for="archive">Ablaufdatum</label>
+            <f:form.textfield
+                    property="archive"
+                    value="{news.archive -> f:format.date(format: 'd.m.Y H:i')}"
+                    id="archive"
+                    class="form-control flatpickr"
+                    additionalAttributes="{placeholder:'DD.MM.YYYY HH:MM'}" />
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Metadaten</legend>
+
+        <div class="form-group">
+            <label for="keywords">Keywords</label>
+            <f:form.textfield
+                    property="keywords"
+                    id="keywords"
+                    class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <f:form.textarea
+                property="description"
+                id="description"
+                class="form-control"
+                rows="2" />
+        </div>
+
+    </fieldset>
+
+</html>

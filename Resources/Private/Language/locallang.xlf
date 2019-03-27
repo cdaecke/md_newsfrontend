@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+    <file source-language="en" datatype="plaintext" original="messages" date="2019-03-25T11:07:19Z" product-name="md_newsfrontend">
+        <header/>
+        <body>
+            <trans-unit id="tx_mdnewsfrontend_domain_model_news">
+                <source>News</source>
+            </trans-unit>
+            <trans-unit id="tx_mdnewsfrontend_domain_model_news.md_newsfrontend_feuser">
+                <source>Md Newsfrontend Feuser</source>
+            </trans-unit>
+
+            <trans-unit id="tx_mdnewsfrontend_domain_model_news.news_list">
+                <source>Your news entries</source>
+            </trans-unit>
+            <trans-unit id="tx_mdnewsfrontend_domain_model_news.new">
+                <source>New</source>
+            </trans-unit>
+            <trans-unit id="tx_mdnewsfrontend_domain_model_news.edit">
+                <source>Edit</source>
+            </trans-unit>
+            <trans-unit id="tx_mdnewsfrontend_domain_model_news.delete">
+                <source>Delete</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

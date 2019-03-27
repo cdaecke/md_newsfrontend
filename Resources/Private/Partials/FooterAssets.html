@@ -1,0 +1,58 @@
+<html xmlns:f="https://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+    <f:if condition="{settings.jquery}">
+        <script src="{f:uri.resource(path: 'Js/jquery-3.3.1.slim.min.js')}"></script>
+    </f:if>
+    <f:if condition="{settings.flatpickr}">
+        <script src="{f:uri.resource(path: 'Js/flatpickr.js')}"></script>
+        <script type="text/javascript">
+            jQuery(document).ready(function ($) {
+                $('.flatpickr').flatpickr(
+                    {
+                        minDate: 'today',
+                        enableTime: true,
+                        dateFormat: 'd.m.Y H:i',
+                        time_24hr: true,
+                    }
+                );
+            });
+        </script>
+    </f:if>
+    <f:if condition="{settings.tinymce}">
+        <script src="{f:uri.resource(path: 'Js/tinymce/tinymce.min.js')}"></script>
+        <script>
+            // initialize tinymce for frontend
+            jQuery(document).ready(function ($) {
+                if ( $('.tinymce').length ) {
+                    tinymce.init(<f:format.raw>{</f:format.raw>
+                        selector: 'textarea.tinymce',
+                        language: '{settings.tinymceLang}', // get language files here: https://www.tiny.cloud/get-tiny/language-packages/
+                        height: 400,
+                        paste_as_text: true,
+                        plugins: [
+                            'lists link',
+                            'contextmenu paste wordcount'
+                        ],
+                        menubar: false,
+                        toolbar: "undo redo | formatselect | link unlink | bold italic | bullist numlist | removeformat",
+                    <f:format.raw>}</f:format.raw>);
+                }
+            });
+        </script>
+    </f:if>
+    <f:if condition="{settings.parsleyjs}">
+        <script src="{f:uri.resource(path: 'Js/Parsley/parsley.min.js')}"></script>
+
+        <f:if condition="{settings.parsleyjsLang} != 'en'">
+            <script src="{f:uri.resource(path: 'Js/Parsley/i18n/{settings.parsleyjsLang}.js')}"></script>
+        </f:if>
+
+        <script>
+            jQuery(document).ready(function ($) {
+                $.extend(Parsley.options, {
+                    errorsWrapper: '<div class="px-3 bg-danger text-white">',
+                    errorTemplate: '<div></div>'
+                });
+            });
+        </script>
+    </f:if>
+</html>

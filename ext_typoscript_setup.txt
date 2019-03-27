@@ -1,0 +1,21 @@
+config.tx_extbase{
+    persistence{
+        classes{
+            Mediadreams\MdNewsfrontend\Domain\Model\News {
+                mapping {
+                    tableName = tx_news_domain_model_news
+                    recordType = 0
+                }
+            }
+
+            Mediadreams\MdNewsfrontend\Domain\Model\FileReference {
+                mapping {
+                    tableName = sys_file_reference
+                    columns {
+                        uid_local.mapOnProperty = originalFileIdentifier
+                    }
+                }
+            }
+        }
+    }
+}

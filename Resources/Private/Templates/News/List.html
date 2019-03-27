@@ -1,0 +1,32 @@
+<html xmlns:f="https://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+    <f:layout name="Default" />
+
+    <f:section name="content">
+        <h1><f:translate key="tx_mdnewsfrontend_domain_model_news.news_list" /></h1>
+
+        <f:flashMessages />
+
+        <div class="row">
+            <f:if condition="{news}">
+                <f:then>
+                    <f:widget.paginate objects="{news}" as="paginatedNews" configuration="{itemsPerPage: 10}">
+                        <f:for each="{paginatedNews}" as="newsItem" iteration="i">
+                            <div class="col-sm-8 {f:if(condition:'{i.isEven}',then:'even',else:'odd')}">
+                                {newsItem.title}
+                            </div>
+                            <div class="col-sm-4 text-right {f:if(condition:'{i.isEven}',then:'even',else:'odd')}">
+                                <f:link.action action="edit" arguments="{news : newsItem}" class="mr-3"><i class="fas fa-pencil-alt"></i> <f:translate key="tx_mdnewsfrontend_domain_model_news.edit" /></f:link.action>
+                                <f:link.action action="delete" arguments="{news : newsItem}" class="text-danger"><i class="fas fa-trash-alt"></i> <f:translate key="tx_mdnewsfrontend_domain_model_news.delete" /></f:link.action>
+                            </div>
+                        </f:for>
+                    </f:widget.paginate>
+                </f:then>
+                <f:else>
+                    There are currently no news entries.
+                </f:else>
+            </f:if>
+        </div>
+
+        <f:link.action action="new" class="btn btn-primary"><f:translate key="tx_mdnewsfrontend_domain_model_news.new" /></f:link.action>
+    </f:section>
+</html>
