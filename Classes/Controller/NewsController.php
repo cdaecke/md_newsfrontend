@@ -48,25 +48,14 @@ class NewsController extends BaseController
     {
         $requestArguments = $this->request->getArguments();
 
+        // add validator for upload fields
+        $this->initializeFileValidator($requestArguments, $this->arguments['newNews']);
+
         // remove category from request, if it was not provided
         if ( empty($requestArguments['newNews']['categories']) ) {
             unset($requestArguments['newNews']['categories']);
             $this->request->setArguments($requestArguments);
         }
-        
-        // validator for field falMedia
-        $this->addFileuploadValidator(
-            $this->arguments['newNews'], 
-            $requestArguments['falMedia'], 
-            $this->settings['allowedImgExtensions']
-        );
-
-        // validator for field falRelatedFiles
-        $this->addFileuploadValidator(
-            $this->arguments['newNews'], 
-            $requestArguments['falRelatedFiles'], 
-            $this->settings['allowedDocExtensions']
-        );
 
         // use correct format for datetime
         $this->arguments->getArgument('newNews')
@@ -91,33 +80,17 @@ class NewsController extends BaseController
         $newNews->setDatetime(new \DateTime()); // make sure, that you have set the correct timezone for $GLOBALS['TYPO3_CONF_VARS']['SYS']['phpTimeZone']
         $newNews->setMdNewsfrontendFeuser($this->feuserObj);
 
-        $requestArgs = $this->request->getArguments();
-
-        // add new image
-        if ( !empty($requestArgs['falMedia']) ) {
-            \Mediadreams\MdNewsfrontend\Utility\FileUpload::handleUpload(
-                $requestArgs['falMedia'], 
-                $newNews, 
-                'falMedia', 
-                $this->settings,
-                $this->feuserUid
-            );
-        }
-
-        /*
-        // TODO: Check, why two uploads are not possible!
-        if ( !empty($requestArgs['falRelatedFiles']) ) {
-            \Mediadreams\MdNewsfrontend\Utility\FileUpload::handleUpload(
-                $requestArgs['falRelatedFiles'], 
-                $newNews, 
-                'falRelatedFiles', 
-                $this->settings,
-                $this->feuserUid
-            );
-        }
-        */
-
         $this->newsRepository->add($newNews);
+        $persistenceManager = $this->objectManager->get(\TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager::class);
+ 
+        // persist news entry in order to get the uid of the entry
+        $persistenceManager->persistAll();
+
+        $requestArguments = $this->request->getArguments();
+
+        // handle the fileupload
+        $this->initializeFileUpload($requestArguments, $newNews);
+        
         $this->clearNewsCache($newNews->getUid(), $newNews->getPid());
 
         $this->addFlashMessage('Die Nachricht wurde erfolgreich angelegt.', '', \TYPO3\CMS\Core\Messaging\AbstractMessage::OK);
@@ -147,17 +120,14 @@ class NewsController extends BaseController
     {
         $requestArguments = $this->request->getArguments();
 
+        // add validator for upload fields
+        $this->initializeFileValidator($requestArguments, $this->arguments['news']);
+
         // remove category from request, if it was not provided
         if ( empty($requestArguments['news']['categories']) ) {
             unset($requestArguments['news']['categories']);
             $this->request->setArguments($requestArguments);
         }
-
-        $this->addFileuploadValidator(
-            $this->arguments['news'], 
-            $requestArguments['falMedia'], 
-            $this->settings['allowedImgExtensions']
-        );
 
         // use correct format for datetime
         $this->arguments->getArgument('news')
@@ -182,23 +152,17 @@ class NewsController extends BaseController
 
         $news->setPid($this->getStoragePid($news));
 
-        $requestArgs = $this->request->getArguments();
+        $requestArguments = $this->request->getArguments();
 
-        // remove image relation from user
-        if ($requestArgs['deleteimage'] == 1) {
+        // TODO: remove image relation from news record
+        /*
+        if ($requestArguments['deleteimage'] == 1) {
             $news->removeImage($news->getFirstImage());
         }
+        */
 
-        // add new image
-        if ( !empty($requestArgs['falMedia']) ) {
-            \Mediadreams\MdNewsfrontend\Utility\FileUpload::handleUpload(
-                $requestArgs['falMedia'], 
-                $news, 
-                'falMedia', 
-                $this->settings,
-                $this->feuserUid
-            );
-        }
+        // handle the fileupload
+        $this->initializeFileUpload($requestArguments, $news);
 
         $this->newsRepository->update($news);
         $this->clearNewsCache($news->getUid(), $news->getPid());

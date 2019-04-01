@@ -31,8 +31,8 @@ plugin.tx_mdnewsfrontend_newsfe {
         parentCategory = {$plugin.tx_mdnewsfrontend_newsfe.settings.parentCategory}
         
         uploadPath = {$plugin.tx_mdnewsfrontend_newsfe.settings.uploadPath}
-        allowedImgExtensions = {$plugin.tx_mdnewsfrontend_newsfe.settings.allowedImgExtensions}
-        allowedDocExtensions = {$plugin.tx_mdnewsfrontend_newsfe.settings.allowedDocExtensions}
+        allowed_falMedia = {$plugin.tx_mdnewsfrontend_newsfe.settings.allowed_falMedia}
+        allowed_falRelatedFiles = {$plugin.tx_mdnewsfrontend_newsfe.settings.allowed_falRelatedFiles}
 
         jquery = {$plugin.tx_mdnewsfrontend_newsfe.settings.jquery}
 

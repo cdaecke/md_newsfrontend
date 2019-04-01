@@ -15,7 +15,8 @@ namespace Mediadreams\MdNewsfrontend\Utility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
-use Mediadreams\MdNewsfrontend\Domain\Model\FileReference;
+use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 
 class FileUpload
 {
@@ -40,7 +41,7 @@ class FileUpload
         /** @var \TYPO3\CMS\Core\Resource\StorageRepository $storageRepository */         
         $storageRepository = $objectManager->get(StorageRepository::class);
         $storage = $storageRepository->findByUid('1');
-        $folder = rtrim($settings['uploadPath'], "/");
+        $folder = rtrim($settings['uploadPath'], '/');
 
         if ($subfolder) {
             $folder = $folder.'/'.$subfolder;
@@ -61,11 +62,78 @@ class FileUpload
                 $obj->removeImage($obj->getFirstImage());
             }
 
+            // upload file
             $movedNewFile = $storage->addFile($originalFilePath, $targetFolder, $newFileName);
-            $newFileReference = $objectManager->get(FileReference::class);
-            $newFileReference->setFile($movedNewFile);
-            $method = 'add' . ucfirst($propertyName);
-            $obj->{$method}($newFileReference);
+
+            // create file references
+            self::updateFileReferences($propertyName, $obj, $movedNewFile->getUid());            
         }
+    }
+
+    protected static function updateFileReferences($propertyName, $obj, $fileUid)
+    {
+        $timestamp = time();
+
+        $propertyName = self::camelCase2unserScore($propertyName);
+
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+                        ->getQueryBuilderForTable('sys_file_reference');
+
+        // delete old file references
+        $queryBuilder
+            ->update('sys_file_reference')
+            ->where(
+                $queryBuilder->expr()->eq('uid_foreign', $obj->getUid()),
+                $queryBuilder->expr()->eq('fieldname', $queryBuilder->createNamedParameter($propertyName))
+            )
+            ->set('tstamp', $timestamp)
+            ->set('deleted', 1)
+            ->execute();
+
+        // add new file reference
+        $queryBuilder
+            ->insert('sys_file_reference')
+            ->values([
+                'pid' => $obj->getPid(),
+                'tstamp' => $timestamp,
+                'crdate' => $timestamp,
+                'uid_local' => $fileUid,
+                'uid_foreign' => $obj->getUid(),
+                'tablenames' => 'tx_news_domain_model_news',
+                'fieldname' => $propertyName,
+                'sorting_foreign' => 1,
+                'table_local' => 'sys_file'
+            ])
+            ->execute();
+
+        // update news record
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+                        ->getQueryBuilderForTable('tx_news_domain_model_news');
+        
+        $queryBuilder
+            ->update('tx_news_domain_model_news')
+            ->where(
+                $queryBuilder->expr()->eq('uid', $obj->getUid())
+            )
+            ->set($propertyName, 1)
+            ->execute();
+    }
+
+    /**
+     * Convert a camelCase string to a under_score string
+     *
+     * @param string $input The camelCase input string
+     * @return string The under_score string
+     */
+    protected static function camelCase2unserScore($input) {
+        preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
+        $ret = $matches[0];
+
+        foreach ($ret as &$match) {
+            $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
+        }
+
+        return implode('_', $ret);
     }
 }

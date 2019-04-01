@@ -7,15 +7,6 @@ config.tx_extbase{
                     recordType = 0
                 }
             }
-
-            Mediadreams\MdNewsfrontend\Domain\Model\FileReference {
-                mapping {
-                    tableName = sys_file_reference
-                    columns {
-                        uid_local.mapOnProperty = originalFileIdentifier
-                    }
-                }
-            }
         }
     }
 }

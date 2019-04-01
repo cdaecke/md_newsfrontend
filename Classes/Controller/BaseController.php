@@ -21,6 +21,11 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
 {
     /**
+     * @var array
+     */
+    protected $uploadFields = ['falMedia', 'falRelatedFiles'];
+
+    /**
      * newsRepository
      *
      * @var \Mediadreams\MdNewsfrontend\Domain\Repository\NewsRepository
@@ -130,6 +135,47 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     }
 
     /**
+     * Initialize the file upload for configured fields
+     *
+     * @param array $requestArgs
+     * @param \Mediadreams\MdNewsfrontend\Domain\Model\News $obj
+     * @return void
+     */
+    protected function initializeFileUpload($requestArgs, $obj)
+    {
+        // handle the fileupload
+        foreach ($this->uploadFields as $fieldName) {
+            if ( !empty($requestArgs[$fieldName]) ) {
+                \Mediadreams\MdNewsfrontend\Utility\FileUpload::handleUpload(
+                    $requestArgs[$fieldName], 
+                    $obj, 
+                    $fieldName, 
+                    $this->settings,
+                    $this->feuserUid
+                );
+            }
+        }
+    }
+
+    /**
+     * Initialize the upload validators for configured fields
+     *
+     * @param array $requestArgs
+     * @param \TYPO3\CMS\Extbase\Mvc\Controller\Argument $argument
+     * @return void
+     */
+    protected function initializeFileValidator($requestArgs, $argument)
+    {
+        foreach ($this->uploadFields as $fieldName) {
+            $this->addFileuploadValidator(
+                $argument, 
+                $requestArgs[$fieldName], 
+                $this->settings['allowed_'.$fieldName]
+            );
+        }
+    }
+
+    /**
      * Add the file upload validator for given object and field
      *
      * @param News $news
@@ -169,7 +215,7 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
             $cacheTagsToFlush[] = 'tx_news_pid_' . $newsPid;
         }
 
-        $cacheManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Cache\\CacheManager');
+        $cacheManager = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class);
         foreach ($cacheTagsToFlush as $cacheTag) {
             $cacheManager->flushCachesInGroupByTag('pages', $cacheTag);
         }
