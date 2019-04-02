@@ -135,6 +135,36 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     }
 
     /**
+     * Get storage pid for news record
+     * If a pid was set via form value use this, otherwise use value from typoscript settings
+     *
+     * @param array $requestArguments
+     * @param \TYPO3\CMS\Extbase\Mvc\Controller\Argument $argument
+     * @return void
+     */
+    protected function initializeCreateUpdate($requestArguments, $argument)
+    {
+        // add validator for upload fields
+        $this->initializeFileValidator($requestArguments, $argument);
+
+        // remove category from request, if it was not provided
+        if ( empty($requestArguments['news']['categories']) ) {
+            unset($requestArguments['news']['categories']);
+            $this->request->setArguments($requestArguments);
+        }
+
+        // use correct format for datetime
+        $argument
+            ->getPropertyMappingConfiguration()
+            ->forProperty('archive')
+            ->setTypeConverterOption(
+                'TYPO3\\CMS\\Extbase\\Property\\TypeConverter\\DateTimeConverter',
+                \TYPO3\CMS\Extbase\Property\TypeConverter\DateTimeConverter::CONFIGURATION_DATE_FORMAT,
+                'd.m.Y H:i'
+            );
+    }
+
+    /**
      * Initialize the file upload for configured fields
      *
      * @param array $requestArguments
@@ -144,14 +174,24 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     protected function initializeFileUpload($requestArguments, $obj)
     {
         foreach ($this->uploadFields as $fieldName) {
-            if ( !empty($requestArguments[$fieldName]) ) {
+            if ( !empty($requestArguments[$fieldName]['tmp_name']) ) {
+                // upload new file and update file reference (meta data)
                 \Mediadreams\MdNewsfrontend\Utility\FileUpload::handleUpload(
-                    $requestArguments[$fieldName], 
+                    $requestArguments, 
                     $obj, 
                     $fieldName, 
                     $this->settings,
                     $this->feuserUid
                 );
+            } else {
+                $methodName = 'getFirst'.ucfirst($fieldName);
+                if ( $obj->$methodName() ) {
+                    // update meta data
+                    $this->updateFileReference(
+                        $obj->$methodName()->getUid(), 
+                        $requestArguments[$fieldName]
+                    );
+                }
             }
         }
     }
@@ -193,6 +233,29 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
         );
 
         $validator->addValidator($checkFileUploadValidator);
+    }
+
+    /**
+     * Update meta data of file references
+     *
+     * @param int $fileReferencesUid uid of sys_file_reference record
+     * @param array $fileData All data about the file
+     * @return void
+     */
+    protected function updateFileReference($fileReferencesUid, $fileData)
+    {
+        $queryBuilder = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Database\ConnectionPool::class)
+                        ->getQueryBuilderForTable('sys_file_reference');
+
+        $queryBuilder
+            ->update('sys_file_reference')
+            ->where(
+                $queryBuilder->expr()->eq('uid', $fileReferencesUid)
+            )
+            ->set('tstamp', time())
+            ->set('title', $fileData['title'])
+            ->set('description', $fileData['description'])
+            ->execute();
     }
 
     /**

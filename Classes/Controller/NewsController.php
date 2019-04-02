@@ -46,26 +46,10 @@ class NewsController extends BaseController
      */
     public function initializeCreateAction()
     {
-        $requestArguments = $this->request->getArguments();
-
-        // add validator for upload fields
-        $this->initializeFileValidator($requestArguments, $this->arguments['newNews']);
-
-        // remove category from request, if it was not provided
-        if ( empty($requestArguments['newNews']['categories']) ) {
-            unset($requestArguments['newNews']['categories']);
-            $this->request->setArguments($requestArguments);
-        }
-
-        // use correct format for datetime
-        $this->arguments->getArgument('newNews')
-            ->getPropertyMappingConfiguration()
-            ->forProperty('archive')
-            ->setTypeConverterOption(
-                'TYPO3\\CMS\\Extbase\\Property\\TypeConverter\\DateTimeConverter',
-                \TYPO3\CMS\Extbase\Property\TypeConverter\DateTimeConverter::CONFIGURATION_DATE_FORMAT,
-                'd.m.Y H:i'
-            );
+        $this->initializeCreateUpdate(
+            $this->request->getArguments(),
+            $this->arguments['newNews']
+        );
     }
 
     /**
@@ -118,26 +102,10 @@ class NewsController extends BaseController
      */
     public function initializeUpdateAction()
     {
-        $requestArguments = $this->request->getArguments();
-
-        // add validator for upload fields
-        $this->initializeFileValidator($requestArguments, $this->arguments['news']);
-
-        // remove category from request, if it was not provided
-        if ( empty($requestArguments['news']['categories']) ) {
-            unset($requestArguments['news']['categories']);
-            $this->request->setArguments($requestArguments);
-        }
-
-        // use correct format for datetime
-        $this->arguments->getArgument('news')
-            ->getPropertyMappingConfiguration()
-            ->forProperty('archive')
-            ->setTypeConverterOption(
-                'TYPO3\\CMS\\Extbase\\Property\\TypeConverter\\DateTimeConverter',
-                \TYPO3\CMS\Extbase\Property\TypeConverter\DateTimeConverter::CONFIGURATION_DATE_FORMAT,
-                'd.m.Y H:i'
-            );
+        $this->initializeCreateUpdate(
+            $this->request->getArguments(),
+            $this->arguments['news']
+        );
     }
 
     /**
@@ -157,7 +125,7 @@ class NewsController extends BaseController
         // TODO: remove image relation from news record
         /*
         if ($requestArguments['deleteimage'] == 1) {
-            $news->removeImage($news->getFirstImage());
+            $news->removeImage($news->getFirstFalMedia());
         }
         */
 

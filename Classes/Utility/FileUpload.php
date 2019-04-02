@@ -28,14 +28,14 @@ class FileUpload
      * we have to build it on our own: https://docs.typo3.org/typo3cms/CoreApiReference/ApiOverview/Fal/UsingFal/ExamplesFileFolder.html#in-the-frontend-context
      * Backend file upload: https://docs.typo3.org/typo3cms/CoreApiReference/ApiOverview/Fal/UsingFal/ExamplesFileFolder.html#in-the-backend-context
      *
-     * @param array $uploadFile The $_FILES array
+     * @param array $requestArguments The $_REQUEST array
      * @param obj $obj Object to attach the file to
      * @param string $propertyName Name of the property
      * @param array $settings Extension settings
      * @param string $subfolder Name of subfolder
      * @return void
      */
-    public static function handleUpload($uploadFile, $obj, $propertyName, $settings, $subfolder = '')
+    public static function handleUpload($requestArguments, $obj, $propertyName, $settings, $subfolder = '')
     {
         $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         /** @var \TYPO3\CMS\Core\Resource\StorageRepository $storageRepository */         
@@ -53,23 +53,32 @@ class FileUpload
             $targetFolder = $storage->createFolder($folder);
         }
 
-        $originalFilePath = $uploadFile['tmp_name'];
-        $newFileName = $uploadFile['name'];
+        $originalFilePath = $requestArguments[$propertyName]['tmp_name'];
+        $newFileName = $requestArguments[$propertyName]['name'];
 
         if (file_exists($originalFilePath)) {
             // upload file
             $movedNewFile = $storage->addFile($originalFilePath, $targetFolder, $newFileName);
 
             // create file references
-            self::updateFileReferences($propertyName, $obj, $movedNewFile->getUid());            
+            self::updateFileReferences($requestArguments, $obj, $propertyName, $movedNewFile->getUid());            
         }
     }
 
-    protected static function updateFileReferences($propertyName, $obj, $fileUid)
+    /**
+     * Handle the file upload and attach the file to the given object
+     *
+     * @param array $requestArguments The $_REQUEST array
+     * @param obj $obj Object to attach the file to
+     * @param string $propertyName Name of the property
+     * @param int $fileUid The uid of uploaded file
+     * @return void
+     */
+    protected static function updateFileReferences($requestArguments, $obj, $propertyName, $fileUid)
     {
         $timestamp = time();
 
-        $propertyName = self::camelCase2unserScore($propertyName);
+        $dbField = self::camelCase2unserScore($propertyName);
 
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
@@ -80,7 +89,7 @@ class FileUpload
             ->update('sys_file_reference')
             ->where(
                 $queryBuilder->expr()->eq('uid_foreign', $obj->getUid()),
-                $queryBuilder->expr()->eq('fieldname', $queryBuilder->createNamedParameter($propertyName))
+                $queryBuilder->expr()->eq('fieldname', $queryBuilder->createNamedParameter($dbField))
             )
             ->set('tstamp', $timestamp)
             ->set('deleted', 1)
@@ -90,15 +99,17 @@ class FileUpload
         $queryBuilder
             ->insert('sys_file_reference')
             ->values([
-                'pid' => $obj->getPid(),
-                'tstamp' => $timestamp,
-                'crdate' => $timestamp,
-                'uid_local' => $fileUid,
-                'uid_foreign' => $obj->getUid(),
-                'tablenames' => 'tx_news_domain_model_news',
-                'fieldname' => $propertyName,
-                'sorting_foreign' => 1,
-                'table_local' => 'sys_file'
+                'pid'               => $obj->getPid(),
+                'tstamp'            => $timestamp,
+                'crdate'            => $timestamp,
+                'uid_local'         => $fileUid,
+                'uid_foreign'       => $obj->getUid(),
+                'tablenames'        => 'tx_news_domain_model_news',
+                'fieldname'         => $dbField,
+                'sorting_foreign'   => 1,
+                'table_local'       => 'sys_file',
+                'title'             => $requestArguments[$propertyName]['title'],
+                'description'       => $requestArguments[$propertyName]['description']
             ])
             ->execute();
 
@@ -111,7 +122,7 @@ class FileUpload
             ->where(
                 $queryBuilder->expr()->eq('uid', $obj->getUid())
             )
-            ->set($propertyName, 1)
+            ->set($dbField, 1)
             ->execute();
     }
 

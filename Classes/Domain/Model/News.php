@@ -47,17 +47,35 @@ class News extends \GeorgRinger\News\Domain\Model\News
     }
 
     /**
-     * Get first image of news
+     * Get first falMedia element of news
      *
      * @return \TYPO3\CMS\Extbase\Domain\Model\FileReference|null
      */
-    public function getFirstImage()
+    public function getFirstFalMedia()
     {
-        $userImg = $this->getFalMedia();
+        $falMedia = $this->getFalMedia();
 
-        if ($userImg) {
-            foreach ($userImg as $image) {
+        if ($falMedia) {
+            foreach ($falMedia as $image) {
                 return $image;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get first falRelatedFiles element of news
+     *
+     * @return \TYPO3\CMS\Extbase\Domain\Model\FileReference|null
+     */
+    public function getFirstFalRelatedFiles()
+    {
+        $falRelatedFiles = $this->getFalRelatedFiles();
+
+        if ($falRelatedFiles) {
+            foreach ($falRelatedFiles as $doc) {
+                return $doc;
             }
         }
 
@@ -70,7 +88,7 @@ class News extends \GeorgRinger\News\Domain\Model\News
      * @param \TYPO3\CMS\Extbase\Domain\Model\FileReference $imageToRemove The FileReference to be removed
      * @return void
      */
-    public function removeImage(\TYPO3\CMS\Extbase\Domain\Model\FileReference $imageToRemove)
+    public function removeFalMedia(\TYPO3\CMS\Extbase\Domain\Model\FileReference $imageToRemove)
     {
         $this->falMedia->detach($imageToRemove);
     }

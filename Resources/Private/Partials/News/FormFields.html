@@ -31,29 +31,60 @@
                 additionalAttributes="{data-parsley-trigger:'change focusout', required:''}" />
         </div>
 
-        <div class="form-group">
-            <label for="falMedia">Bild</label>
-            <f:form.upload name="falMedia" id="falMedia" class="form-control-file" />
 
-            <f:if condition="{news.firstImage}">
-                <br />
-                <f:form.checkbox name="deleteimage" value="1" id="deleteimage" class="form-check-input" />
-                <label for="deleteimage">Bild löschen</label>
-                <f:image image="{news.firstImage}" alt="" maxWidth="100"/>
-            </f:if>
-        </div>
 
-        <div class="form-group">
-            <label for="falRelatedFiles">falRelatedFiles</label>
-            <f:form.upload name="falRelatedFiles" id="falRelatedFiles" class="form-control-file" />
+        <fieldset class="form-group">
+            <div class="form-group">
+                <legend>Bild zur News</legend>
 
-            <f:if condition="{news.firstImage}">
-                <br />
-                <f:form.checkbox name="deleteimage" value="1" id="deleteimage" class="form-check-input" />
-                <label for="deleteimage">Bild löschen</label>
-                <f:image image="{news.firstImage}" alt="" maxWidth="100"/>
-            </f:if>
-        </div>
+                <label for="falMedia">Bild</label>
+                <f:form.upload name="falMedia" id="falMedia" class="form-control-file" />
+
+                <f:if condition="{news.firstFalMedia}">
+                    <div>
+                        <f:form.checkbox name="falMedia[delete]" value="1" id="falMediaDelete" />
+                        <label for="falMediaDelete">Bild löschen</label>
+                        <f:image image="{news.firstFalMedia}" alt="" maxWidth="100"/>
+                    </div>
+                </f:if>
+            </div>
+
+            <div class="form-group">
+                <label for="falMediaTitle">Bildtitel</label>
+                <f:form.textfield name="falMedia[title]" id="falMediaTitle" value="{news.firstFalMedia.title}" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="falMediaDescription">Bildunterschrift</label>
+                <f:form.textfield name="falMedia[description]" value="{news.firstFalMedia.description}" id="falMediaDescription" class="form-control" />
+            </div>
+        </fieldset>
+
+        <fieldset class="form-group">
+            <div class="form-group">
+                <legend>Dokument zur News</legend>
+
+                <label for="falRelatedFiles">falRelatedFiles</label>
+                <f:form.upload name="falRelatedFiles" id="falRelatedFiles" class="form-control-file" />
+
+                <f:if condition="{news.firstFalRelatedFiles}">
+                    <div>
+                        <f:form.checkbox name="falRelatedFiles[delete]" value="1" id="falRelatedFilesDelete" />
+                        <label for="falRelatedFilesDelete">Dokument löschen</label>
+                    </div>
+                </f:if>
+            </div>
+
+            <div class="form-group">
+                <label for="falRelatedFilesTitle">Dateititel</label>
+                <f:form.textfield name="falRelatedFiles[title]" id="falRelatedFilesTitle" value="{news.firstFalRelatedFiles.title}" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="falRelatedFilesDescription">Bildunterschrift</label>
+                <f:form.textfield name="falRelatedFiles[description]" value="{news.firstFalRelatedFiles.description}" id="falRelatedFilesDescription" class="form-control" />
+            </div>
+        </fieldset>
+
+
 
         <div class="form-group">
             <label for="categories">Categories</label>
