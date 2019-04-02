@@ -74,14 +74,4 @@ class News extends \GeorgRinger\News\Domain\Model\News
     {
         $this->falMedia->detach($imageToRemove);
     }
-
-    /**
-     * Wrapper for addFalRelatedFile()
-     *
-     * @param \TYPO3\CMS\Extbase\Domain\Model\FileReference $file
-     */
-    public function addFalRelatedFiles(\TYPO3\CMS\Extbase\Domain\Model\FileReference $file)
-    {
-        $this->addFalRelatedFile($file);
-    }
 }
