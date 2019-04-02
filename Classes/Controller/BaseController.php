@@ -137,17 +137,16 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     /**
      * Initialize the file upload for configured fields
      *
-     * @param array $requestArgs
+     * @param array $requestArguments
      * @param \Mediadreams\MdNewsfrontend\Domain\Model\News $obj
      * @return void
      */
-    protected function initializeFileUpload($requestArgs, $obj)
+    protected function initializeFileUpload($requestArguments, $obj)
     {
-        // handle the fileupload
         foreach ($this->uploadFields as $fieldName) {
-            if ( !empty($requestArgs[$fieldName]) ) {
+            if ( !empty($requestArguments[$fieldName]) ) {
                 \Mediadreams\MdNewsfrontend\Utility\FileUpload::handleUpload(
-                    $requestArgs[$fieldName], 
+                    $requestArguments[$fieldName], 
                     $obj, 
                     $fieldName, 
                     $this->settings,
@@ -160,16 +159,16 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     /**
      * Initialize the upload validators for configured fields
      *
-     * @param array $requestArgs
+     * @param array $requestArguments
      * @param \TYPO3\CMS\Extbase\Mvc\Controller\Argument $argument
      * @return void
      */
-    protected function initializeFileValidator($requestArgs, $argument)
+    protected function initializeFileValidator($requestArguments, $argument)
     {
         foreach ($this->uploadFields as $fieldName) {
             $this->addFileuploadValidator(
                 $argument, 
-                $requestArgs[$fieldName], 
+                $requestArguments[$fieldName], 
                 $this->settings['allowed_'.$fieldName]
             );
         }
