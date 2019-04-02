@@ -57,11 +57,6 @@ class FileUpload
         $newFileName = $uploadFile['name'];
 
         if (file_exists($originalFilePath)) {
-            // if user has already an image -> remove it!
-            if ($obj->getFirstImage()) {
-                $obj->removeImage($obj->getFirstImage());
-            }
-
             // upload file
             $movedNewFile = $storage->addFile($originalFilePath, $targetFolder, $newFileName);
 
