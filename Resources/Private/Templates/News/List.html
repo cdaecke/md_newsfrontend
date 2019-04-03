@@ -15,8 +15,8 @@
                                 {newsItem.title}
                             </div>
                             <div class="col-sm-4 text-right {f:if(condition:'{i.isEven}',then:'even',else:'odd')}">
-                                <f:link.action action="edit" arguments="{news : newsItem}" class="mr-3"><i class="fas fa-pencil-alt"></i> <f:translate key="edit" /></f:link.action>
-                                <f:link.action action="delete" arguments="{news : newsItem}" class="text-danger delete" additionalAttributes="{data-toggle: 'modal', data-target: '#deleteModal'}"><i class="fas fa-trash-alt"></i> <f:translate key="delete" /></f:link.action>
+                                <f:link.action action="edit" arguments="{news : newsItem}" class="mr-3" title="{f:translate(key: 'edit')}: {newsItem.title}"><i class="fas fa-pencil-alt"></i> <f:translate key="edit" /></f:link.action>
+                                <f:link.action action="delete" arguments="{news : newsItem}" class="text-danger delete" additionalAttributes="{data-toggle: 'modal', data-target: '#deleteModal'}" title="{f:translate(key: 'delete')}: {newsItem.title}"><i class="fas fa-trash-alt"></i> <f:translate key="delete" /></f:link.action>
                             </div>
                         </f:for>
                     </f:widget.paginate>
