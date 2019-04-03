@@ -50,6 +50,22 @@
                 <source>Edit News</source>
                 <target>Beitrag bearbeiten</target>
             </trans-unit>
+            <trans-unit id="modal.title">
+                <source>Delete entry</source>
+                <target>Beitrag löschen</target>
+            </trans-unit>
+            <trans-unit id="modal.close">
+                <source>Close</source>
+                <target>Schließen</target>
+            </trans-unit>
+            <trans-unit id="modal.delete">
+                <source>Delete</source>
+                <target>Löschen</target>
+            </trans-unit>
+            <trans-unit id="modal.text">
+                <source>Do you realy want to delete this News entry?</source>
+                <target>Sind Sie sicher, dass Sie diesen Beitrag löschen wollen?</target>
+            </trans-unit>
 
             <trans-unit id="title">
                 <source>Title</source>

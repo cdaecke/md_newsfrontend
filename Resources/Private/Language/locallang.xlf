@@ -39,6 +39,18 @@
             <trans-unit id="edit_news">
                 <source>Edit News</source>
             </trans-unit>
+            <trans-unit id="modal.title">
+                <source>Delete entry</source>
+            </trans-unit>
+            <trans-unit id="modal.close">
+                <source>Close</source>
+            </trans-unit>
+            <trans-unit id="modal.delete">
+                <source>Delete</source>
+            </trans-unit>
+            <trans-unit id="modal.text">
+                <source>Do you realy want to delete this News entry?</source>
+            </trans-unit>
 
             <trans-unit id="title">
                 <source>Title</source>
