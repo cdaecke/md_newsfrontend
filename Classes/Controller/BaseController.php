@@ -14,6 +14,8 @@ namespace Mediadreams\MdNewsfrontend\Controller;
 
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+use TYPO3\CMS\Core\Messaging\AbstractMessage;
 
 /**
  * Base controllerUnreadnewsController
@@ -113,7 +115,12 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     protected function checkAccess(\Mediadreams\MdNewsfrontend\Domain\Model\News $newsRecord)
     {
         if ($newsRecord->getMdNewsfrontendFeuser()->getUid() != $this->feuserUid) {
-            $this->addFlashMessage('Sie sind nicht berechtigt, diese Nachricht zu bearbeiten!', '', \TYPO3\CMS\Core\Messaging\AbstractMessage::ERROR);
+            $this->addFlashMessage(
+                LocalizationUtility::translate('controller.access_error','md_newsfrontend'),
+                '', 
+                AbstractMessage::ERROR
+            );
+
             $this->redirect('list');
         }
     }

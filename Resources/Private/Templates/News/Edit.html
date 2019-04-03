@@ -2,7 +2,7 @@
     <f:layout name="Default" />
 
     <f:section name="content">
-        <h1>Edit News</h1>
+        <h1><f:translate key="edit_news" /></h1>
 
         <f:flashMessages />
 
@@ -10,8 +10,8 @@
 
         <f:form action="update" name="news" object="{news}" enctype="multipart/form-data" additionalAttributes="{data-parsley-validate:''}">
             <f:render partial="News/FormFields" arguments="{_all}" />
-            <f:form.submit value="Speichern" class="btn btn-primary" />
-            oder <f:link.action action="list">Zurück zur Liste</f:link.action>
+            <f:form.submit value="{f:translate(key: 'save')}" class="btn btn-primary" />
+            <f:translate key="or" /> <f:link.action action="list"><f:translate key="back_to_list" /></f:link.action>
         </f:form>
     </f:section>
 

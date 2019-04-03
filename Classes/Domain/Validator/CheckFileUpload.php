@@ -14,6 +14,7 @@ namespace Mediadreams\MdNewsfrontend\Domain\Validator;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
  * Validator for file upload
@@ -60,7 +61,7 @@ class CheckFileUpload extends \TYPO3\CMS\Extbase\Validation\Validator\AbstractVa
     private function checkDenyPattern($uploadFile)
     {
         if (!GeneralUtility::verifyFilenameAgainstDenyPattern($uploadFile['name'])) {
-            $this->addError('Der Dateityp ist nicht erlaubt.', 1540902993);
+            $this->addError(LocalizationUtility::translate('validator.file_type','md_newsfrontend'), 1540902993);
         }
 
         return true;
@@ -75,20 +76,20 @@ class CheckFileUpload extends \TYPO3\CMS\Extbase\Validation\Validator\AbstractVa
     private function checkUploadError($uploadFile)
     {
         if ( !isset($uploadFile['error']) || is_array($uploadFile['error']) ) {
-            $this->addError('Falsche Parameter.', 1540929658);
+            $this->addError(LocalizationUtility::translate('validator.wrong_parameter','md_newsfrontend'), 1540929658);
         }
 
         switch ($uploadFile['error']) {
             case \UPLOAD_ERR_OK:
                 break;
             case \UPLOAD_ERR_NO_FILE:
-                $this->addError('Es wurde keine Datei gewählt.', 1540929694);
+                $this->addError(LocalizationUtility::translate('validator.no_file','md_newsfrontend'), 1540929694);
             case \UPLOAD_ERR_INI_SIZE:
             case \UPLOAD_ERR_FORM_SIZE:
             case \UPLOAD_ERR_PARTIAL:
-                $this->addError('Error Code: ' . $uploadFile['error'], 1540929726);
+                $this->addError(LocalizationUtility::translate('validator.partial','md_newsfrontend').' ' . $uploadFile['error'], 1540929726);
             default:
-                $this->addError('Unbekannter Fehler.', 1540929756);
+                $this->addError(LocalizationUtility::translate('validator.unknown','md_newsfrontend'), 1540929756);
         }
 
         return true;
@@ -107,7 +108,7 @@ class CheckFileUpload extends \TYPO3\CMS\Extbase\Validation\Validator\AbstractVa
         if ($allowedFileExtensions !== null) {
             $filePathInfo = PathUtility::pathinfo($uploadFile['name']);
             if (!GeneralUtility::inList($allowedFileExtensions, strtolower($filePathInfo['extension']))) {
-                $this->addError('Es sind nur folgende Dateierweiterungen erlaubt: '.$allowedFileExtensions, 1540903586);
+                $this->addError(LocalizationUtility::translate('validator.allowed_file_extensions','md_newsfrontend').' '.$allowedFileExtensions, 1540903586);
             }
         }
 

@@ -1,127 +1,121 @@
 <html xmlns:f="https://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
 
-    <fieldset>
-        <legend>News</legend>
-
-        <div class="form-group">
-            <label for="title">Titel</label>
-            <f:form.textfield
-                    property="title"
-                    id="title"
-                    class="form-control"
-                    additionalAttributes="{data-parsley-trigger:'change focusout', required:''}" />
-        </div>
-
-        <div class="form-group">
-            <label for="teaser">Teaser</label>
-            <f:form.textarea
-                property="teaser"
-                id="teaser"
+    <div class="form-group">
+        <label for="title"><f:translate key="title" /></label>
+        <f:form.textfield
+                property="title"
+                id="title"
                 class="form-control"
-                rows="2" />
-        </div>
-
-        <div class="form-group">
-            <label for="bodytext">Text</label>
-            <f:form.textarea
-                property="bodytext"
-                id="bodytext"
-                class="form-control tinymce"
-                rows="5"
                 additionalAttributes="{data-parsley-trigger:'change focusout', required:''}" />
-        </div>
+    </div>
 
+    <div class="form-group">
+        <label for="teaser"><f:translate key="teaser" /></label>
+        <f:form.textarea
+            property="teaser"
+            id="teaser"
+            class="form-control"
+            rows="2" />
+    </div>
 
+    <div class="form-group">
+        <label for="bodytext"><f:translate key="bodytext" /></label>
+        <f:form.textarea
+            property="bodytext"
+            id="bodytext"
+            class="form-control tinymce"
+            rows="5"
+            additionalAttributes="{data-parsley-trigger:'change focusout', required:''}" />
+    </div>
 
-        <fieldset class="form-group">
-            <div class="form-group">
-                <legend>Bild zur News</legend>
-
-                <label for="falMedia">Bild</label>
-                <f:form.upload name="falMedia" id="falMedia" class="form-control-file" />
-
-                <f:if condition="{news.firstFalMedia}">
-                    <div>
-                        <div>
-                            <f:image image="{news.firstFalMedia}" alt="" maxWidth="100"/>
-                        </div>
-                        <f:form.checkbox name="falMedia[delete]" value="1" id="falMediaDelete" />
-                        <label for="falMediaDelete">Bild löschen</label>
-                    </div>
-                </f:if>
-            </div>
-
-            <div class="form-group">
-                <label for="falMediaTitle">Bildtitel</label>
-                <f:form.textfield name="falMedia[title]" id="falMediaTitle" value="{news.firstFalMedia.title}" class="form-control" />
-            </div>
-            <div class="form-group">
-                <label for="falMediaDescription">Bildunterschrift</label>
-                <f:form.textfield name="falMedia[description]" value="{news.firstFalMedia.description}" id="falMediaDescription" class="form-control" />
-            </div>
-        </fieldset>
-
-        <fieldset class="form-group">
-            <div class="form-group">
-                <legend>Dokument zur News</legend>
-
-                <label for="falRelatedFiles">falRelatedFiles</label>
-                <f:form.upload name="falRelatedFiles" id="falRelatedFiles" class="form-control-file" />
-
-                <f:if condition="{news.firstFalRelatedFiles}">
-                    <div>
-                        <div>
-                            Aktuelle Datei: 
-                            <f:link.typolink parameter="{news.firstFalRelatedFiles.originalResource.originalFile.publicUrl}" target="_blank">{news.firstFalRelatedFiles.originalResource.originalFile.name}</f:link.typolink>
-                        </div>
-                        <f:form.checkbox name="falRelatedFiles[delete]" value="1" id="falRelatedFilesDelete" />
-                        <label for="falRelatedFilesDelete">Dokument löschen</label>
-                    </div>
-                </f:if>
-            </div>
-
-            <div class="form-group">
-                <label for="falRelatedFilesTitle">Dateititel</label>
-                <f:form.textfield name="falRelatedFiles[title]" id="falRelatedFilesTitle" value="{news.firstFalRelatedFiles.title}" class="form-control" />
-            </div>
-            <div class="form-group">
-                <label for="falRelatedFilesDescription">Bildunterschrift</label>
-                <f:form.textfield name="falRelatedFiles[description]" value="{news.firstFalRelatedFiles.description}" id="falRelatedFilesDescription" class="form-control" />
-            </div>
-        </fieldset>
-
-
+    <fieldset class="form-group border p-3">
+        <legend><f:translate key="image_legend" /></legend>
 
         <div class="form-group">
-            <label for="categories">Categories</label>
+            <label for="falMedia"><f:translate key="image" /></label>
+            <f:form.upload name="falMedia" id="falMedia" class="form-control-file" />
 
-            <f:form.select 
-                property="categories" 
-                options="{categories}" 
-                optionValueField="uid" 
-                optionLabelField="title"
-                id="categories"
-                class="form-control"
-                multiple="multiple"
-                size="3" />
+            <f:if condition="{news.firstFalMedia}">
+                <div>
+                    <div>
+                        <f:image image="{news.firstFalMedia}" alt="" maxWidth="100"/>
+                    </div>
+                    <f:form.checkbox name="falMedia[delete]" value="1" id="falMediaDelete" />
+                    <label for="falMediaDelete"><f:translate key="image_delete" /></label>
+                </div>
+            </f:if>
         </div>
 
         <div class="form-group">
-            <label for="archive">Ablaufdatum</label>
-            <f:form.textfield
-                    property="archive"
-                    value="{news.archive -> f:format.date(format: 'd.m.Y H:i')}"
-                    id="archive"
-                    class="form-control flatpickr"
-                    additionalAttributes="{placeholder:'DD.MM.YYYY HH:MM'}" />
+            <label for="falMediaTitle"><f:translate key="image_title" /></label>
+            <f:form.textfield name="falMedia[title]" id="falMediaTitle" value="{news.firstFalMedia.title}" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="falMediaDescription"><f:translate key="image_description" /></label>
+            <f:form.textfield name="falMedia[description]" value="{news.firstFalMedia.description}" id="falMediaDescription" class="form-control" />
         </div>
     </fieldset>
 
-    <fieldset>
-        <legend>Metadaten</legend>
+    <fieldset class="form-group border p-3">
+        <legend><f:translate key="document_legend" /></legend>
+        
+        <div class="form-group">
+            <label for="falRelatedFiles"><f:translate key="document" /></label>
+            <f:form.upload name="falRelatedFiles" id="falRelatedFiles" class="form-control-file" />
+
+            <f:if condition="{news.firstFalRelatedFiles}">
+                <div>
+                    <div>
+                        <f:translate key="document_current" />
+                        <f:link.typolink parameter="{news.firstFalRelatedFiles.originalResource.originalFile.publicUrl}" target="_blank">{news.firstFalRelatedFiles.originalResource.originalFile.name}</f:link.typolink>
+                    </div>
+                    <f:form.checkbox name="falRelatedFiles[delete]" value="1" id="falRelatedFilesDelete" />
+                    <label for="falRelatedFilesDelete"><f:translate key="document_delete" /></label>
+                </div>
+            </f:if>
+        </div>
 
         <div class="form-group">
-            <label for="keywords">Keywords</label>
+            <label for="falRelatedFilesTitle"><f:translate key="document_title" /></label>
+            <f:form.textfield name="falRelatedFiles[title]" id="falRelatedFilesTitle" value="{news.firstFalRelatedFiles.title}" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="falRelatedFilesDescription"><f:translate key="document_description" /></label>
+            <f:form.textfield name="falRelatedFiles[description]" value="{news.firstFalRelatedFiles.description}" id="falRelatedFilesDescription" class="form-control" />
+        </div>
+    </fieldset>
+
+
+
+    <div class="form-group">
+        <label for="categories"><f:translate key="categories" /></label>
+
+        <f:form.select 
+            property="categories" 
+            options="{categories}" 
+            optionValueField="uid" 
+            optionLabelField="title"
+            id="categories"
+            class="form-control"
+            multiple="multiple"
+            size="3" />
+    </div>
+
+    <div class="form-group">
+        <label for="archive"><f:translate key="archive" /></label>
+        <f:form.textfield
+                property="archive"
+                value="{news.archive -> f:format.date(format: 'd.m.Y H:i')}"
+                id="archive"
+                class="form-control flatpickr"
+                additionalAttributes="{placeholder:'DD.MM.YYYY HH:MM'}" />
+    </div>
+
+    <fieldset class="form-group border p-3">
+        <legend><f:translate key="metadata_legend" /></legend>
+
+        <div class="form-group">
+            <label for="keywords"><f:translate key="metadata_keywords" /></label>
             <f:form.textfield
                     property="keywords"
                     id="keywords"
@@ -129,7 +123,7 @@
         </div>
 
         <div class="form-group">
-            <label for="description">Description</label>
+            <label for="description"><f:translate key="metadata_description" /></label>
             <f:form.textarea
                 property="description"
                 id="description"

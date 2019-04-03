@@ -12,6 +12,9 @@ namespace Mediadreams\MdNewsfrontend\Controller;
  *
  */
 
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+use TYPO3\CMS\Core\Messaging\AbstractMessage;
+
 /**
  * NewsController
  */
@@ -77,7 +80,12 @@ class NewsController extends BaseController
         
         $this->clearNewsCache($newNews->getUid(), $newNews->getPid());
 
-        $this->addFlashMessage('Die Nachricht wurde erfolgreich angelegt.', '', \TYPO3\CMS\Core\Messaging\AbstractMessage::OK);
+        $this->addFlashMessage(
+            LocalizationUtility::translate('controller.new_success','md_newsfrontend'),
+            '', 
+            AbstractMessage::OK
+        );
+
         $this->redirect('list');
     }
 
@@ -139,7 +147,12 @@ class NewsController extends BaseController
         $this->newsRepository->update($news);
         $this->clearNewsCache($news->getUid(), $news->getPid());
 
-        $this->addFlashMessage('Die Nachricht wurde erfolgreich geändert.', '', \TYPO3\CMS\Core\Messaging\AbstractMessage::OK);
+        $this->addFlashMessage(
+            LocalizationUtility::translate('controller.edit_success','md_newsfrontend'),
+            '', 
+            AbstractMessage::OK
+        );
+
         $this->redirect('list');
     }
 
@@ -154,7 +167,12 @@ class NewsController extends BaseController
         $this->checkAccess($news);
         $this->newsRepository->remove($news);
 
-        $this->addFlashMessage('Die Nachricht wurde erfolgreich gelöscht.', '', \TYPO3\CMS\Core\Messaging\AbstractMessage::OK);
+        $this->addFlashMessage(
+            LocalizationUtility::translate('controller.delete_success','md_newsfrontend'),
+            '', 
+            AbstractMessage::OK
+        );
+
         $this->redirect('list');
     }
 }

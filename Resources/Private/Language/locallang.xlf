@@ -10,17 +10,131 @@
                 <source>Md Newsfrontend Feuser</source>
             </trans-unit>
 
-            <trans-unit id="tx_mdnewsfrontend_domain_model_news.news_list">
+            <trans-unit id="list_news">
                 <source>Your news entries</source>
             </trans-unit>
-            <trans-unit id="tx_mdnewsfrontend_domain_model_news.new">
-                <source>New</source>
+            <trans-unit id="no_items">
+                <source>There are currently no news entries.</source>
             </trans-unit>
-            <trans-unit id="tx_mdnewsfrontend_domain_model_news.edit">
+            <trans-unit id="new">
+                <source>Create new</source>
+            </trans-unit>
+            <trans-unit id="edit">
                 <source>Edit</source>
             </trans-unit>
-            <trans-unit id="tx_mdnewsfrontend_domain_model_news.delete">
+            <trans-unit id="delete">
                 <source>Delete</source>
+            </trans-unit>
+
+            <trans-unit id="new_news">
+                <source>New News</source>
+            </trans-unit>
+            <trans-unit id="save">
+                <source>Save</source>
+            </trans-unit>
+            <trans-unit id="or">
+                <source>or</source>
+            </trans-unit>
+            <trans-unit id="back_to_list">
+                <source>Back to list</source>
+            </trans-unit>
+
+            <trans-unit id="edit_news">
+                <source>Edit News</source>
+            </trans-unit>
+
+            <trans-unit id="title">
+                <source>Title</source>
+            </trans-unit>
+            <trans-unit id="teaser">
+                <source>Teaser</source>
+            </trans-unit>
+            <trans-unit id="bodytext">
+                <source>Content</source>
+            </trans-unit>
+
+            <trans-unit id="image_legend">
+                <source>Image for News</source>
+            </trans-unit>
+            <trans-unit id="image">
+                <source>Image</source>
+            </trans-unit>
+            <trans-unit id="image_delete">
+                <source>Delete image</source>
+            </trans-unit>
+            <trans-unit id="image_title">
+                <source>Image title</source>
+            </trans-unit>
+            <trans-unit id="image_description">
+                <source>Image caption</source>
+            </trans-unit>
+
+            <trans-unit id="document_legend">
+                <source>File for News</source>
+            </trans-unit>
+            <trans-unit id="document">
+                <source>File</source>
+            </trans-unit>
+            <trans-unit id="document_current">
+                <source>Current file:</source>
+            </trans-unit>
+            <trans-unit id="document_delete">
+                <source>Delete file</source>
+            </trans-unit>
+            <trans-unit id="document_title">
+                <source>File title</source>
+            </trans-unit>
+            <trans-unit id="document_description">
+                <source>File description</source>
+            </trans-unit>
+
+            <trans-unit id="categories">
+                <source>Categories</source>
+            </trans-unit>
+            <trans-unit id="archive">
+                <source>Archive</source>
+            </trans-unit>
+
+            <trans-unit id="metadata_legend">
+                <source>Meta data</source>
+            </trans-unit>
+            <trans-unit id="metadata_keywords">
+                <source>Keywords</source>
+            </trans-unit>
+            <trans-unit id="metadata_description">
+                <source>Description</source>
+            </trans-unit>
+
+            <trans-unit id="controller.new_success">
+                <source>The News record was successfully created.</source>
+            </trans-unit>
+            <trans-unit id="controller.edit_success">
+                <source>The News record was successfully updated.</source>
+            </trans-unit>
+            <trans-unit id="controller.delete_success">
+                <source>The News record was successfully delted.</source>
+            </trans-unit>
+            <trans-unit id="controller.access_error">
+                <source>You are not allowed to edit this record.</source>
+            </trans-unit>
+
+            <trans-unit id="validator.allowed_file_extensions">
+                <source>The following file extensions are allowed only:</source>
+            </trans-unit>
+            <trans-unit id="validator.wrong_parameter">
+                <source>Wrong parameter</source>
+            </trans-unit>
+            <trans-unit id="validator.no_file">
+                <source>No file selected</source>
+            </trans-unit>
+            <trans-unit id="validator.partial">
+                <source>Error code:</source>
+            </trans-unit>
+            <trans-unit id="validator.unknown">
+                <source>Unknown error</source>
+            </trans-unit>
+            <trans-unit id="validator.file_type">
+                <source>File type not allowed</source>
             </trans-unit>
         </body>
     </file>
