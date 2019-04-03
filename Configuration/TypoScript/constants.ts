@@ -17,7 +17,7 @@ plugin.tx_mdnewsfrontend_newsfe {
         parentCategory = 
 
         # cat=plugin.tx_mdnewsfrontend_newsfe/aa1; type=string; label=Path in fileadmin where to store frontend file uploads. Path will be extended by a folder named by user uid.
-        uploadPath = md_newsfrontend
+        uploadPath = user_upload/md_newsfrontend
 
         # cat=plugin.tx_mdnewsfrontend_newsfe/aa2; type=string; label=Comma separated file extensions, which are allowed for file upload in field fal_media.
         allowed_falMedia = gif,jpg,jpeg,png
