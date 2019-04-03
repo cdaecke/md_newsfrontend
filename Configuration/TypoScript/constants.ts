@@ -10,7 +10,7 @@ plugin.tx_mdnewsfrontend_newsfe {
     }
 
     settings {
-        # cat=plugin.tx_mdnewsfrontend_newsfe/a1; type=int+; label=Show categories of category tree which have this parent uid in the select box of the form. If no parent category was defined, there will be nothing to select in the frontend.
+        # cat=plugin.tx_mdnewsfrontend_newsfe/a1; type=int+; label=Show categories which have this parent uid. The categories will be shown in the select box of the new and edit form. If no parent category was defined, there will be nothing to select in the frontend.
         parentCategory = 
 
         # cat=plugin.tx_mdnewsfrontend_newsfe/aa1; type=string; label=Path in fileadmin where to store frontend file uploads. Path will be extended by a folder named by user uid.
