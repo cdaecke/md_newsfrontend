@@ -83,7 +83,12 @@ class News extends \GeorgRinger\News\Domain\Model\News
     }
 
     /**
-     * Removes a FileReference
+     * Removes a FileReference from falMedia
+     *
+     * TODO:
+     * Somehow this does not set the entry in sys_file_reference to deleted but removes 
+     * uid_foreign, tablenames and fieldname
+     * Is this the intended behaviour???
      *
      * @param \TYPO3\CMS\Extbase\Domain\Model\FileReference $imageToRemove The FileReference to be removed
      * @return void
@@ -91,5 +96,21 @@ class News extends \GeorgRinger\News\Domain\Model\News
     public function removeFalMedia(\TYPO3\CMS\Extbase\Domain\Model\FileReference $imageToRemove)
     {
         $this->falMedia->detach($imageToRemove);
+    }
+
+    /**
+     * Removes a FileReference from falRelatedFiles
+     *
+     * TODO:
+     * Somehow this does not set the entry in sys_file_reference to deleted but removes 
+     * uid_foreign, tablenames and fieldname
+     * Is this the intended behaviour???
+     *
+     * @param \TYPO3\CMS\Extbase\Domain\Model\FileReference $fileToRemove The FileReference to be removed
+     * @return void
+     */
+    public function removeFalRelatedFiles(\TYPO3\CMS\Extbase\Domain\Model\FileReference $fileToRemove)
+    {
+        $this->falRelatedFiles->detach($fileToRemove);
     }
 }

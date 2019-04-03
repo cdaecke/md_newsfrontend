@@ -122,12 +122,16 @@ class NewsController extends BaseController
 
         $requestArguments = $this->request->getArguments();
 
-        // TODO: remove image relation from news record
-        /*
-        if ($requestArguments['deleteimage'] == 1) {
-            $news->removeImage($news->getFirstFalMedia());
+        // Remove file relation from news record
+        foreach ($this->uploadFields as $fieldName) {
+            if ($requestArguments[$fieldName]['delete'] == 1) {
+                $removeMethod = 'remove'.ucfirst($fieldName);
+                $getFirstMethod = 'getFirst'.ucfirst($fieldName);
+
+                $news->$removeMethod($news->$getFirstMethod());
+            }
         }
-        */
+        
 
         // handle the fileupload
         $this->initializeFileUpload($requestArguments, $news);
