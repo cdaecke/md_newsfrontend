@@ -134,8 +134,7 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     }
 
     /**
-     * Get storage pid for news record
-     * If a pid was set via form value use this, otherwise use value from typoscript settings
+     * This will initialize everything which is needed in create or update action
      *
      * @param array $requestArguments
      * @param \TYPO3\CMS\Extbase\Mvc\Controller\Argument $argument
