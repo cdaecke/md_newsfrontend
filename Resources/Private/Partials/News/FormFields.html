@@ -42,9 +42,11 @@
 
                 <f:if condition="{news.firstFalMedia}">
                     <div>
+                        <div>
+                            <f:image image="{news.firstFalMedia}" alt="" maxWidth="100"/>
+                        </div>
                         <f:form.checkbox name="falMedia[delete]" value="1" id="falMediaDelete" />
                         <label for="falMediaDelete">Bild löschen</label>
-                        <f:image image="{news.firstFalMedia}" alt="" maxWidth="100"/>
                     </div>
                 </f:if>
             </div>
@@ -68,6 +70,10 @@
 
                 <f:if condition="{news.firstFalRelatedFiles}">
                     <div>
+                        <div>
+                            Aktuelle Datei: 
+                            <f:link.typolink parameter="{news.firstFalRelatedFiles.originalResource.originalFile.publicUrl}" target="_blank">{news.firstFalRelatedFiles.originalResource.originalFile.name}</f:link.typolink>
+                        </div>
                         <f:form.checkbox name="falRelatedFiles[delete]" value="1" id="falRelatedFilesDelete" />
                         <label for="falRelatedFilesDelete">Dokument löschen</label>
                     </div>
