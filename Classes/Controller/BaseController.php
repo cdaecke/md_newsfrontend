@@ -12,10 +12,18 @@ namespace Mediadreams\MdNewsfrontend\Controller;
  *
  */
 
+use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+
+use TYPO3\CMS\Extbase\Domain\Repository\CategoryRepository;
+use TYPO3\CMS\Extbase\Property\TypeConverter\DateTimeConverter;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
+
+use Mediadreams\MdNewsfrontend\Utility\FileUpload;
 
 /**
  * Base controllerUnreadnewsController
@@ -61,7 +69,7 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     protected function initializeView(\TYPO3\CMS\Extbase\Mvc\View\ViewInterface $view)
     {
         if ( strlen($this->settings['parentCategory']) > 0 ) {
-            $categoryRepository = $this->objectManager->get(\TYPO3\CMS\Extbase\Domain\Repository\CategoryRepository::class);
+            $categoryRepository = $this->objectManager->get(CategoryRepository::class);
             $categories = $categoryRepository->findByParent($this->settings['parentCategory']);
 
             // Assign categories to template
@@ -166,7 +174,7 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
             ->forProperty('archive')
             ->setTypeConverterOption(
                 'TYPO3\\CMS\\Extbase\\Property\\TypeConverter\\DateTimeConverter',
-                \TYPO3\CMS\Extbase\Property\TypeConverter\DateTimeConverter::CONFIGURATION_DATE_FORMAT,
+                DateTimeConverter::CONFIGURATION_DATE_FORMAT,
                 'd.m.Y H:i'
             );
     }
@@ -183,7 +191,7 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
         foreach ($this->uploadFields as $fieldName) {
             if ( !empty($requestArguments[$fieldName]['tmp_name']) ) {
                 // upload new file and update file reference (meta data)
-                \Mediadreams\MdNewsfrontend\Utility\FileUpload::handleUpload(
+                FileUpload::handleUpload(
                     $requestArguments, 
                     $obj, 
                     $fieldName, 
@@ -251,7 +259,7 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      */
     protected function updateFileReference($fileReferencesUid, $fileData)
     {
-        $queryBuilder = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Database\ConnectionPool::class)
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
                         ->getQueryBuilderForTable('sys_file_reference');
 
         $queryBuilder
@@ -284,7 +292,7 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
             $cacheTagsToFlush[] = 'tx_news_pid_' . $newsPid;
         }
 
-        $cacheManager = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class);
+        $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
         foreach ($cacheTagsToFlush as $cacheTag) {
             $cacheManager->flushCachesInGroupByTag('pages', $cacheTag);
         }

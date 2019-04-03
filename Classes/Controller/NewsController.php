@@ -12,8 +12,10 @@ namespace Mediadreams\MdNewsfrontend\Controller;
  *
  */
 
-use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
+
+use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
  * NewsController
@@ -68,7 +70,7 @@ class NewsController extends BaseController
         $newNews->setMdNewsfrontendFeuser($this->feuserObj);
 
         $this->newsRepository->add($newNews);
-        $persistenceManager = $this->objectManager->get(\TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager::class);
+        $persistenceManager = $this->objectManager->get(PersistenceManager::class);
  
         // persist news entry in order to get the uid of the entry
         $persistenceManager->persistAll();
