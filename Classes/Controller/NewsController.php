@@ -65,7 +65,6 @@ class NewsController extends BaseController
      */
     public function createAction(\Mediadreams\MdNewsfrontend\Domain\Model\News $newNews)
     {
-        $newNews->setPid($this->getStoragePid($newNews));
         $newNews->setDatetime(new \DateTime()); // make sure, that you have set the correct timezone for $GLOBALS['TYPO3_CONF_VARS']['SYS']['phpTimeZone']
         $newNews->setMdNewsfrontendFeuser($this->feuserObj);
 
@@ -127,8 +126,6 @@ class NewsController extends BaseController
     public function updateAction(\Mediadreams\MdNewsfrontend\Domain\Model\News $news)
     {
         $this->checkAccess($news);
-
-        $news->setPid($this->getStoragePid($news));
 
         $requestArguments = $this->request->getArguments();
 

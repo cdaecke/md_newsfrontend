@@ -27,7 +27,6 @@ plugin.tx_mdnewsfrontend_newsfe {
     }
 
     settings {
-        storagePid = {$plugin.tx_mdnewsfrontend_newsfe.settings.storagePid}
         parentCategory = {$plugin.tx_mdnewsfrontend_newsfe.settings.parentCategory}
         
         uploadPath = {$plugin.tx_mdnewsfrontend_newsfe.settings.uploadPath}

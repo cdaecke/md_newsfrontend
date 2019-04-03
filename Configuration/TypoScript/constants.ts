@@ -10,9 +10,6 @@ plugin.tx_mdnewsfrontend_newsfe {
     }
 
     settings {
-        # cat=plugin.tx_mdnewsfrontend_newsfe/a1; type=int+; label=Uid of storage page for news records. On this page all news which are created in the frontend will be saved.
-        storagePid = 0
-
         # cat=plugin.tx_mdnewsfrontend_newsfe/a1; type=int+; label=Show categories of category tree which have this parent uid in the select box of the form. If no parent category was defined, there will be nothing to select in the frontend.
         parentCategory = 
 

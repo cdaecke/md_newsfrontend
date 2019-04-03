@@ -137,22 +137,6 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      * Get storage pid for news record
      * If a pid was set via form value use this, otherwise use value from typoscript settings
      *
-     * @param \Mediadreams\MdNewsfrontend\Domain\Model\News $newsRecord
-     * @return int
-     */
-    protected function getStoragePid(\Mediadreams\MdNewsfrontend\Domain\Model\News $newsRecord)
-    {
-        if ($newsRecord->getPid() > 0) {
-            return $newsRecord->getPid();
-        } else {
-            return (int)$this->settings['storagePid'];
-        }
-    }
-
-    /**
-     * Get storage pid for news record
-     * If a pid was set via form value use this, otherwise use value from typoscript settings
-     *
      * @param array $requestArguments
      * @param \TYPO3\CMS\Extbase\Mvc\Controller\Argument $argument
      * @return void
