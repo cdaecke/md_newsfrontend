@@ -148,8 +148,8 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
         $this->initializeFileValidator($requestArguments, $argument);
 
         // remove category from request, if it was not provided
-        if ( empty($requestArguments['news']['categories']) ) {
-            unset($requestArguments['news']['categories']);
+        if ( empty($requestArguments[$argument->getName()]['categories']) ) {
+            unset($requestArguments[$argument->getName()]['categories']);
             $this->request->setArguments($requestArguments);
         }
 
