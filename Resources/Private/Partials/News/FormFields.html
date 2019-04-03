@@ -32,7 +32,7 @@
         <legend><f:translate key="image_legend" /></legend>
 
         <div class="form-group">
-            <label for="falMedia"><f:translate key="image" /></label>
+            <label for="falMedia"><f:translate key="image" /> ({settings.allowed_falMedia})</label>
             <f:form.upload name="falMedia" id="falMedia" class="form-control-file" />
 
             <f:if condition="{news.firstFalMedia}">
@@ -60,7 +60,7 @@
         <legend><f:translate key="document_legend" /></legend>
         
         <div class="form-group">
-            <label for="falRelatedFiles"><f:translate key="document" /></label>
+            <label for="falRelatedFiles"><f:translate key="document" /> ({settings.allowed_falRelatedFiles})</label>
             <f:form.upload name="falRelatedFiles" id="falRelatedFiles" class="form-control-file" />
 
             <f:if condition="{news.firstFalRelatedFiles}">
