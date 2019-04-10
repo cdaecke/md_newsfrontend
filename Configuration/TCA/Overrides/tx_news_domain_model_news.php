@@ -2,9 +2,9 @@
 defined('TYPO3_MODE') || die();
 
 $additionalFields = [
-    'md_newsfrontend_feuser' => [
+    'tx_md_newsfrontend_feuser' => [
         'exclude' => true,
-        'label' => 'LLL:EXT:md_newsfrontend/Resources/Private/Language/locallang_db.xlf:tx_mdnewsfrontend_domain_model_news.md_newsfrontend_feuser',
+        'label' => 'LLL:EXT:md_newsfrontend/Resources/Private/Language/locallang_db.xlf:tx_mdnewsfrontend_domain_model_news.tx_md_newsfrontend_feuser',
         'config' => [
             'type' => 'group',
             'internal_type' => 'db',
@@ -28,4 +28,4 @@ $additionalFields = [
 ];
 
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('tx_news_domain_model_news', $additionalFields);
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('tx_news_domain_model_news', 'md_newsfrontend_feuser', '', 'after:bodytext');
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('tx_news_domain_model_news', 'tx_md_newsfrontend_feuser', '', 'after:bodytext');

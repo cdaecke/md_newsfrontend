@@ -29,7 +29,7 @@ class NewsController extends BaseController
      */
     public function listAction()
     {
-        $news = $this->newsRepository->findByMdNewsfrontendFeuser($this->feuserUid);
+        $news = $this->newsRepository->findByTxMdNewsfrontendFeuser($this->feuserUid);
         $this->view->assign('news', $news);
     }
 
@@ -66,7 +66,7 @@ class NewsController extends BaseController
     public function createAction(\Mediadreams\MdNewsfrontend\Domain\Model\News $newNews)
     {
         $newNews->setDatetime(new \DateTime()); // make sure, that you have set the correct timezone for $GLOBALS['TYPO3_CONF_VARS']['SYS']['phpTimeZone']
-        $newNews->setMdNewsfrontendFeuser($this->feuserObj);
+        $newNews->setTxMdNewsfrontendFeuser($this->feuserObj);
 
         $this->newsRepository->add($newNews);
         $persistenceManager = $this->objectManager->get(PersistenceManager::class);

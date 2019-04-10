@@ -6,7 +6,7 @@
             <trans-unit id="tx_mdnewsfrontend_domain_model_news">
                 <source>News</source>
             </trans-unit>
-            <trans-unit id="tx_mdnewsfrontend_domain_model_news.md_newsfrontend_feuser">
+            <trans-unit id="tx_mdnewsfrontend_domain_model_news.tx_md_newsfrontend_feuser">
                 <source>Frontend user</source>
             </trans-unit>
             <trans-unit id="tx_md_newsfrontend_newsfe.name">

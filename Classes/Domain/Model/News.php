@@ -23,27 +23,27 @@ class News extends \GeorgRinger\News\Domain\Model\News
      * @var \TYPO3\CMS\Extbase\Domain\Model\FrontendUser
      * @lazy
      */
-    protected $mdNewsfrontendFeuser = null;
+    protected $txMdNewsfrontendFeuser = null;
 
     /**
-     * Returns the mdNewsfrontendFeuser
+     * Returns the txMdNewsfrontendFeuser
      *
-     * @return \TYPO3\CMS\Extbase\Domain\Model\FrontendUser $mdNewsfrontendFeuser
+     * @return \TYPO3\CMS\Extbase\Domain\Model\FrontendUser $txMdNewsfrontendFeuser
      */
-    public function getMdNewsfrontendFeuser()
+    public function getTxMdNewsfrontendFeuser()
     {
-        return $this->mdNewsfrontendFeuser;
+        return $this->txMdNewsfrontendFeuser;
     }
 
     /**
-     * Sets the mdNewsfrontendFeuser
+     * Sets the txMdNewsfrontendFeuser
      *
-     * @param \TYPO3\CMS\Extbase\Domain\Model\FrontendUser $mdNewsfrontendFeuser
+     * @param \TYPO3\CMS\Extbase\Domain\Model\FrontendUser $txMdNewsfrontendFeuser
      * @return void
      */
-    public function setMdNewsfrontendFeuser(\TYPO3\CMS\Extbase\Domain\Model\FrontendUser $mdNewsfrontendFeuser)
+    public function setTxMdNewsfrontendFeuser(\TYPO3\CMS\Extbase\Domain\Model\FrontendUser $txMdNewsfrontendFeuser)
     {
-        $this->mdNewsfrontendFeuser = $mdNewsfrontendFeuser;
+        $this->txMdNewsfrontendFeuser = $txMdNewsfrontendFeuser;
     }
 
     /**

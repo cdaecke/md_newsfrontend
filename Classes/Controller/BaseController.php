@@ -122,7 +122,7 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      */
     protected function checkAccess(\Mediadreams\MdNewsfrontend\Domain\Model\News $newsRecord)
     {
-        if ($newsRecord->getMdNewsfrontendFeuser()->getUid() != $this->feuserUid) {
+        if ($newsRecord->getTxMdNewsfrontendFeuser()->getUid() != $this->feuserUid) {
             $this->addFlashMessage(
                 LocalizationUtility::translate('controller.access_error','md_newsfrontend'),
                 '', 
