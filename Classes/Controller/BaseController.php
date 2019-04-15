@@ -158,7 +158,7 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
             ->setTypeConverterOption(
                 'TYPO3\\CMS\\Extbase\\Property\\TypeConverter\\DateTimeConverter',
                 DateTimeConverter::CONFIGURATION_DATE_FORMAT,
-                'd.m.Y H:i'
+                'd.m.Y'
             );
     }
 

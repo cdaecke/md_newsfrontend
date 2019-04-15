@@ -105,10 +105,10 @@
         <label for="archive"><f:translate key="archive" /></label>
         <f:form.textfield
                 property="archive"
-                value="{news.archive -> f:format.date(format: 'd.m.Y H:i')}"
+                value="{news.archive -> f:format.date(format: 'd.m.Y')}"
                 id="archive"
                 class="form-control flatpickr"
-                additionalAttributes="{placeholder:'DD.MM.YYYY HH:MM'}" />
+                additionalAttributes="{placeholder:'DD.MM.YYYY'}" />
     </div>
 
     <fieldset class="form-group border p-3">
