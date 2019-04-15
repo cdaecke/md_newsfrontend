@@ -120,6 +120,10 @@
                 <source>Description</source>
             </trans-unit>
 
+            <trans-unit id="controller.typoscript_missing">
+                <source>Please include the static TypoScript of ext:md_newsfrontend!</source>
+            </trans-unit>
+
             <trans-unit id="controller.new_success">
                 <source>The News record was successfully created.</source>
             </trans-unit>

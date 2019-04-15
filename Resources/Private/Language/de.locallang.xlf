@@ -156,6 +156,11 @@
                 <target>Description</target>
             </trans-unit>
 
+            <trans-unit id="controller.typoscript_missing">
+                <source>Please include the static TypoScript of ext:md_newsfrontend!</source>
+                <target>Bitte binden Sie das statische TypoScript template der ext:md_newsfrontend ein!</target>
+            </trans-unit>
+
             <trans-unit id="controller.new_success">
                 <source>The News record was successfully created.</source>
                 <target>Der Beitrag wurde erfolgreich angelegt.</target>

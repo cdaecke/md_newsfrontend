@@ -68,6 +68,15 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      */
     protected function initializeView(\TYPO3\CMS\Extbase\Mvc\View\ViewInterface $view)
     {
+        // check if TypoScript is loaded
+        if (!isset($this->settings['uploadPath'])) {
+            $this->addFlashMessage(
+                LocalizationUtility::translate('controller.typoscript_missing','md_newsfrontend'),
+                '', 
+                AbstractMessage::ERROR
+            );
+        }
+        
         if ( strlen($this->settings['parentCategory']) > 0 ) {
             $categoryRepository = $this->objectManager->get(CategoryRepository::class);
             $categories = $categoryRepository->findByParent($this->settings['parentCategory']);
