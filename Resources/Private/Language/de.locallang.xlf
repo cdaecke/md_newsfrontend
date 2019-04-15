@@ -139,6 +139,14 @@
                 <source>Meta data</source>
                 <target>Metadaten</target>
             </trans-unit>
+            <trans-unit id="metadata_author">
+                <source>Author</source>
+                <target>Autor</target>
+            </trans-unit>
+            <trans-unit id="metadata_authorEmail">
+                <source>Author Email</source>
+                <target>Autor Email</target>
+            </trans-unit>
             <trans-unit id="metadata_keywords">
                 <source>Keywords</source>
                 <target>Keywords</target>

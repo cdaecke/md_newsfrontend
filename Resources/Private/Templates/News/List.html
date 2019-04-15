@@ -6,10 +6,10 @@
 
         <f:flashMessages />
 
-        <div class="row">
-            <f:if condition="{news}">
-                <f:then>
-                    <f:widget.paginate objects="{news}" as="paginatedNews" configuration="{itemsPerPage: 10}">
+        <f:if condition="{news}">
+            <f:then>
+                <f:widget.paginate objects="{news}" as="paginatedNews" configuration="{itemsPerPage: 10}">
+                    <div class="row">
                         <f:for each="{paginatedNews}" as="newsItem" iteration="i">
                             <div class="col-sm-8 {f:if(condition:'{i.isEven}',then:'even',else:'odd')}">
                                 {newsItem.title}
@@ -19,15 +19,15 @@
                                 <f:link.action action="delete" arguments="{news : newsItem}" class="text-danger delete" additionalAttributes="{data-toggle: 'modal', data-target: '#deleteModal'}" title="{f:translate(key: 'delete')}: {newsItem.title}"><i class="fas fa-trash-alt"></i> <f:translate key="delete" /></f:link.action>
                             </div>
                         </f:for>
-                    </f:widget.paginate>
-                </f:then>
-                <f:else>
-                    <div class="col">
-                        <f:translate key="no_items" />
                     </div>
-                </f:else>
-            </f:if>
-        </div>
+                </f:widget.paginate>
+            </f:then>
+            <f:else>
+                <div class="no-items">
+                    <f:translate key="no_items" />
+                </div>
+            </f:else>
+        </f:if>
 
         <f:link.action action="new" class="btn btn-primary"><f:translate key="new" /></f:link.action>
 

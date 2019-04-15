@@ -42,7 +42,7 @@ class NewsController extends BaseController
      */
     public function newAction()
     {
-        
+        $this->view->assign('user', $this->feuserObj);
     }
 
     /**

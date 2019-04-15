@@ -115,6 +115,24 @@
         <legend><f:translate key="metadata_legend" /></legend>
 
         <div class="form-group">
+            <label for="author"><f:translate key="metadata_author" /></label>
+            <f:form.textfield
+                    property="author"
+                    value="{user.name}"
+                    id="author"
+                    class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="authorEmail"><f:translate key="metadata_authorEmail" /></label>
+            <f:form.textfield
+                    property="authorEmail"
+                    value="{user.email}"
+                    id="authorEmail"
+                    class="form-control" />
+        </div>
+
+        <div class="form-group">
             <label for="keywords"><f:translate key="metadata_keywords" /></label>
             <f:form.textfield
                     property="keywords"
