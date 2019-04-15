@@ -1,33 +1,35 @@
 {
     "name": "mediadreams/md_newsfrontend",
     "type": "typo3-cms-extension",
-    "description": "This extension enables frontend users to created news records in the frontend.",
+    "description": "This TYPO3 extension enables frontend users to created news records.",
+    "version": "1.0.0",
+    "license": "GPL-2.0+",
     "keywords": [
         "TYPO3",
         "extension",
         "news",
-        "frontend"
+        "frontend",
+        "fe_users"
     ],
+    "homepage": "http://www.mediadreams.org",
     "authors": [
         {
             "name": "Christoph Daecke",
+            "email": "typo3@mediadreams.org",
             "role": "Developer"
         }
     ],
-    "require": {
-        "typo3/cms-core": "^8.7.0|| ^9.5.0"
+    "support": {
+        "issues": "https://github.com/cdaecke/md_newsfrontend/issues",
+        "source": "https://github.com/cdaecke/md_newsfrontend"
     },
-    "suggest": {
-        "georgringer/news": "~6.0"
+    "require": {
+        "typo3/cms-core": "^8.7.0|| ^9.5.0",
+        "georgringer/news": ">=7.0,<8.0"
     },
     "autoload": {
         "psr-4": {
             "Mediadreams\\MdNewsfrontend\\": "Classes"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Mediadreams\\MdNewsfrontend\\Tests\\": "Tests"
         }
     },
     "replace": {
