@@ -15,8 +15,8 @@
     "authors": [
         {
             "name": "Christoph Daecke",
-            "email": "typo3@mediadreams.org",
-            "role": "Developer"
+            "role": "Developer",
+            "homepage": "http://www.mediadreams.org"
         }
     ],
     "support": {
