@@ -68,8 +68,14 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      */
     protected function initializeView(\TYPO3\CMS\Extbase\Mvc\View\ViewInterface $view)
     {
-        // check if TypoScript is loaded
-        if (!isset($this->settings['uploadPath'])) {
+        // check if user is logged in
+        if (!$GLOBALS['TSFE']->fe_user->user) {
+            $this->addFlashMessage(
+                LocalizationUtility::translate('controller.not_loggedin','md_newsfrontend'),
+                '', 
+                AbstractMessage::ERROR
+            );
+        } else if (!isset($this->settings['uploadPath'])) { // check if TypoScript is loaded
             $this->addFlashMessage(
                 LocalizationUtility::translate('controller.typoscript_missing','md_newsfrontend'),
                 '', 

@@ -132,6 +132,9 @@
                 <source>Description</source>
             </trans-unit>
 
+            <trans-unit id="controller.not_loggedin">
+                <source>Plugin "News frontend" is called on a page which is not restricted to frontend users. Please make sure, that it can be called only, when a frontend user is logged in!</source>
+            </trans-unit>
             <trans-unit id="controller.typoscript_missing">
                 <source>Please include the static TypoScript of ext:md_newsfrontend!</source>
             </trans-unit>
