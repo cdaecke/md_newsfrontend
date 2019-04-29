@@ -100,6 +100,22 @@
                 <source>Image caption</source>
                 <target>Bildunterschrift</target>
             </trans-unit>
+            <trans-unit id="image_showinpreview">
+                <source>Show in views</source>
+                <target>Anzeige des Bildes</target>
+            </trans-unit>
+            <trans-unit id="image_showinpreview.0">
+                <source>Show only in detail views</source>
+                <target>In Detailansicht anzeigen</target>
+            </trans-unit>
+            <trans-unit id="image_showinpreview.1">
+                <source>Show in all views</source>
+                <target>In allen Ansichten anzeigen</target>
+            </trans-unit>
+            <trans-unit id="image_showinpreview.2">
+                <source>Show only in list views</source>
+                <target>In Listenansicht anzeigen</target>
+            </trans-unit>
 
             <trans-unit id="document_legend">
                 <source>File for News</source>

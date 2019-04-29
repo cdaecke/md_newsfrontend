@@ -77,6 +77,18 @@
             <trans-unit id="image_description">
                 <source>Image caption</source>
             </trans-unit>
+            <trans-unit id="image_showinpreview">
+                <source>Show in views</source>
+            </trans-unit>
+            <trans-unit id="image_showinpreview.0">
+                <source>Show only in detail views</source>
+            </trans-unit>
+            <trans-unit id="image_showinpreview.1">
+                <source>Show in all views</source>
+            </trans-unit>
+            <trans-unit id="image_showinpreview.2">
+                <source>Show only in list views</source>
+            </trans-unit>
 
             <trans-unit id="document_legend">
                 <source>File for News</source>

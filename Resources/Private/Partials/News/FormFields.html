@@ -54,6 +54,16 @@
             <label for="falMediaDescription"><f:translate key="image_description" /></label>
             <f:form.textfield name="falMedia[description]" value="{news.firstFalMedia.description}" id="falMediaDescription" class="form-control" />
         </div>
+        <div class="form-group">
+            <label for="showinpreview"><f:translate key="image_showinpreview" /></label>
+
+            <f:form.select 
+                name="falMedia[showinpreview]" 
+                options="{showinpreviewOptions}" 
+                value="{news.firstFalMedia.showinpreview}"
+                id="showinpreview"
+                class="form-control" />
+        </div>
     </fieldset>
 
     <fieldset class="form-group border p-3">

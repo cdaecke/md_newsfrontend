@@ -251,6 +251,8 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      */
     protected function updateFileReference($fileReferencesUid, $fileData)
     {
+        $showinpreview = !isset($fileData['showinpreview'])? 0:$fileData['showinpreview'];
+
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
                         ->getQueryBuilderForTable('sys_file_reference');
 
@@ -262,7 +264,23 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
             ->set('tstamp', time())
             ->set('title', $fileData['title'])
             ->set('description', $fileData['description'])
+            ->set('showinpreview', (int)$showinpreview)
             ->execute();
+    }
+
+    /**
+     * This gets the values for the "Show in preview" select box in the template
+     *
+     * @return array
+     */
+    
+    protected function getValuesForShowinpreview()
+    {
+        return [
+            0 => LocalizationUtility::translate('image_showinpreview.0', 'md_newsfrontend'),
+            1 => LocalizationUtility::translate('image_showinpreview.1', 'md_newsfrontend'),
+            2 => LocalizationUtility::translate('image_showinpreview.2', 'md_newsfrontend')
+        ];
     }
 
     /**

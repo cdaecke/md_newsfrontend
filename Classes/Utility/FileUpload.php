@@ -77,6 +77,7 @@ class FileUpload
     protected static function updateFileReferences($requestArguments, $obj, $propertyName, $fileUid)
     {
         $timestamp = time();
+        $showinpreview = !isset($requestArguments[$propertyName]['showinpreview'])? 0:$requestArguments[$propertyName]['showinpreview'];
 
         $dbField = self::camelCase2unserScore($propertyName);
 
@@ -109,7 +110,8 @@ class FileUpload
                 'sorting_foreign'   => 1,
                 'table_local'       => 'sys_file',
                 'title'             => $requestArguments[$propertyName]['title'],
-                'description'       => $requestArguments[$propertyName]['description']
+                'description'       => $requestArguments[$propertyName]['description'],
+                'showinpreview'     => (int)$showinpreview
             ])
             ->execute();
 

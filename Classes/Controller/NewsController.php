@@ -42,7 +42,12 @@ class NewsController extends BaseController
      */
     public function newAction()
     {
-        $this->view->assign('user', $this->feuserObj);
+        $this->view->assignMultiple(
+            [
+                'user' => $this->feuserObj,
+                'showinpreviewOptions' => $this->getValuesForShowinpreview()
+            ]
+        );
     }
 
     /**
@@ -105,7 +110,13 @@ class NewsController extends BaseController
     public function editAction(\Mediadreams\MdNewsfrontend\Domain\Model\News $news)
     {
         $this->checkAccess($news);
-        $this->view->assign('news', $news);
+        
+        $this->view->assignMultiple(
+            [
+                'news' => $news,
+                'showinpreviewOptions' => $this->getValuesForShowinpreview()
+            ]
+        );
     }
 
     /**
