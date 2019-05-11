@@ -8,7 +8,7 @@
             jQuery(document).ready(function ($) {
                 $('.flatpickr').flatpickr(
                     {
-                        minDate: 'today',
+                        minDate: new Date().fp_incr(1),
                         dateFormat: 'd.m.Y',
                     }
                 );
