@@ -78,6 +78,13 @@ class NewsController extends BaseController
         // generate and set slug for news record
         $newNews->setPathSegment( Transliterator::urlize( $newNews->getTitle() ) );
 
+        // add signal slot BeforeSave
+        $this->signalSlotDispatcher->dispatch(
+            __CLASS__, 
+            __FUNCTION__ . 'BeforeSave', 
+            [$newNews, $this]
+        );
+
         $this->newsRepository->add($newNews);
         $persistenceManager = $this->objectManager->get(PersistenceManager::class);
  
@@ -88,6 +95,13 @@ class NewsController extends BaseController
 
         // handle the fileupload
         $this->initializeFileUpload($requestArguments, $newNews);
+
+        // add signal slot AfterPersist
+        $this->signalSlotDispatcher->dispatch(
+            __CLASS__, 
+            __FUNCTION__ . 'AfterPersist', 
+            [$newNews, $this]
+        );
         
         $this->clearNewsCache($newNews->getUid(), $newNews->getPid());
 
@@ -159,6 +173,13 @@ class NewsController extends BaseController
         // handle the fileupload
         $this->initializeFileUpload($requestArguments, $news);
 
+        // add signal slot BeforeSave
+        $this->signalSlotDispatcher->dispatch(
+            __CLASS__, 
+            __FUNCTION__ . 'BeforeSave', 
+            [$news, $this]
+        );
+
         $this->newsRepository->update($news);
         $this->clearNewsCache($news->getUid(), $news->getPid());
 
@@ -180,6 +201,14 @@ class NewsController extends BaseController
     public function deleteAction(\Mediadreams\MdNewsfrontend\Domain\Model\News $news)
     {
         $this->checkAccess($news);
+
+        // add signal slot BeforeSave
+        $this->signalSlotDispatcher->dispatch(
+            __CLASS__, 
+            __FUNCTION__ . 'BeforeDelete', 
+            [$news, $this]
+        );
+
         $this->newsRepository->remove($news);
 
         $this->addFlashMessage(
