@@ -211,6 +211,8 @@ class NewsController extends BaseController
 
         $this->newsRepository->remove($news);
 
+        $this->clearNewsCache($news->getUid(), $news->getPid());
+
         $this->addFlashMessage(
             LocalizationUtility::translate('controller.delete_success','md_newsfrontend'),
             '', 
