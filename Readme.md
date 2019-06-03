@@ -21,6 +21,53 @@ Templates are ready to use with the [bootstrap framework](https://getbootstrap.c
 - Select a storage page in the plugin-tab in the field ``Record Storage Page``
 - Now a frontend user is able to add, edit and delete own records
 
+### Signal slots
+
+Following signal slots are available:
+
+- createActionBeforeSave: Called just before saving a new record
+- createActionAfterPersist: Called after a new record was saved (new record Id is available)
+- updateActionBeforeSave: Called just before an existig record will be updated
+- deleteActionBeforeDelete: Called just before a record will be deleted
+
+Example, how to catch a signal:
+
+Add following lines in `ext_localconf.php` of your own extension:
+
+```php
+$signalSlotDispatcher = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\SignalSlot\Dispatcher::class);
+
+// slot for ext:md_newsfrontend
+$signalSlotDispatcher->connect(
+    \Mediadreams\MdNewsfrontend\Controller\NewsController::class,
+    'createActionBeforeSave',
+    \Vendor\Extension\Slot\YourClass::class,
+    'yourMethod'
+);
+```
+
+Add the class `Vendor\Extension\Slot\YourClass` with the method `yourMethod` in your extension.
+
+Example:
+
+```php
+namespace Vendor\Extension\Slot;
+
+class YourClass
+{
+
+    /**
+     *
+     * @param object $news The news object
+     * @param object $obj The controller object
+     * @return void
+     */
+    public function yourMethod($news, $obj) {
+        // do something...
+    }
+}
+```
+
 ## Bugs and Known Issues
 If you find a bug, it would be nice if you add an issue on [Github](https://github.com/cdaecke/md_newsfrontend/issues).
 
