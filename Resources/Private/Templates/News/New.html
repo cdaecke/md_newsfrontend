@@ -8,7 +8,7 @@
 
         <f:render partial="FormErrors" />
 
-        <f:form action="create" name="newNews" object="{newNews}" enctype="multipart/form-data" additionalAttributes="{data-parsley-validate:''}">
+        <f:form action="create" name="newNews" id="mdNewsfrontendForm" object="{newNews}" enctype="multipart/form-data" additionalAttributes="{data-parsley-validate:''}">
             <f:render partial="News/FormFields" arguments="{_all}" />
             <f:form.submit value="{f:translate(key: 'save')}" class="btn btn-primary" />
             <f:translate key="or" /> <f:link.action action="list"><f:translate key="back_to_list" /></f:link.action>

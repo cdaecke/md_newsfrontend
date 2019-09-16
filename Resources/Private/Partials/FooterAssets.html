@@ -46,10 +46,14 @@
 
         <script>
             jQuery(document).ready(function ($) {
-                $.extend(Parsley.options, {
-                    errorsWrapper: '<div class="px-3 bg-danger text-white">',
-                    errorTemplate: '<div></div>'
-                });
+                // make sure to add validation AFTER tinyMCE is loaded
+                $('form#mdNewsfrontendForm').parsley().destroy();
+                $('form#mdNewsfrontendForm').parsley(
+                    {
+                        errorsWrapper: '<div class="px-3 bg-danger text-white">',
+                        errorTemplate: '<div></div>'
+                    }
+                );
 
                 // add parsley validator for file size
                 window.Parsley.addValidator('maxFileSize', {
