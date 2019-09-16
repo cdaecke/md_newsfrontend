@@ -13,11 +13,12 @@ namespace Mediadreams\MdNewsfrontend\Controller;
  */
 
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
-use GeorgRinger\News\Service\Transliterator\Transliterator;
+use GeorgRinger\News\Backend\NewsSlugHelper;
 
 /**
  * NewsController
@@ -76,7 +77,10 @@ class NewsController extends BaseController
         $newNews->setTxMdNewsfrontendFeuser($this->feuserObj);
 
         // generate and set slug for news record
-        $newNews->setPathSegment( Transliterator::urlize( $newNews->getTitle() ) );
+        if (version_compare(TYPO3_branch, '9.5', '<')) {
+            $slugHelperFor8 = GeneralUtility::makeInstance(NewsSlugHelper::class);
+            $newNews->setPathSegment( $slugHelperFor8->sanitize( $newNews->getTitle() ) );
+        }
 
         // add signal slot BeforeSave
         $this->signalSlotDispatcher->dispatch(
