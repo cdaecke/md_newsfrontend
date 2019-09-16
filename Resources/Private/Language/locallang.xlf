@@ -77,6 +77,9 @@
             <trans-unit id="image_description">
                 <source>Image caption</source>
             </trans-unit>
+            <trans-unit id="image_max_filesize">
+                <source>max %1$s Kb</source>
+            </trans-unit>
             <trans-unit id="image_showinpreview">
                 <source>Show in views</source>
             </trans-unit>
@@ -107,6 +110,9 @@
             </trans-unit>
             <trans-unit id="document_description">
                 <source>File description</source>
+            </trans-unit>
+            <trans-unit id="document_max_filesize">
+                <source>max %1$s Kb</source>
             </trans-unit>
 
             <trans-unit id="categories">

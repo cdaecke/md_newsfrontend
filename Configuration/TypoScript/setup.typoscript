@@ -31,7 +31,9 @@ plugin.tx_mdnewsfrontend_newsfe {
         
         uploadPath = {$plugin.tx_mdnewsfrontend_newsfe.settings.uploadPath}
         allowed_falMedia = {$plugin.tx_mdnewsfrontend_newsfe.settings.allowed_falMedia}
+        allowed_falMedia_size = {$plugin.tx_mdnewsfrontend_newsfe.settings.allowed_falMedia_size}
         allowed_falRelatedFiles = {$plugin.tx_mdnewsfrontend_newsfe.settings.allowed_falRelatedFiles}
+        allowed_falRelatedFiles_size = {$plugin.tx_mdnewsfrontend_newsfe.settings.allowed_falRelatedFiles_size}
 
         jquery = {$plugin.tx_mdnewsfrontend_newsfe.settings.jquery}
 

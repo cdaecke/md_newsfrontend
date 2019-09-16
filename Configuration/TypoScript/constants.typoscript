@@ -19,8 +19,14 @@ plugin.tx_mdnewsfrontend_newsfe {
         # cat=plugin.tx_mdnewsfrontend_newsfe/aa2; type=string; label=Comma separated file extensions, which are allowed for file upload in field fal_media.
         allowed_falMedia = gif,jpg,jpeg,png
 
+        # cat=plugin.tx_mdnewsfrontend_newsfe/aa2; type=int+; label=Max file upload size in Kb for image. This value is optional.
+        allowed_falMedia_size = 
+
         # cat=plugin.tx_mdnewsfrontend_newsfe/aa3; type=string; label=Comma separated file extensions, which are allowed for file upload in field fal_related_files.
         allowed_falRelatedFiles = pdf
+
+        # cat=plugin.tx_mdnewsfrontend_newsfe/aa3; type=int+; label=Max file upload size in Kb for related file. This value is optional.
+        allowed_falRelatedFiles_size = 
 
         # cat=plugin.tx_mdnewsfrontend_newsfe/b1; type=boolean; label=Load jQuery library. Use this, if you don't habe jQuery loaded already.
         jquery = 0

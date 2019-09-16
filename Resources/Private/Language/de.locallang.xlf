@@ -100,6 +100,10 @@
                 <source>Image caption</source>
                 <target>Bildunterschrift</target>
             </trans-unit>
+            <trans-unit id="image_max_filesize">
+                <source>max %1$s Kb</source>
+                <target>max %1$s Kb</target>
+            </trans-unit>
             <trans-unit id="image_showinpreview">
                 <source>Show in views</source>
                 <target>Anzeige des Bildes</target>
@@ -140,6 +144,10 @@
             <trans-unit id="document_description">
                 <source>File description</source>
                 <target>Beschreibung der Datei</target>
+            </trans-unit>
+            <trans-unit id="document_max_filesize">
+                <source>max %1$s Kb</source>
+                <target>max %1$s Kb</target>
             </trans-unit>
 
             <trans-unit id="categories">
