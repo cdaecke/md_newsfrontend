@@ -1,3 +1,11 @@
+Version 1.1.1 (2019-09-16)
+    BUGFIX: Use new slug generation of ext news (old one was removed in version 7.3)
+    BUGFIX: Make sure to add parsleyJS validation to form AFTER tinyMCE was loaded
+    FEATURE: Limit filesize of image and file upload. This can optionally be set by constants.
+
+    All changes
+    https://github.com/cdaecke/md_newsfrontend/compare/1.1.0...1.1.1
+
 Version 1.1.0 (2019-06-03)
     FEATURE: Add signal slots
 
