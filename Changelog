@@ -1,3 +1,10 @@
+Version 1.1.2 (2019-09-18)
+    BUGFIX: Generate path_segement for news record in all TYPO3 versions
+
+    All changes
+    https://github.com/cdaecke/md_newsfrontend/compare/1.1.1...1.1.2
+
+
 Version 1.1.1 (2019-09-16)
     BUGFIX: Use new slug generation of ext news (old one was removed in version 7.3)
     BUGFIX: Make sure to add parsleyJS validation to form AFTER tinyMCE was loaded
