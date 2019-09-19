@@ -36,7 +36,7 @@ class NewsSlugHelper
 
         // Convert some special tokens (space, "_" and "-") to the space character
         $fallbackCharacter = '-';
-        $slug = preg_replace('/[ \t\x{00A0}\-+_]+/u', $fallbackCharacter, $slug);
+        $slug = preg_replace('/[ \t\x{00A0}\-+_\/]+/u', $fallbackCharacter, $slug);
 
         // Convert extended letters to ascii equivalents
         // The specCharsToASCII() converts "€" to "EUR"
