@@ -166,7 +166,19 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
             $this->request->setArguments($requestArguments);
         }
 
-        // use correct format for datetime
+        if ( !empty($requestArguments[$argument->getName()]['datetime']) ) {
+            // use correct format for datetime
+            $argument
+                ->getPropertyMappingConfiguration()
+                ->forProperty('datetime')
+                ->setTypeConverterOption(
+                    'TYPO3\\CMS\\Extbase\\Property\\TypeConverter\\DateTimeConverter',
+                    DateTimeConverter::CONFIGURATION_DATE_FORMAT,
+                    $this->settings['formatDatetime']
+                );
+        }
+
+        // use correct format for archive date
         $argument
             ->getPropertyMappingConfiguration()
             ->forProperty('archive')

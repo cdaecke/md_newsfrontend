@@ -45,5 +45,8 @@ plugin.tx_mdnewsfrontend_newsfe {
 
         # cat=plugin.tx_mdnewsfrontend_newsfe/e2; type=string; label=Language for tinymce
         tinymceLang = en
+
+        # cat=plugin.tx_mdnewsfrontend_newsfe/f1; type=string; label=Format of input for field datetime
+        formatDatetime = d.m.Y H:i
     }
 }

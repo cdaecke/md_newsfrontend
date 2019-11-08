@@ -73,7 +73,11 @@ class NewsController extends BaseController
      */
     public function createAction(\Mediadreams\MdNewsfrontend\Domain\Model\News $newNews)
     {
-        $newNews->setDatetime(new \DateTime()); // make sure, that you have set the correct timezone for $GLOBALS['TYPO3_CONF_VARS']['SYS']['phpTimeZone']
+        // if no value is provided for field datetime, use current date
+        if (!$newNews->getDatetime() instanceof \DateTime) {
+            $newNews->setDatetime(new \DateTime()); // make sure, that you have set the correct timezone for $GLOBALS['TYPO3_CONF_VARS']['SYS']['phpTimeZone']
+        }
+
         $newNews->setTxMdNewsfrontendFeuser($this->feuserObj);
 
         // generate and set slug for news record
