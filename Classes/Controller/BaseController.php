@@ -160,12 +160,6 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
         // add validator for upload fields
         $this->initializeFileValidator($requestArguments, $argument);
 
-        // remove category from request, if it was not provided
-        if ( empty($requestArguments[$argument->getName()]['categories']) ) {
-            unset($requestArguments[$argument->getName()]['categories']);
-            $this->request->setArguments($requestArguments);
-        }
-
         if ( !empty($requestArguments[$argument->getName()]['datetime']) ) {
             // use correct format for datetime
             $argument
