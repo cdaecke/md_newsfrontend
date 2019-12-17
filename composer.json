@@ -33,7 +33,6 @@
         }
     },
     "replace": {
-        "md_newsfrontend": "self.version",
-        "typo3-ter/md-newsfrontend": "self.version"
+        "typo3-ter/md_newsfrontend": "self.version"
     }
 }
