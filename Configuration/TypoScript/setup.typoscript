@@ -46,5 +46,6 @@ plugin.tx_mdnewsfrontend_newsfe {
         tinymceLang = {$plugin.tx_mdnewsfrontend_newsfe.settings.tinymceLang}
 
         formatDatetime = {$plugin.tx_mdnewsfrontend_newsfe.settings.formatDatetime}
+        formatArchive = {$plugin.tx_mdnewsfrontend_newsfe.settings.formatArchive}
     }
 }
