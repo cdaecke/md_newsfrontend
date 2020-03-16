@@ -1,3 +1,9 @@
+Version 1.1.5 (2020-03-16)
+    FEATURE: Allow to configure date format for field archive
+
+    All changes
+    https://github.com/cdaecke/md_newsfrontend/compare/1.1.4...1.1.5
+
 Version 1.1.4 (2020-01-08)
     FEATURE: Allow to set values for field datetime
     BUGFIX: Allow to remove all categories from a news record
