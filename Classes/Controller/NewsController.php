@@ -124,7 +124,7 @@ class NewsController extends BaseController
      * action edit
      *
      * @param \Mediadreams\MdNewsfrontend\Domain\Model\News $news
-     * @ignorevalidation $news
+     * @TYPO3\CMS\Extbase\Annotation\IgnoreValidation("news")
      * @return void
      */
     public function editAction(\Mediadreams\MdNewsfrontend\Domain\Model\News $news)

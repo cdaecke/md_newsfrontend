@@ -39,7 +39,7 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      * newsRepository
      *
      * @var \Mediadreams\MdNewsfrontend\Domain\Repository\NewsRepository
-     * @inject
+     * @TYPO3\CMS\Extbase\Annotation\Inject
      */
     protected $newsRepository = null;
 
@@ -47,7 +47,7 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      * userRepository
      *
      * @var \TYPO3\CMS\Extbase\Domain\Repository\FrontendUserRepository
-     * @inject
+     * @TYPO3\CMS\Extbase\Annotation\Inject
      */
     protected $userRepository = null;
 
