@@ -80,10 +80,6 @@ class NewsController extends BaseController
 
         $newNews->setTxMdNewsfrontendFeuser($this->feuserObj);
 
-        // generate and set slug for news record
-        $slugHelper = GeneralUtility::makeInstance(NewsSlugHelper::class);
-        $newNews->setPathSegment( $slugHelper->sanitize( $newNews->getTitle() ) );
-
         // add signal slot BeforeSave
         $this->signalSlotDispatcher->dispatch(
             __CLASS__, 
@@ -96,6 +92,12 @@ class NewsController extends BaseController
  
         // persist news entry in order to get the uid of the entry
         $persistenceManager->persistAll();
+
+        // generate and set slug for news record
+        $slugHelper = GeneralUtility::makeInstance(NewsSlugHelper::class);
+        $slug = $slugHelper->getSlug($newNews);
+        $newNews->setPathSegment($slug);
+        $this->newsRepository->update($newNews);
 
         $requestArguments = $this->request->getArguments();
 

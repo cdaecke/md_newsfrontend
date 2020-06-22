@@ -1,76 +1,64 @@
 <?php
 namespace Mediadreams\MdNewsfrontend\Service;
 
-use TYPO3\CMS\Core\Charset\CharsetConverter;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-
 /**
  *
  * This file is part of the "News frontend" Extension for TYPO3 CMS.
  *
  * For the full copyright and license information, please read the
  * LICENSE.txt file that was distributed with this source code.
- * 
- * This code was taken over from ext:news (GeorgRinger\News\Backend\NewsSlugHelper)
- * Thanks for that, @GeorgRinger!
+ *
+ * (c) 2020 Christoph Daecke <typo3@mediadreams.org>
  *
  */
+
+use TYPO3\CMS\Core\DataHandling\Model\RecordStateFactory;
+use TYPO3\CMS\Core\DataHandling\SlugHelper;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Generate slug for the news entry
  */
 class NewsSlugHelper
 {
+    /**
+     * @var tableName
+     */
+    protected $tableName = 'tx_news_domain_model_news';
 
     /**
-     * Cleans a slug value so it is used directly in the path segment of a URL.
-     *
-     * @param string $slug
-     * @return string
+     * @var slugService
      */
-    public function sanitize(string $slug): string
+    protected $slugService;
+
+    /**
+     * NewsSlugHelper constructor.
+     */
+    public function __construct()
     {
-        // Convert to lowercase + remove tags
-        $slug = mb_strtolower($slug, 'utf-8');
-        $slug = strip_tags($slug);
-
-        // Convert some special tokens (space, "_" and "-") to the space character
-        $fallbackCharacter = '-';
-        $slug = preg_replace('/[ \t\x{00A0}\-+_\/]+/u', $fallbackCharacter, $slug);
-
-        // Convert extended letters to ascii equivalents
-        // The specCharsToASCII() converts "€" to "EUR"
-        $slug = GeneralUtility::makeInstance(CharsetConverter::class)->specCharsToASCII('utf-8', $slug);
-
-        // Get rid of all invalid characters, but allow slashes
-        $slug = preg_replace('/[^\p{L}0-9\/' . preg_quote($fallbackCharacter) . ']/u', '', $slug);
-
-        // Convert multiple fallback characters to a single one
-        if ($fallbackCharacter !== '') {
-            $slug = preg_replace('/' . preg_quote($fallbackCharacter) . '{2,}/', $fallbackCharacter, $slug);
-        }
-
-        // Ensure slug is lower cased after all replacement was done
-        $slug = mb_strtolower($slug, 'utf-8');
-        // Extract slug, thus it does not have wrapping fallback and slash characters
-        $extractedSlug = $this->extract($slug);
-        // Remove trailing and beginning slashes, except if the trailing slash was added, then we'll re-add it
-        $appendTrailingSlash = $extractedSlug !== '' && substr($slug, -1) === '/';
-        $slug = $extractedSlug . ($appendTrailingSlash ? '/' : '');
-        return $slug;
+        $fieldConfig = $GLOBALS['TCA'][$this->tableName]['columns']['path_segment']['config'];
+        $this->slugService = GeneralUtility::makeInstance(SlugHelper::class, $this->tableName, 'path_segment', $fieldConfig);
     }
 
     /**
-     * Extracts payload of slug and removes wrapping delimiters,
-     * e.g. `/hello/world/` will become `hello/world`.
+     * Get unique slug for entry
      *
-     * @param string $slug
+     * @param object $obj
      * @return string
      */
-    public function extract(string $slug): string
+    public function getSlug($obj): string
     {
-        // Convert some special tokens (space, "_" and "-") to the space character
-        $fallbackCharacter = '-';
-        return trim($slug, $fallbackCharacter . '/');
+        $newsArr = [
+            'title' => $obj->getTitle(),
+        ];
+
+        $slug = $this->slugService->generate($newsArr,  $obj->getPid());
+
+        $state = RecordStateFactory::forName($this->tableName)
+            ->fromArray($newsArr, $obj->getPid(), $obj->getUid());
+
+        $slug = $this->slugService->buildSlugForUniqueInSite($slug, $state);
+
+        return $slug;
     }
 }
