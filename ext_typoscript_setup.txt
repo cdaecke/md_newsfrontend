@@ -1,0 +1,16 @@
+/*
+@todo Remove, when TYPO3 9 support is dropped
+*/
+
+config.tx_extbase{
+    persistence{
+        classes{
+            Mediadreams\MdNewsfrontend\Domain\Model\News {
+                mapping {
+                    tableName = tx_news_domain_model_news
+                    recordType = 0
+                }
+            }
+        }
+    }
+}

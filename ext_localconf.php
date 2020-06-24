@@ -6,14 +6,14 @@ call_user_func(
     {
         
         \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
-            'MdNewsfrontend',
+            'Mediadreams.MdNewsfrontend',
             'Newsfe',
             [
-                \Mediadreams\MdNewsfrontend\Controller\NewsController::class => 'list, new, create, edit, update, delete'
+                'News' => 'list, new, create, edit, update, delete'
             ],
             // non-cacheable actions
             [
-                \Mediadreams\MdNewsfrontend\Controller\NewsController::class => 'list, create, update, delete'
+                'News' => 'list, create, update, delete'
             ]
         );
         
