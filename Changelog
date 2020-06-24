@@ -1,3 +1,9 @@
+Version 2.0.0 (2020-06-24)
+    FEATURE: TYPO3 10 compatibility
+
+    All changes
+    https://github.com/cdaecke/md_newsfrontend/compare/1.1.5...2.0.0
+
 Version 1.1.5 (2020-03-16)
     FEATURE: Allow to configure date format for field archive
 
