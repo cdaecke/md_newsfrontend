@@ -46,7 +46,7 @@
                     <div>
                         <f:image image="{news.firstFalMedia}" alt="" maxWidth="100"/>
                     </div>
-                    <f:form.checkbox name="falMedia[delete]" value="1" id="falMediaDelete" />
+                    <f:form.checkbox name="falMedia[delete]" checked="0" value="1" id="falMediaDelete" />
                     <label for="falMediaDelete"><f:translate key="image_delete" /></label>
                 </div>
             </f:if>
@@ -91,7 +91,7 @@
                         <f:translate key="document_current" />
                         <f:link.typolink parameter="{news.firstFalRelatedFiles.originalResource.originalFile.publicUrl}" target="_blank">{news.firstFalRelatedFiles.originalResource.originalFile.name}</f:link.typolink>
                     </div>
-                    <f:form.checkbox name="falRelatedFiles[delete]" value="1" id="falRelatedFilesDelete" />
+                    <f:form.checkbox name="falRelatedFiles[delete]" checked="0" value="1" id="falRelatedFilesDelete" />
                     <label for="falRelatedFilesDelete"><f:translate key="document_delete" /></label>
                 </div>
             </f:if>
