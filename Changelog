@@ -1,3 +1,9 @@
+Version 2.0.1 (2020-11-05)
+    [BUGFIX] add proxy-class generation for ext:news again
+
+    All changes
+    https://github.com/cdaecke/md_newsfrontend/compare/2.0.0...2.0.1
+
 Version 2.0.0 (2020-06-24)
     FEATURE: TYPO3 10 compatibility
 
