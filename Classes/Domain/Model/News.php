@@ -21,7 +21,6 @@ class News extends \GeorgRinger\News\Domain\Model\News
      * Uid of feUser
      *
      * @var \TYPO3\CMS\Extbase\Domain\Model\FrontendUser
-     * @TYPO3\CMS\Extbase\Annotation\ORM\Lazy
      */
     protected $txMdNewsfrontendFeuser = null;
 
