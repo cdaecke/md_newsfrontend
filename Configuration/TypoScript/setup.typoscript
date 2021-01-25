@@ -10,7 +10,7 @@ plugin.tx_mdnewsfrontend_newsfe {
     }
 
     persistence {
-        #storagePid = 
+        #storagePid =
         #recursive = 1
     }
 
@@ -21,14 +21,14 @@ plugin.tx_mdnewsfrontend_newsfe {
         # Should be on by default, but can be disabled if all action in the plugin are uncached
         requireCHashArgumentForActionArguments = 1
     }
-    
+
     mvc {
         #callDefaultActionIfActionCantBeResolved = 1
     }
 
     settings {
         parentCategory = {$plugin.tx_mdnewsfrontend_newsfe.settings.parentCategory}
-        
+
         uploadPath = {$plugin.tx_mdnewsfrontend_newsfe.settings.uploadPath}
         allowed_falMedia = {$plugin.tx_mdnewsfrontend_newsfe.settings.allowed_falMedia}
         allowed_falMedia_size = {$plugin.tx_mdnewsfrontend_newsfe.settings.allowed_falMedia_size}
@@ -47,5 +47,7 @@ plugin.tx_mdnewsfrontend_newsfe {
 
         formatDatetime = {$plugin.tx_mdnewsfrontend_newsfe.settings.formatDatetime}
         formatArchive = {$plugin.tx_mdnewsfrontend_newsfe.settings.formatArchive}
+
+        allowNotEnabledNews = {$plugin.tx_mdnewsfrontend_newsfe.settings.allowNotEnabledNews}
     }
 }

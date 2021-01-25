@@ -32,8 +32,9 @@ class NewsController extends BaseController
      */
     public function listAction()
     {
-        $news = $this->newsRepository->findByTxMdNewsfrontendFeuser($this->feuserUid);
+        $news = $this->newsRepository->findByFeuserId($this->feuserUid, $this->settings['allowNotEnabledNews']);
         $this->view->assign('news', $news);
+        $this->view->assign('testSettings', $this->settings);
     }
 
     /**
@@ -82,14 +83,14 @@ class NewsController extends BaseController
 
         // add signal slot BeforeSave
         $this->signalSlotDispatcher->dispatch(
-            __CLASS__, 
-            __FUNCTION__ . 'BeforeSave', 
+            __CLASS__,
+            __FUNCTION__ . 'BeforeSave',
             [$newNews, $this]
         );
 
         $this->newsRepository->add($newNews);
         $persistenceManager = $this->objectManager->get(PersistenceManager::class);
- 
+
         // persist news entry in order to get the uid of the entry
         $persistenceManager->persistAll();
 
@@ -106,16 +107,16 @@ class NewsController extends BaseController
 
         // add signal slot AfterPersist
         $this->signalSlotDispatcher->dispatch(
-            __CLASS__, 
-            __FUNCTION__ . 'AfterPersist', 
+            __CLASS__,
+            __FUNCTION__ . 'AfterPersist',
             [$newNews, $this]
         );
-        
+
         $this->clearNewsCache($newNews->getUid(), $newNews->getPid());
 
         $this->addFlashMessage(
             LocalizationUtility::translate('controller.new_success','md_newsfrontend'),
-            '', 
+            '',
             AbstractMessage::OK
         );
 
@@ -132,7 +133,7 @@ class NewsController extends BaseController
     public function editAction(\Mediadreams\MdNewsfrontend\Domain\Model\News $news)
     {
         $this->checkAccess($news);
-        
+
         $this->view->assignMultiple(
             [
                 'news' => $news,
@@ -176,15 +177,15 @@ class NewsController extends BaseController
                 $news->$removeMethod($news->$getFirstMethod());
             }
         }
-        
+
 
         // handle the fileupload
         $this->initializeFileUpload($requestArguments, $news);
 
         // add signal slot BeforeSave
         $this->signalSlotDispatcher->dispatch(
-            __CLASS__, 
-            __FUNCTION__ . 'BeforeSave', 
+            __CLASS__,
+            __FUNCTION__ . 'BeforeSave',
             [$news, $this]
         );
 
@@ -193,7 +194,7 @@ class NewsController extends BaseController
 
         $this->addFlashMessage(
             LocalizationUtility::translate('controller.edit_success','md_newsfrontend'),
-            '', 
+            '',
             AbstractMessage::OK
         );
 
@@ -212,8 +213,8 @@ class NewsController extends BaseController
 
         // add signal slot BeforeSave
         $this->signalSlotDispatcher->dispatch(
-            __CLASS__, 
-            __FUNCTION__ . 'BeforeDelete', 
+            __CLASS__,
+            __FUNCTION__ . 'BeforeDelete',
             [$news, $this]
         );
 
@@ -223,7 +224,7 @@ class NewsController extends BaseController
 
         $this->addFlashMessage(
             LocalizationUtility::translate('controller.delete_success','md_newsfrontend'),
-            '', 
+            '',
             AbstractMessage::OK
         );
 
