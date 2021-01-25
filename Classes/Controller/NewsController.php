@@ -34,7 +34,6 @@ class NewsController extends BaseController
     {
         $news = $this->newsRepository->findByFeuserId($this->feuserUid, $this->settings['allowNotEnabledNews']);
         $this->view->assign('news', $news);
-        $this->view->assign('testSettings', $this->settings);
     }
 
     /**
