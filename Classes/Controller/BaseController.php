@@ -72,17 +72,17 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
         if (!$GLOBALS['TSFE']->fe_user->user) {
             $this->addFlashMessage(
                 LocalizationUtility::translate('controller.not_loggedin','md_newsfrontend'),
-                '', 
+                '',
                 AbstractMessage::ERROR
             );
         } else if (!isset($this->settings['uploadPath'])) { // check if TypoScript is loaded
             $this->addFlashMessage(
                 LocalizationUtility::translate('controller.typoscript_missing','md_newsfrontend'),
-                '', 
+                '',
                 AbstractMessage::ERROR
             );
         }
-        
+
         if ( strlen($this->settings['parentCategory']) > 0 ) {
             $categoryRepository = $this->objectManager->get(CategoryRepository::class);
             $categories = $categoryRepository->findByParent($this->settings['parentCategory']);
@@ -103,7 +103,7 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
         // Use stdWrap for given defined settings
         // Thanks to Georg Ringer: https://github.com/georgringer/news/blob/2c8522ad508fa92ad39a5effe4301f7d872238a5/Classes/Controller/NewsController.php#L597
         if (
-            isset($this->settings['useStdWrap']) 
+            isset($this->settings['useStdWrap'])
             && !empty($this->settings['useStdWrap'])
         ) {
             $typoScriptService = GeneralUtility::makeInstance(TypoScriptService::class);
@@ -140,7 +140,7 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
         if ($newsRecord->getTxMdNewsfrontendFeuser()->getUid() != $this->feuserUid) {
             $this->addFlashMessage(
                 LocalizationUtility::translate('controller.access_error','md_newsfrontend'),
-                '', 
+                '',
                 AbstractMessage::ERROR
             );
 
@@ -172,6 +172,30 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
                 );
         }
 
+        if ( !empty($requestArguments[$argument->getName()]['starttime']) ) {
+            // use correct format for datetime
+            $argument
+                ->getPropertyMappingConfiguration()
+                ->forProperty('starttime')
+                ->setTypeConverterOption(
+                    'TYPO3\\CMS\\Extbase\\Property\\TypeConverter\\DateTimeConverter',
+                    DateTimeConverter::CONFIGURATION_DATE_FORMAT,
+                    $this->settings['formatDatetime']
+                );
+        }
+
+        if ( !empty($requestArguments[$argument->getName()]['endtime']) ) {
+            // use correct format for datetime
+            $argument
+                ->getPropertyMappingConfiguration()
+                ->forProperty('endtime')
+                ->setTypeConverterOption(
+                    'TYPO3\\CMS\\Extbase\\Property\\TypeConverter\\DateTimeConverter',
+                    DateTimeConverter::CONFIGURATION_DATE_FORMAT,
+                    $this->settings['formatDatetime']
+                );
+        }
+
         // use correct format for archive date
         $argument
             ->getPropertyMappingConfiguration()
@@ -196,9 +220,9 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
             if ( !empty($requestArguments[$fieldName]['tmp_name']) ) {
                 // upload new file and update file reference (meta data)
                 FileUpload::handleUpload(
-                    $requestArguments, 
-                    $obj, 
-                    $fieldName, 
+                    $requestArguments,
+                    $obj,
+                    $fieldName,
                     $this->settings,
                     $this->feuserUid
                 );
@@ -207,7 +231,7 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
                 if ( $obj->$methodName() ) {
                     // update meta data
                     $this->updateFileReference(
-                        $obj->$methodName()->getUid(), 
+                        $obj->$methodName()->getUid(),
                         $requestArguments[$fieldName]
                     );
                 }
@@ -226,8 +250,8 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     {
         foreach ($this->uploadFields as $fieldName) {
             $this->addFileuploadValidator(
-                $argument, 
-                $requestArguments[$fieldName], 
+                $argument,
+                $requestArguments[$fieldName],
                 $this->settings['allowed_'.$fieldName]
             );
         }
@@ -244,7 +268,7 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
         $validator = $arguments->getValidator();
 
         $checkFileUploadValidator = $this->objectManager->get(
-            'Mediadreams\MdNewsfrontend\Domain\Validator\CheckFileUpload', 
+            'Mediadreams\MdNewsfrontend\Domain\Validator\CheckFileUpload',
             array(
                 'filesArr'              => $fieldName,
                 'allowedFileExtensions' => $allowedFileExtensions,
@@ -285,7 +309,7 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      *
      * @return array
      */
-    
+
     protected function getValuesForShowinpreview()
     {
         return [
