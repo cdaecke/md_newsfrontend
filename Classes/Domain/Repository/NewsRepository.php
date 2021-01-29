@@ -40,22 +40,13 @@ class NewsRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
     public function findByFeuserId(int $userId, int $allowNotEnabledNews = 0)
     {
 
-        $tableName = 'tx_news_domain_model_news';
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($tableName);
-        $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
-
-        if( $allowNotEnabledNews === 1){
-            $queryBuilder
-                ->getRestrictions()
-                ->removeByType(StartTimeRestriction::class)
-                ->removeByType(EndTimeRestriction::class);
+        $query = $this->createQuery();
+        $query->matching($query->equals('Tx_md_newsfrontend_feuser', $userId));
+        if( $allowNotEnabledNews === 1) {
+            $query->getQuerySettings()->setIgnoreEnableFields(true);
         }
+        return $query->execute();
 
-        return $queryBuilder
-            ->select('*')
-            ->from($tableName)
-            ->where($queryBuilder->expr()->eq('Tx_md_newsfrontend_feuser', $queryBuilder->createNamedParameter($userId, \PDO::PARAM_INT)))
-            ->execute();
     }
 
 }
