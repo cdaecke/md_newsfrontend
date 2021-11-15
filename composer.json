@@ -2,8 +2,7 @@
     "name": "mediadreams/md_newsfrontend",
     "type": "typo3-cms-extension",
     "description": "This TYPO3 extension enables frontend users to created news records.",
-    "version": "2.0.2",
-    "license": "GPL-2.0+",
+    "license": "GPL-2.0-or-later",
     "keywords": [
         "TYPO3",
         "extension",
