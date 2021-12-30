@@ -1,4 +1,5 @@
 <?php
+
 namespace Mediadreams\MdNewsfrontend\Controller;
 
 /**
@@ -12,21 +13,23 @@ namespace Mediadreams\MdNewsfrontend\Controller;
  *
  */
 
+use GeorgRinger\NumberedPagination\NumberedPagination;
+use Mediadreams\MdNewsfrontend\Domain\Repository\NewsRepository;
+use Mediadreams\MdNewsfrontend\Utility\FileUpload;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-
 use TYPO3\CMS\Extbase\Domain\Repository\CategoryRepository;
+use TYPO3\CMS\Extbase\Domain\Repository\FrontendUserRepository;
+use TYPO3\CMS\Extbase\Pagination\QueryResultPaginator;
 use TYPO3\CMS\Extbase\Property\TypeConverter\DateTimeConverter;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
-use TYPO3\CMS\Core\Messaging\AbstractMessage;
-
-use Mediadreams\MdNewsfrontend\Utility\FileUpload;
-
 /**
- * Base controllerUnreadnewsController
+ * Class BaseController
+ * @package Mediadreams\MdNewsfrontend\Controller
  */
 class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
 {
@@ -36,20 +39,41 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     protected $uploadFields = ['falMedia', 'falRelatedFiles'];
 
     /**
+     * categoryRepository
+     *
+     * @var CategoryRepository
+     */
+    protected $categoryRepository = null;
+
+    /**
      * newsRepository
      *
-     * @var \Mediadreams\MdNewsfrontend\Domain\Repository\NewsRepository
-     * @TYPO3\CMS\Extbase\Annotation\Inject
+     * @var NewsRepository
      */
     protected $newsRepository = null;
 
     /**
      * userRepository
      *
-     * @var \TYPO3\CMS\Extbase\Domain\Repository\FrontendUserRepository
-     * @TYPO3\CMS\Extbase\Annotation\Inject
+     * @var FrontendUserRepository
      */
     protected $userRepository = null;
+
+    /**
+     * NewsController constructor.
+     * @param CategoryRepository $categoryRepository
+     * @param NewsRepository $newsRepository
+     * @param FrontendUserRepository $userRepository
+     */
+    public function __construct(
+        CategoryRepository $categoryRepository,
+        NewsRepository $newsRepository,
+        FrontendUserRepository $userRepository
+    ) {
+        $this->categoryRepository = $categoryRepository;
+        $this->newsRepository = $newsRepository;
+        $this->userRepository = $userRepository;
+    }
 
     /**
      * Deactivate errorFlashMessage
@@ -71,21 +95,22 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
         // check if user is logged in
         if (!$GLOBALS['TSFE']->fe_user->user) {
             $this->addFlashMessage(
-                LocalizationUtility::translate('controller.not_loggedin','md_newsfrontend'),
-                '', 
+                LocalizationUtility::translate('controller.not_loggedin', 'md_newsfrontend'),
+                '',
                 AbstractMessage::ERROR
             );
-        } else if (!isset($this->settings['uploadPath'])) { // check if TypoScript is loaded
-            $this->addFlashMessage(
-                LocalizationUtility::translate('controller.typoscript_missing','md_newsfrontend'),
-                '', 
-                AbstractMessage::ERROR
-            );
+        } else {
+            if (!isset($this->settings['uploadPath'])) { // check if TypoScript is loaded
+                $this->addFlashMessage(
+                    LocalizationUtility::translate('controller.typoscript_missing', 'md_newsfrontend'),
+                    '',
+                    AbstractMessage::ERROR
+                );
+            }
         }
-        
-        if ( strlen($this->settings['parentCategory']) > 0 ) {
-            $categoryRepository = $this->objectManager->get(CategoryRepository::class);
-            $categories = $categoryRepository->findByParent($this->settings['parentCategory']);
+
+        if (strlen($this->settings['parentCategory']) > 0) {
+            $categories = $this->categoryRepository->findByParent($this->settings['parentCategory']);
 
             // Assign categories to template
             $view->assign('categories', $categories);
@@ -103,7 +128,7 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
         // Use stdWrap for given defined settings
         // Thanks to Georg Ringer: https://github.com/georgringer/news/blob/2c8522ad508fa92ad39a5effe4301f7d872238a5/Classes/Controller/NewsController.php#L597
         if (
-            isset($this->settings['useStdWrap']) 
+            isset($this->settings['useStdWrap'])
             && !empty($this->settings['useStdWrap'])
         ) {
             $typoScriptService = GeneralUtility::makeInstance(TypoScriptService::class);
@@ -139,8 +164,8 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     {
         if ($newsRecord->getTxMdNewsfrontendFeuser()->getUid() != $this->feuserUid) {
             $this->addFlashMessage(
-                LocalizationUtility::translate('controller.access_error','md_newsfrontend'),
-                '', 
+                LocalizationUtility::translate('controller.access_error', 'md_newsfrontend'),
+                '',
                 AbstractMessage::ERROR
             );
 
@@ -160,7 +185,7 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
         // add validator for upload fields
         $this->initializeFileValidator($requestArguments, $argument);
 
-        if ( !empty($requestArguments[$argument->getName()]['datetime']) ) {
+        if (!empty($requestArguments[$argument->getName()]['datetime'])) {
             // use correct format for datetime
             $argument
                 ->getPropertyMappingConfiguration()
@@ -193,21 +218,21 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     protected function initializeFileUpload($requestArguments, $obj)
     {
         foreach ($this->uploadFields as $fieldName) {
-            if ( !empty($requestArguments[$fieldName]['tmp_name']) ) {
+            if (!empty($requestArguments[$fieldName]['tmp_name'])) {
                 // upload new file and update file reference (meta data)
                 FileUpload::handleUpload(
-                    $requestArguments, 
-                    $obj, 
-                    $fieldName, 
+                    $requestArguments,
+                    $obj,
+                    $fieldName,
                     $this->settings,
                     $this->feuserUid
                 );
             } else {
-                $methodName = 'getFirst'.ucfirst($fieldName);
-                if ( $obj->$methodName() ) {
+                $methodName = 'getFirst' . ucfirst($fieldName);
+                if ($obj->$methodName()) {
                     // update meta data
                     $this->updateFileReference(
-                        $obj->$methodName()->getUid(), 
+                        $obj->$methodName()->getUid(),
                         $requestArguments[$fieldName]
                     );
                 }
@@ -226,9 +251,9 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     {
         foreach ($this->uploadFields as $fieldName) {
             $this->addFileuploadValidator(
-                $argument, 
-                $requestArguments[$fieldName], 
-                $this->settings['allowed_'.$fieldName]
+                $argument,
+                $requestArguments[$fieldName],
+                $this->settings['allowed_' . $fieldName]
             );
         }
     }
@@ -244,9 +269,9 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
         $validator = $arguments->getValidator();
 
         $checkFileUploadValidator = $this->objectManager->get(
-            'Mediadreams\MdNewsfrontend\Domain\Validator\CheckFileUpload', 
+            'Mediadreams\MdNewsfrontend\Domain\Validator\CheckFileUpload',
             array(
-                'filesArr'              => $fieldName,
+                'filesArr' => $fieldName,
                 'allowedFileExtensions' => $allowedFileExtensions,
             )
         );
@@ -263,10 +288,10 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      */
     protected function updateFileReference($fileReferencesUid, $fileData)
     {
-        $showinpreview = !isset($fileData['showinpreview'])? 0:$fileData['showinpreview'];
+        $showinpreview = !isset($fileData['showinpreview']) ? 0 : $fileData['showinpreview'];
 
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-                        ->getQueryBuilderForTable('sys_file_reference');
+            ->getQueryBuilderForTable('sys_file_reference');
 
         $queryBuilder
             ->update('sys_file_reference')
@@ -285,7 +310,7 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      *
      * @return array
      */
-    
+
     protected function getValuesForShowinpreview()
     {
         return [
@@ -318,5 +343,34 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
         foreach ($cacheTagsToFlush as $cacheTag) {
             $cacheManager->flushCachesInGroupByTag('pages', $cacheTag);
         }
+    }
+
+    /**
+     * Assign pagination to current view object
+     *
+     * @param $items
+     * @param int $itemsPerPage
+     * @param int $maximumNumberOfLinks
+     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\NoSuchArgumentException
+     */
+    protected function assignPagination($items, $itemsPerPage = 10, $maximumNumberOfLinks = 5)
+    {
+        $currentPage = $this->request->hasArgument('currentPage') ? (int)$this->request->getArgument('currentPage') : 1;
+
+        $paginator = new QueryResultPaginator(
+            $items,
+            $currentPage,
+            $itemsPerPage
+        );
+
+        $pagination = new NumberedPagination(
+            $paginator,
+            $maximumNumberOfLinks
+        );
+
+        $this->view->assign('pagination', [
+            'paginator' => $paginator,
+            'pagination' => $pagination,
+        ]);
     }
 }

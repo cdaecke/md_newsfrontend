@@ -6,21 +6,27 @@
 
         <f:flashMessages />
 
-        <f:if condition="{news}">
+        <f:if condition="{pagination.paginator.paginatedItems}">
             <f:then>
-                <f:widget.paginate objects="{news}" as="paginatedNews" configuration="{itemsPerPage: 10}">
-                    <div class="row">
-                        <f:for each="{paginatedNews}" as="newsItem" iteration="i">
-                            <div class="col-sm-8 {f:if(condition:'{i.isEven}',then:'even',else:'odd')}">
-                                {newsItem.title}
-                            </div>
-                            <div class="col-sm-4 text-right {f:if(condition:'{i.isEven}',then:'even',else:'odd')}">
-                                <f:link.action action="edit" arguments="{news : newsItem}" class="mr-3" title="{f:translate(key: 'edit')}: {newsItem.title}"><i class="fas fa-pencil-alt"></i> <f:translate key="edit" /></f:link.action>
-                                <f:link.action action="delete" arguments="{news : newsItem}" class="text-danger delete" additionalAttributes="{data-toggle: 'modal', data-target: '#deleteModal'}" title="{f:translate(key: 'delete')}: {newsItem.title}"><i class="fas fa-trash-alt"></i> <f:translate key="delete" /></f:link.action>
-                            </div>
-                        </f:for>
-                    </div>
-                </f:widget.paginate>
+                <f:if condition="{settings.list.paginate.insertAbove}">
+                    <f:render partial="Pagination" arguments="{pagination: pagination.pagination, paginator: pagination.paginator}" />
+                </f:if>
+
+                <div class="row">
+                    <f:for each="{pagination.paginator.paginatedItems}" as="newsItem" iteration="i">
+                        <div class="col-sm-8 {f:if(condition:'{i.isEven}',then:'even',else:'odd')}">
+                            {newsItem.title}
+                        </div>
+                        <div class="col-sm-4 text-right {f:if(condition:'{i.isEven}',then:'even',else:'odd')}">
+                            <f:link.action action="edit" arguments="{news : newsItem}" class="mr-3" title="{f:translate(key: 'edit')}: {newsItem.title}"><i class="fas fa-pencil-alt"></i> <f:translate key="edit" /></f:link.action>
+                            <f:link.action action="delete" arguments="{news : newsItem}" class="text-danger delete" additionalAttributes="{data-toggle: 'modal', data-target: '#deleteModal'}" title="{f:translate(key: 'delete')}: {newsItem.title}"><i class="fas fa-trash-alt"></i> <f:translate key="delete" /></f:link.action>
+                        </div>
+                    </f:for>
+                </div>
+
+                <f:if condition="{settings.list.paginate.insertBelow}">
+                    <f:render partial="Pagination" arguments="{pagination: pagination.pagination, paginator: pagination.paginator}" />
+                </f:if>
             </f:then>
             <f:else>
                 <div class="no-items">

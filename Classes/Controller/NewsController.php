@@ -1,4 +1,5 @@
 <?php
+
 namespace Mediadreams\MdNewsfrontend\Controller;
 
 /**
@@ -21,7 +22,8 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use Mediadreams\MdNewsfrontend\Service\NewsSlugHelper;
 
 /**
- * NewsController
+ * Class NewsController
+ * @package Mediadreams\MdNewsfrontend\Controller
  */
 class NewsController extends BaseController
 {
@@ -33,7 +35,12 @@ class NewsController extends BaseController
     public function listAction()
     {
         $news = $this->newsRepository->findByTxMdNewsfrontendFeuser($this->feuserUid);
-        $this->view->assign('news', $news);
+
+        $this->assignPagination(
+            $news,
+            $this->settings['paginate']['itemsPerPage'],
+            $this->settings['paginate']['maximumNumberOfLinks']
+        );
     }
 
     /**
@@ -82,14 +89,14 @@ class NewsController extends BaseController
 
         // add signal slot BeforeSave
         $this->signalSlotDispatcher->dispatch(
-            __CLASS__, 
-            __FUNCTION__ . 'BeforeSave', 
+            __CLASS__,
+            __FUNCTION__ . 'BeforeSave',
             [$newNews, $this]
         );
 
         $this->newsRepository->add($newNews);
         $persistenceManager = $this->objectManager->get(PersistenceManager::class);
- 
+
         // persist news entry in order to get the uid of the entry
         $persistenceManager->persistAll();
 
@@ -106,16 +113,16 @@ class NewsController extends BaseController
 
         // add signal slot AfterPersist
         $this->signalSlotDispatcher->dispatch(
-            __CLASS__, 
-            __FUNCTION__ . 'AfterPersist', 
+            __CLASS__,
+            __FUNCTION__ . 'AfterPersist',
             [$newNews, $this]
         );
-        
+
         $this->clearNewsCache($newNews->getUid(), $newNews->getPid());
 
         $this->addFlashMessage(
-            LocalizationUtility::translate('controller.new_success','md_newsfrontend'),
-            '', 
+            LocalizationUtility::translate('controller.new_success', 'md_newsfrontend'),
+            '',
             AbstractMessage::OK
         );
 
@@ -132,7 +139,7 @@ class NewsController extends BaseController
     public function editAction(\Mediadreams\MdNewsfrontend\Domain\Model\News $news)
     {
         $this->checkAccess($news);
-        
+
         $this->view->assignMultiple(
             [
                 'news' => $news,
@@ -170,21 +177,21 @@ class NewsController extends BaseController
         // Remove file relation from news record
         foreach ($this->uploadFields as $fieldName) {
             if ($requestArguments[$fieldName]['delete'] == 1) {
-                $removeMethod = 'remove'.ucfirst($fieldName);
-                $getFirstMethod = 'getFirst'.ucfirst($fieldName);
+                $removeMethod = 'remove' . ucfirst($fieldName);
+                $getFirstMethod = 'getFirst' . ucfirst($fieldName);
 
                 $news->$removeMethod($news->$getFirstMethod());
             }
         }
-        
+
 
         // handle the fileupload
         $this->initializeFileUpload($requestArguments, $news);
 
         // add signal slot BeforeSave
         $this->signalSlotDispatcher->dispatch(
-            __CLASS__, 
-            __FUNCTION__ . 'BeforeSave', 
+            __CLASS__,
+            __FUNCTION__ . 'BeforeSave',
             [$news, $this]
         );
 
@@ -192,8 +199,8 @@ class NewsController extends BaseController
         $this->clearNewsCache($news->getUid(), $news->getPid());
 
         $this->addFlashMessage(
-            LocalizationUtility::translate('controller.edit_success','md_newsfrontend'),
-            '', 
+            LocalizationUtility::translate('controller.edit_success', 'md_newsfrontend'),
+            '',
             AbstractMessage::OK
         );
 
@@ -212,8 +219,8 @@ class NewsController extends BaseController
 
         // add signal slot BeforeSave
         $this->signalSlotDispatcher->dispatch(
-            __CLASS__, 
-            __FUNCTION__ . 'BeforeDelete', 
+            __CLASS__,
+            __FUNCTION__ . 'BeforeDelete',
             [$news, $this]
         );
 
@@ -222,8 +229,8 @@ class NewsController extends BaseController
         $this->clearNewsCache($news->getUid(), $news->getPid());
 
         $this->addFlashMessage(
-            LocalizationUtility::translate('controller.delete_success','md_newsfrontend'),
-            '', 
+            LocalizationUtility::translate('controller.delete_success', 'md_newsfrontend'),
+            '',
             AbstractMessage::OK
         );
 

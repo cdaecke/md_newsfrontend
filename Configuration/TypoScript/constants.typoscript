@@ -51,5 +51,13 @@ plugin.tx_mdnewsfrontend_newsfe {
 
         # cat=plugin.tx_mdnewsfrontend_newsfe/g1; type=string; label=Format of input for field datetime
         formatArchive = d.m.Y
+
+        # cat=plugin.tx_mdnewsfrontend_newsfe/h1; type=string; label=Paginate configuration
+        paginate {
+            itemsPerPage = 10
+            insertAbove = 0
+            insertBelow = 1
+            maximumNumberOfLinks = 6
+        }
     }
 }

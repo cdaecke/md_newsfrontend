@@ -47,5 +47,12 @@ plugin.tx_mdnewsfrontend_newsfe {
 
         formatDatetime = {$plugin.tx_mdnewsfrontend_newsfe.settings.formatDatetime}
         formatArchive = {$plugin.tx_mdnewsfrontend_newsfe.settings.formatArchive}
+
+        paginate {
+            itemsPerPage = {$plugin.tx_mdnewsfrontend_newsfe.settings.paginate.itemsPerPage}
+            insertAbove = {$plugin.tx_mdnewsfrontend_newsfe.settings.paginate.insertAbove}
+            insertBelow = {$plugin.tx_mdnewsfrontend_newsfe.settings.paginate.insertBelow}
+            maximumNumberOfLinks = {$plugin.tx_mdnewsfrontend_newsfe.settings.paginate.maximumNumberOfLinks}
+        }
     }
 }
