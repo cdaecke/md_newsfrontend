@@ -8,7 +8,7 @@
 
         <f:if condition="{pagination.paginator.paginatedItems}">
             <f:then>
-                <f:if condition="{settings.list.paginate.insertAbove}">
+                <f:if condition="{settings.paginate.insertAbove}">
                     <f:render partial="Pagination" arguments="{pagination: pagination.pagination, paginator: pagination.paginator}" />
                 </f:if>
 
@@ -19,23 +19,25 @@
                         </div>
                         <div class="col-sm-4 text-right {f:if(condition:'{i.isEven}',then:'even',else:'odd')}">
                             <f:link.action action="edit" arguments="{news : newsItem}" class="mr-3" title="{f:translate(key: 'edit')}: {newsItem.title}"><i class="fas fa-pencil-alt"></i> <f:translate key="edit" /></f:link.action>
-                            <f:link.action action="delete" arguments="{news : newsItem}" class="text-danger delete" additionalAttributes="{data-toggle: 'modal', data-target: '#deleteModal'}" title="{f:translate(key: 'delete')}: {newsItem.title}"><i class="fas fa-trash-alt"></i> <f:translate key="delete" /></f:link.action>
+                            <f:link.action action="delete" arguments="{news : newsItem}" class="text-danger delete" additionalAttributes="{data-toggle: 'modal', data-target: '#deleteModal', data-bs-toggle: 'modal', data-bs-target: '#deleteModal'}" title="{f:translate(key: 'delete')}: {newsItem.title}"><i class="fas fa-trash-alt"></i> <f:translate key="delete" /></f:link.action>
                         </div>
                     </f:for>
                 </div>
 
-                <f:if condition="{settings.list.paginate.insertBelow}">
+                <f:link.action action="new" class="btn btn-primary"><f:translate key="new" /></f:link.action>
+
+                <f:if condition="{settings.paginate.insertBelow}">
                     <f:render partial="Pagination" arguments="{pagination: pagination.pagination, paginator: pagination.paginator}" />
                 </f:if>
             </f:then>
             <f:else>
                 <div class="no-items">
-                    <f:translate key="no_items" />
+                    <p><f:translate key="no_items" /></p>
+
+                    <f:link.action action="new" class="btn btn-primary"><f:translate key="new" /></f:link.action>
                 </div>
             </f:else>
         </f:if>
-
-        <f:link.action action="new" class="btn btn-primary"><f:translate key="new" /></f:link.action>
 
         <!-- Modal -->
         <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -43,15 +45,13 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="deleteModalLabel"><f:translate key="modal.title" /></h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                        <button type="button" class="close btn-close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <f:translate key="modal.text" />
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal"><f:translate key="modal.close" /></button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" data-bs-dismiss="modal"><f:translate key="modal.close" /></button>
                         <a href="#" class="btn btn-danger" id="delLink"><f:translate key="modal.delete" /></a>
                     </div>
                 </div>
@@ -59,13 +59,15 @@
         </div>
 
         <script type="text/javascript">
-            (function($){
-                $(document).ready(function() {
-                    $('.delete').on('click', function() {
-                        $('#delLink').attr('href', $(this).attr('href'));
+            document.addEventListener('DOMContentLoaded',() => {
+                (function($){
+                    $(document).ready(function() {
+                        $('.delete').on('click', function() {
+                            $('#delLink').attr('href', $(this).attr('href'));
+                        });
                     });
-                });
-            })(jQuery);
+                })(jQuery);
+            });
         </script>
     </f:section>
 </html>

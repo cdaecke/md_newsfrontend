@@ -230,6 +230,27 @@
                 <source>File type not allowed.</source>
                 <target>Der Dateityp ist nicht erlaubt.</target>
             </trans-unit>
+
+            <trans-unit id="pagination.overall">
+                <source>Page %s of %s</source>
+                <target>Seite %s von %s</target>
+            </trans-unit>
+            <trans-unit id="pagination.first">
+                <source>First</source>
+                <target>Anfang</target>
+            </trans-unit>
+            <trans-unit id="pagination.last">
+                <source>Last</source>
+                <target>Ende</target>
+            </trans-unit>
+            <trans-unit id="pagination.previous">
+                <source>Previous</source>
+                <target>Vorherige</target>
+            </trans-unit>
+            <trans-unit id="pagination.next">
+                <source>Next</source>
+                <target>Nächste</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

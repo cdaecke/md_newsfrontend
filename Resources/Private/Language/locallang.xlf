@@ -176,6 +176,22 @@
             <trans-unit id="validator.file_type">
                 <source>File type not allowed.</source>
             </trans-unit>
+
+            <trans-unit id="pagination.overall">
+                <source>Page %s of %s</source>
+            </trans-unit>
+            <trans-unit id="pagination.first">
+                <source>First</source>
+            </trans-unit>
+            <trans-unit id="pagination.last">
+                <source>Last</source>
+            </trans-unit>
+            <trans-unit id="pagination.previous">
+                <source>Previous</source>
+            </trans-unit>
+            <trans-unit id="pagination.next">
+                <source>Next</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>
