@@ -1,4 +1,5 @@
 <?php
+
 namespace Mediadreams\MdNewsfrontend\Domain\Validator;
 
 /**
@@ -12,24 +13,26 @@ namespace Mediadreams\MdNewsfrontend\Domain\Validator;
  *
  */
 
+use TYPO3\CMS\Core\Resource\Security\FileNameValidator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
+ * Class CheckFileUpload
  * Validator for file upload
  *
- * @api
+ * @package Mediadreams\MdNewsfrontend\Domain\Validator
  */
 class CheckFileUpload extends \TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator
 {
     /**
      * @var array
      */
-    protected $supportedOptions = array(
-        'filesArr'              => array(0, 'The $_FILE["image"] array', 'array'),
-        'allowedFileExtensions' => array(0, 'A comma seperated list of allowed file extensions', 'string'),
-    );
+    protected $supportedOptions = [
+        'filesArr' => [0, 'The $_FILE["image"] array', 'array'],
+        'allowedFileExtensions' => [0, 'A comma seperated list of allowed file extensions', 'string'],
+    ];
 
     /**
      * Validates the file upload
@@ -45,7 +48,7 @@ class CheckFileUpload extends \TYPO3\CMS\Extbase\Validation\Validator\AbstractVa
         $uploadFile = $this->options['filesArr'];
         $allowedFileExtensions = $this->options['allowedFileExtensions'];
 
-        if ( !empty($uploadFile['name']) ) {
+        if (!empty($uploadFile['name'])) {
             $this->checkDenyPattern($uploadFile);
             $this->checkUploadError($uploadFile);
             $this->checkFileExtension($uploadFile, $allowedFileExtensions);
@@ -55,13 +58,13 @@ class CheckFileUpload extends \TYPO3\CMS\Extbase\Validation\Validator\AbstractVa
     /**
      * General check against deny pattern in TYPO3
      *
-     * @var $uploadFile The $_FILE["image"] parameter
      * @return bool
+     * @var $uploadFile The $_FILE["image"] parameter
      */
     private function checkDenyPattern($uploadFile)
     {
-        if (!GeneralUtility::verifyFilenameAgainstDenyPattern($uploadFile['name'])) {
-            $this->addError(LocalizationUtility::translate('validator.file_type','md_newsfrontend'), 1540902993);
+        if (!GeneralUtility::makeInstance(FileNameValidator::class)->isValid($uploadFile['name'])) {
+            $this->addError(LocalizationUtility::translate('validator.file_type', 'md_newsfrontend'), 1540902993);
         }
 
         return true;
@@ -70,26 +73,26 @@ class CheckFileUpload extends \TYPO3\CMS\Extbase\Validation\Validator\AbstractVa
     /**
      * Checks upload error
      *
-     * @var $uploadFile The $_FILE["image"] parameter
      * @return bool
+     * @var $uploadFile The $_FILE["image"] parameter
      */
     private function checkUploadError($uploadFile)
     {
-        if ( !isset($uploadFile['error']) || is_array($uploadFile['error']) ) {
-            $this->addError(LocalizationUtility::translate('validator.wrong_parameter','md_newsfrontend'), 1540929658);
+        if (!isset($uploadFile['error']) || is_array($uploadFile['error'])) {
+            $this->addError(LocalizationUtility::translate('validator.wrong_parameter', 'md_newsfrontend'), 1540929658);
         }
 
         switch ($uploadFile['error']) {
             case \UPLOAD_ERR_OK:
                 break;
             case \UPLOAD_ERR_NO_FILE:
-                $this->addError(LocalizationUtility::translate('validator.no_file','md_newsfrontend'), 1540929694);
+                $this->addError(LocalizationUtility::translate('validator.no_file', 'md_newsfrontend'), 1540929694);
             case \UPLOAD_ERR_INI_SIZE:
             case \UPLOAD_ERR_FORM_SIZE:
             case \UPLOAD_ERR_PARTIAL:
-                $this->addError(LocalizationUtility::translate('validator.partial','md_newsfrontend').' ' . $uploadFile['error'], 1540929726);
+                $this->addError(LocalizationUtility::translate('validator.partial', 'md_newsfrontend') . ' ' . $uploadFile['error'], 1540929726);
             default:
-                $this->addError(LocalizationUtility::translate('validator.unknown','md_newsfrontend'), 1540929756);
+                $this->addError(LocalizationUtility::translate('validator.unknown', 'md_newsfrontend'), 1540929756);
         }
 
         return true;
@@ -98,9 +101,9 @@ class CheckFileUpload extends \TYPO3\CMS\Extbase\Validation\Validator\AbstractVa
     /**
      * Checks for allowed file extensions
      *
+     * @return bool
      * @var array $uploadFile The $_FILE["image"] parameter
      * @var string $allowedFileExtensions String of comma seperated file extensions which are allowed
-     * @return bool
      */
     private function checkFileExtension($uploadFile, $allowedFileExtensions)
     {
@@ -108,7 +111,7 @@ class CheckFileUpload extends \TYPO3\CMS\Extbase\Validation\Validator\AbstractVa
         if ($allowedFileExtensions !== null) {
             $filePathInfo = PathUtility::pathinfo($uploadFile['name']);
             if (!GeneralUtility::inList($allowedFileExtensions, strtolower($filePathInfo['extension']))) {
-                $this->addError(LocalizationUtility::translate('validator.allowed_file_extensions','md_newsfrontend').' '.$allowedFileExtensions, 1540903586);
+                $this->addError(LocalizationUtility::translate('validator.allowed_file_extensions', 'md_newsfrontend') . ' ' . $allowedFileExtensions, 1540903586);
             }
         }
 
