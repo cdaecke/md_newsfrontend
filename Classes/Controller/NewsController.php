@@ -13,13 +13,15 @@ namespace Mediadreams\MdNewsfrontend\Controller;
  *
  */
 
+use Mediadreams\MdNewsfrontend\Event\CreateActionAfterPersistEvent;
+use Mediadreams\MdNewsfrontend\Event\CreateActionBeforeSaveEvent;
+use Mediadreams\MdNewsfrontend\Event\DeleteActionBeforeDeleteEvent;
+use Mediadreams\MdNewsfrontend\Event\UpdateActionBeforeSaveEvent;
+use Mediadreams\MdNewsfrontend\Service\NewsSlugHelper;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
-
-use Mediadreams\MdNewsfrontend\Service\NewsSlugHelper;
 
 /**
  * Class NewsController
@@ -27,6 +29,21 @@ use Mediadreams\MdNewsfrontend\Service\NewsSlugHelper;
  */
 class NewsController extends BaseController
 {
+    /**
+     * persistenceManager
+     *
+     * @var PersistenceManager
+     */
+    protected $persistenceManager = null;
+
+    /**
+     * @param PersistenceManager $persistenceManager
+     */
+    public function injectPersistenceManager(PersistenceManager $persistenceManager)
+    {
+        $this->persistenceManager = $persistenceManager;
+    }
+
     /**
      * action list
      *
@@ -90,17 +107,20 @@ class NewsController extends BaseController
         $newNews->setTxMdNewsfrontendFeuser($this->feuserObj);
 
         // add signal slot BeforeSave
+        // @deprecated will be removed in TYPO3 v12.0. Use PSR-14 based events and EventDispatcherInterface instead.
         $this->signalSlotDispatcher->dispatch(
             __CLASS__,
             __FUNCTION__ . 'BeforeSave',
             [$newNews, $this]
         );
 
+        // PSR-14 Event
+        $this->eventDispatcher->dispatch(new CreateActionBeforeSaveEvent($newNews, $this));
+
         $this->newsRepository->add($newNews);
-        $persistenceManager = $this->objectManager->get(PersistenceManager::class);
 
         // persist news entry in order to get the uid of the entry
-        $persistenceManager->persistAll();
+        $this->persistenceManager->persistAll();
 
         // generate and set slug for news record
         $slugHelper = GeneralUtility::makeInstance(NewsSlugHelper::class);
@@ -114,11 +134,15 @@ class NewsController extends BaseController
         $this->initializeFileUpload($requestArguments, $newNews);
 
         // add signal slot AfterPersist
+        // @deprecated will be removed in TYPO3 v12.0. Use PSR-14 based events and EventDispatcherInterface instead.
         $this->signalSlotDispatcher->dispatch(
             __CLASS__,
             __FUNCTION__ . 'AfterPersist',
             [$newNews, $this]
         );
+
+        // PSR-14 Event
+        $this->eventDispatcher->dispatch(new CreateActionAfterPersistEvent($newNews, $this));
 
         $this->clearNewsCache($newNews->getUid(), $newNews->getPid());
 
@@ -191,11 +215,15 @@ class NewsController extends BaseController
         $this->initializeFileUpload($requestArguments, $news);
 
         // add signal slot BeforeSave
+        // @deprecated will be removed in TYPO3 v12.0. Use PSR-14 based events and EventDispatcherInterface instead.
         $this->signalSlotDispatcher->dispatch(
             __CLASS__,
             __FUNCTION__ . 'BeforeSave',
             [$news, $this]
         );
+
+        // PSR-14 Event
+        $this->eventDispatcher->dispatch(new UpdateActionBeforeSaveEvent($news, $this));
 
         $this->newsRepository->update($news);
         $this->clearNewsCache($news->getUid(), $news->getPid());
@@ -220,11 +248,15 @@ class NewsController extends BaseController
         $this->checkAccess($news);
 
         // add signal slot BeforeSave
+        // @deprecated will be removed in TYPO3 v12.0. Use PSR-14 based events and EventDispatcherInterface instead.
         $this->signalSlotDispatcher->dispatch(
             __CLASS__,
             __FUNCTION__ . 'BeforeDelete',
             [$news, $this]
         );
+
+        // PSR-14 Event
+        $this->eventDispatcher->dispatch(new DeleteActionBeforeDeleteEvent($news, $this));
 
         $this->newsRepository->remove($news);
 

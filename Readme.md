@@ -6,7 +6,7 @@ Templates are ready to use with the [bootstrap framework](https://getbootstrap.c
 
 ## Requirements
 
-- TYPO3 >= 8.7
+- TYPO3 >= 10.4
 - ext:news >= 7.0
 
 ## Installation
@@ -23,12 +23,15 @@ Templates are ready to use with the [bootstrap framework](https://getbootstrap.c
 
 ### Signal slots
 
+<mark>Signal slots are deprecated and will be removed in TYPO3 v12.0.
+Please use PSR-14 Events instead (see below)!</mark>
+
 Following signal slots are available:
 
-- createActionBeforeSave: Called just before saving a new record
-- createActionAfterPersist: Called after a new record was saved (new record Id is available)
-- updateActionBeforeSave: Called just before an existig record will be updated
-- deleteActionBeforeDelete: Called just before a record will be deleted
+- `createActionBeforeSave`: Called just before saving a new record
+- `createActionAfterPersist`: Called after a new record was saved (new record Id is available)
+- `updateActionBeforeSave`: Called just before an existig record will be updated
+- `deleteActionBeforeDelete`: Called just before a record will be deleted
 
 Example, how to catch a signal:
 
@@ -66,6 +69,51 @@ class YourClass
         // do something...
     }
 }
+```
+
+## PSR-14 Events
+
+Following PSR-14 events are available:
+
+- `Mediadreams\MdNewsfrontend\Event\CreateActionBeforeSave`: Called just before saving a new record
+- `Mediadreams\MdNewsfrontend\Event\CreateActionAfterPersist`: Called after a new record was saved (new record Id is available)
+- `Mediadreams\MdNewsfrontend\Event\UpdateActionBeforeSave`: Called just before an existig record will be updated
+- `Mediadreams\MdNewsfrontend\Event\DeleteActionBeforeDelete`: Called just before a record will be deleted
+
+### Register an event
+
+Add following lines in `Configuration/Services.yaml` of your own extension:
+
+```yaml
+services:
+  Vendor\Extension\EventListener\MyListener:
+    tags:
+      - name: event.listener
+        identifier: 'ext-mdnewsfrontend/createActionBeforeSaveEvent'
+        method: 'yourMethod'
+        event: Mediadreams\MdNewsfrontend\Event\CreateActionBeforeSaveEvent
+```
+
+Add the class `Vendor\Extension\EventListener\MyListener` with the method `enrichNews` in your extension:
+
+```php
+namespace Vendor\Extension\EventListener;
+
+use Mediadreams\MdNewsfrontend\Event\CreateActionBeforeSaveEvent;
+
+final class MyListener
+{
+    public function yourMethod(CreateActionBeforeSaveEvent $obj)
+    {
+        // Get news object 
+        $news = $obj->getNews();
+        $news->setTeaser('Set some teaser...');
+
+        // Get NewsController
+        $newsController = $obj->getNewsController();
+    }
+}
+
 ```
 
 ## Bugs and Known Issues
