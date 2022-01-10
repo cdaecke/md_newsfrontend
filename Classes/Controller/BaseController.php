@@ -16,6 +16,7 @@ namespace Mediadreams\MdNewsfrontend\Controller;
  */
 
 use GeorgRinger\NumberedPagination\NumberedPagination;
+use Mediadreams\MdNewsfrontend\Domain\Model\News;
 use Mediadreams\MdNewsfrontend\Domain\Repository\NewsRepository;
 use Mediadreams\MdNewsfrontend\Property\TypeConverter\EnableFieldsObjectConverter;
 use Mediadreams\MdNewsfrontend\Utility\FileUpload;
@@ -26,6 +27,10 @@ use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Domain\Repository\CategoryRepository;
 use TYPO3\CMS\Extbase\Domain\Repository\FrontendUserRepository;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Mvc\Controller\Argument;
+use TYPO3\CMS\Extbase\Mvc\Exception\NoSuchArgumentException;
+use TYPO3\CMS\Extbase\Mvc\View\ViewInterface;
 use TYPO3\CMS\Extbase\Pagination\QueryResultPaginator;
 use TYPO3\CMS\Extbase\Property\TypeConverter\DateTimeConverter;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
@@ -34,7 +39,7 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
  * Class BaseController
  * @package Mediadreams\MdNewsfrontend\Controller
  */
-class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
+class BaseController extends ActionController
 {
     /**
      * @var array
@@ -91,9 +96,9 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     /**
      * Initializes the view and pass additional data to template
      *
-     * @param \TYPO3\CMS\Extbase\Mvc\View\ViewInterface $view The view to be initialized
+     * @param ViewInterface $view The view to be initialized
      */
-    protected function initializeView(\TYPO3\CMS\Extbase\Mvc\View\ViewInterface $view)
+    protected function initializeView(ViewInterface $view)
     {
         // check if user is logged in
         if (!$GLOBALS['TSFE']->fe_user->user) {
@@ -160,10 +165,10 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      * Check, if news record belongs to user
      * If news record does not belong to user, redirect to list action
      *
-     * @param \Mediadreams\MdNewsfrontend\Domain\Model\News $newsRecord
+     * @param News $newsRecord
      * @return void
      */
-    protected function checkAccess(\Mediadreams\MdNewsfrontend\Domain\Model\News $newsRecord)
+    protected function checkAccess(News $newsRecord)
     {
         if ($newsRecord->getTxMdNewsfrontendFeuser()->getUid() != $this->feuserUid) {
             $this->addFlashMessage(
@@ -180,7 +185,7 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      * This will initialize everything which is needed in create or update action
      *
      * @param array $requestArguments
-     * @param \TYPO3\CMS\Extbase\Mvc\Controller\Argument $argument
+     * @param Argument $argument
      * @return void
      */
     protected function initializeCreateUpdate($requestArguments, $argument)
@@ -232,58 +237,10 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     }
 
     /**
-     * Set type converter for enable fields
-     * This is needed, in order to edit/show/delete hidden records
-     *
-     * @param string $object
-     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\NoSuchArgumentException
-     */
-    protected function setEnableFieldsTypeConverter(string $object): void
-    {
-        if ((int)$this->settings['allowNotEnabledNews'] === 1) {
-            $this->arguments->getArgument('news')
-                ->getPropertyMappingConfiguration()
-                ->setTypeConverter($this->objectManager->get(EnableFieldsObjectConverter::class));
-        }
-    }
-
-    /**
-     * Initialize the file upload for configured fields
-     *
-     * @param array $requestArguments
-     * @param \Mediadreams\MdNewsfrontend\Domain\Model\News $obj
-     * @return void
-     */
-    protected function initializeFileUpload($requestArguments, $obj)
-    {
-        foreach ($this->uploadFields as $fieldName) {
-            if (!empty($requestArguments[$fieldName]['tmp_name'])) {
-                // upload new file and update file reference (meta data)
-                FileUpload::handleUpload(
-                    $requestArguments,
-                    $obj,
-                    $fieldName,
-                    $this->settings,
-                    $this->feuserUid
-                );
-            } else {
-                $methodName = 'getFirst' . ucfirst($fieldName);
-                if ($obj->$methodName()) {
-                    // update meta data
-                    $this->updateFileReference(
-                        $obj->$methodName()->getUid(),
-                        $requestArguments[$fieldName]
-                    );
-                }
-            }
-        }
-    }
-
-    /**
      * Initialize the upload validators for configured fields
      *
      * @param array $requestArguments
-     * @param \TYPO3\CMS\Extbase\Mvc\Controller\Argument $argument
+     * @param Argument $argument
      * @return void
      */
     protected function initializeFileValidator($requestArguments, $argument)
@@ -316,6 +273,54 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
         );
 
         $validator->addValidator($checkFileUploadValidator);
+    }
+
+    /**
+     * Set type converter for enable fields
+     * This is needed, in order to edit/show/delete hidden records
+     *
+     * @param string $object
+     * @throws NoSuchArgumentException
+     */
+    protected function setEnableFieldsTypeConverter(string $object): void
+    {
+        if ((int)$this->settings['allowNotEnabledNews'] === 1) {
+            $this->arguments->getArgument('news')
+                ->getPropertyMappingConfiguration()
+                ->setTypeConverter($this->objectManager->get(EnableFieldsObjectConverter::class));
+        }
+    }
+
+    /**
+     * Initialize the file upload for configured fields
+     *
+     * @param array $requestArguments
+     * @param News $obj
+     * @return void
+     */
+    protected function initializeFileUpload($requestArguments, $obj)
+    {
+        foreach ($this->uploadFields as $fieldName) {
+            if (!empty($requestArguments[$fieldName]['tmp_name'])) {
+                // upload new file and update file reference (meta data)
+                FileUpload::handleUpload(
+                    $requestArguments,
+                    $obj,
+                    $fieldName,
+                    $this->settings,
+                    $this->feuserUid
+                );
+            } else {
+                $methodName = 'getFirst' . ucfirst($fieldName);
+                if ($obj->$methodName()) {
+                    // update meta data
+                    $this->updateFileReference(
+                        $obj->$methodName()->getUid(),
+                        $requestArguments[$fieldName]
+                    );
+                }
+            }
+        }
     }
 
     /**
@@ -390,7 +395,7 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      * @param $items
      * @param int $itemsPerPage
      * @param int $maximumNumberOfLinks
-     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\NoSuchArgumentException
+     * @throws NoSuchArgumentException
      */
     protected function assignPagination($items, $itemsPerPage = 10, $maximumNumberOfLinks = 5)
     {

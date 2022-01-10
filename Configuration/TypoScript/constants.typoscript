@@ -1,66 +1,65 @@
-
 plugin.tx_mdnewsfrontend_newsfe {
-    view {
-        # cat=plugin.tx_mdnewsfrontend_newsfe/file; type=string; label=Path to template root (FE)
-        templateRootPath = EXT:md_newsfrontend/Resources/Private/Templates/
-        # cat=plugin.tx_mdnewsfrontend_newsfe/file; type=string; label=Path to template partials (FE)
-        partialRootPath = EXT:md_newsfrontend/Resources/Private/Partials/
-        # cat=plugin.tx_mdnewsfrontend_newsfe/file; type=string; label=Path to template layouts (FE)
-        layoutRootPath = EXT:md_newsfrontend/Resources/Private/Layouts/
+  view {
+    # cat=plugin.tx_mdnewsfrontend_newsfe/file; type=string; label=Path to template root (FE)
+    templateRootPath = EXT:md_newsfrontend/Resources/Private/Templates/
+    # cat=plugin.tx_mdnewsfrontend_newsfe/file; type=string; label=Path to template partials (FE)
+    partialRootPath = EXT:md_newsfrontend/Resources/Private/Partials/
+    # cat=plugin.tx_mdnewsfrontend_newsfe/file; type=string; label=Path to template layouts (FE)
+    layoutRootPath = EXT:md_newsfrontend/Resources/Private/Layouts/
+  }
+
+  settings {
+    # cat=plugin.tx_mdnewsfrontend_newsfe/a1; type=int+; label=Show categories which have this parent uid. The categories will be shown in the select box of the new and edit form. If no parent category was defined, there will be nothing to select in the frontend.
+    parentCategory =
+
+    # cat=plugin.tx_mdnewsfrontend_newsfe/aa1; type=string; label=Path in fileadmin where to store frontend file uploads. Path will be extended by a folder named by user uid.
+    uploadPath = user_upload/md_newsfrontend
+
+    # cat=plugin.tx_mdnewsfrontend_newsfe/aa2; type=string; label=Comma separated file extensions, which are allowed for file upload in field fal_media.
+    allowed_falMedia = gif,jpg,jpeg,png
+
+    # cat=plugin.tx_mdnewsfrontend_newsfe/aa2; type=int+; label=Max file upload size in Kb for image. This value is optional.
+    allowed_falMedia_size =
+
+    # cat=plugin.tx_mdnewsfrontend_newsfe/aa3; type=string; label=Comma separated file extensions, which are allowed for file upload in field fal_related_files.
+    allowed_falRelatedFiles = pdf
+
+    # cat=plugin.tx_mdnewsfrontend_newsfe/aa3; type=int+; label=Max file upload size in Kb for related file. This value is optional.
+    allowed_falRelatedFiles_size =
+
+    # cat=plugin.tx_mdnewsfrontend_newsfe/b1; type=boolean; label=Load jQuery library. Use this, if you don't habe jQuery loaded already.
+    jquery = 0
+
+    # cat=plugin.tx_mdnewsfrontend_newsfe/c1; type=boolean; label=Load flatpickr for picking of datetime. This is used to enrich fields with a datepicker.
+    flatpickr = 1
+
+    # cat=plugin.tx_mdnewsfrontend_newsfe/d1; type=boolean; label=Load Parsley.js library. This is used for validating form fields.
+    parsleyjs = 1
+
+    # cat=plugin.tx_mdnewsfrontend_newsfe/d2; type=string; label=Language for Parsley.js error messages (eg. de).
+    parsleyjsLang = en
+
+    # cat=plugin.tx_mdnewsfrontend_newsfe/e1; type=boolean; label=Load tinymce library. This is used for rich text editing in textareas.
+    tinymce = 1
+
+    # cat=plugin.tx_mdnewsfrontend_newsfe/e2; type=string; label=Language for tinymce
+    tinymceLang = en
+
+    # cat=plugin.tx_mdnewsfrontend_newsfe/f1; type=string; label=Format of input for field datetime
+    formatDatetime = d.m.Y H:i
+
+    # cat=plugin.tx_mdnewsfrontend_newsfe/g1; type=string; label=Format of input for field datetime
+    formatArchive = d.m.Y
+
+    # cat=plugin.tx_mdnewsfrontend_newsfe/h1; type=boolean; label=Show entries outside of startTS and or stopTS in list
+    allowNotEnabledNews = 0
+
+    # cat=plugin.tx_mdnewsfrontend_newsfe/i1; type=string; label=Paginate configuration
+    paginate {
+      itemsPerPage = 10
+      insertAbove = 0
+      insertBelow = 1
+      maximumNumberOfLinks = 6
     }
-
-    settings {
-        # cat=plugin.tx_mdnewsfrontend_newsfe/a1; type=int+; label=Show categories which have this parent uid. The categories will be shown in the select box of the new and edit form. If no parent category was defined, there will be nothing to select in the frontend.
-        parentCategory =
-
-        # cat=plugin.tx_mdnewsfrontend_newsfe/aa1; type=string; label=Path in fileadmin where to store frontend file uploads. Path will be extended by a folder named by user uid.
-        uploadPath = user_upload/md_newsfrontend
-
-        # cat=plugin.tx_mdnewsfrontend_newsfe/aa2; type=string; label=Comma separated file extensions, which are allowed for file upload in field fal_media.
-        allowed_falMedia = gif,jpg,jpeg,png
-
-        # cat=plugin.tx_mdnewsfrontend_newsfe/aa2; type=int+; label=Max file upload size in Kb for image. This value is optional.
-        allowed_falMedia_size = 
-
-        # cat=plugin.tx_mdnewsfrontend_newsfe/aa3; type=string; label=Comma separated file extensions, which are allowed for file upload in field fal_related_files.
-        allowed_falRelatedFiles = pdf
-
-        # cat=plugin.tx_mdnewsfrontend_newsfe/aa3; type=int+; label=Max file upload size in Kb for related file. This value is optional.
-        allowed_falRelatedFiles_size = 
-
-        # cat=plugin.tx_mdnewsfrontend_newsfe/b1; type=boolean; label=Load jQuery library. Use this, if you don't habe jQuery loaded already.
-        jquery = 0
-
-        # cat=plugin.tx_mdnewsfrontend_newsfe/c1; type=boolean; label=Load flatpickr for picking of datetime. This is used to enrich fields with a datepicker.
-        flatpickr = 1
-
-        # cat=plugin.tx_mdnewsfrontend_newsfe/d1; type=boolean; label=Load Parsley.js library. This is used for validating form fields.
-        parsleyjs = 1
-
-        # cat=plugin.tx_mdnewsfrontend_newsfe/d2; type=string; label=Language for Parsley.js error messages (eg. de).
-        parsleyjsLang = en
-
-        # cat=plugin.tx_mdnewsfrontend_newsfe/e1; type=boolean; label=Load tinymce library. This is used for rich text editing in textareas.
-        tinymce = 1
-
-        # cat=plugin.tx_mdnewsfrontend_newsfe/e2; type=string; label=Language for tinymce
-        tinymceLang = en
-
-        # cat=plugin.tx_mdnewsfrontend_newsfe/f1; type=string; label=Format of input for field datetime
-        formatDatetime = d.m.Y H:i
-
-        # cat=plugin.tx_mdnewsfrontend_newsfe/g1; type=string; label=Format of input for field datetime
-        formatArchive = d.m.Y
-
-        # cat=plugin.tx_mdnewsfrontend_newsfe/h1; type=boolean; label=Show entries outside of startTS and or stopTS in list
-        allowNotEnabledNews = 0
-
-        # cat=plugin.tx_mdnewsfrontend_newsfe/i1; type=string; label=Paginate configuration
-        paginate {
-            itemsPerPage = 10
-            insertAbove = 0
-            insertBelow = 1
-            maximumNumberOfLinks = 6
-        }
-    }
+  }
 }

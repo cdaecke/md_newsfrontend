@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Mediadreams\MdNewsfrontend\Domain\Model;
 
 /**
@@ -12,6 +15,9 @@ namespace Mediadreams\MdNewsfrontend\Domain\Model;
  *
  */
 
+use TYPO3\CMS\Extbase\Domain\Model\FileReference;
+use TYPO3\CMS\Extbase\Domain\Model\FrontendUser;
+
 /**
  * News
  */
@@ -20,14 +26,14 @@ class News extends \GeorgRinger\News\Domain\Model\News
     /**
      * Uid of feUser
      *
-     * @var \TYPO3\CMS\Extbase\Domain\Model\FrontendUser
+     * @var FrontendUser
      */
     protected $txMdNewsfrontendFeuser = null;
 
     /**
      * Returns the txMdNewsfrontendFeuser
      *
-     * @return \TYPO3\CMS\Extbase\Domain\Model\FrontendUser $txMdNewsfrontendFeuser
+     * @return FrontendUser $txMdNewsfrontendFeuser
      */
     public function getTxMdNewsfrontendFeuser()
     {
@@ -37,10 +43,10 @@ class News extends \GeorgRinger\News\Domain\Model\News
     /**
      * Sets the txMdNewsfrontendFeuser
      *
-     * @param \TYPO3\CMS\Extbase\Domain\Model\FrontendUser $txMdNewsfrontendFeuser
+     * @param FrontendUser $txMdNewsfrontendFeuser
      * @return void
      */
-    public function setTxMdNewsfrontendFeuser(\TYPO3\CMS\Extbase\Domain\Model\FrontendUser $txMdNewsfrontendFeuser)
+    public function setTxMdNewsfrontendFeuser(FrontendUser $txMdNewsfrontendFeuser)
     {
         $this->txMdNewsfrontendFeuser = $txMdNewsfrontendFeuser;
     }
@@ -48,7 +54,7 @@ class News extends \GeorgRinger\News\Domain\Model\News
     /**
      * Get first falMedia element of news
      *
-     * @return \TYPO3\CMS\Extbase\Domain\Model\FileReference|null
+     * @return FileReference|null
      */
     public function getFirstFalMedia()
     {
@@ -66,7 +72,7 @@ class News extends \GeorgRinger\News\Domain\Model\News
     /**
      * Get first falRelatedFiles element of news
      *
-     * @return \TYPO3\CMS\Extbase\Domain\Model\FileReference|null
+     * @return FileReference|null
      */
     public function getFirstFalRelatedFiles()
     {
@@ -85,14 +91,14 @@ class News extends \GeorgRinger\News\Domain\Model\News
      * Removes a FileReference from falMedia
      *
      * TODO:
-     * Somehow this does not set the entry in sys_file_reference to deleted but removes 
+     * Somehow this does not set the entry in sys_file_reference to deleted but removes
      * uid_foreign, tablenames and fieldname
      * Is this the intended behaviour???
      *
-     * @param \TYPO3\CMS\Extbase\Domain\Model\FileReference $imageToRemove The FileReference to be removed
+     * @param FileReference $imageToRemove The FileReference to be removed
      * @return void
      */
-    public function removeFalMedia(\TYPO3\CMS\Extbase\Domain\Model\FileReference $imageToRemove)
+    public function removeFalMedia(FileReference $imageToRemove)
     {
         $this->falMedia->detach($imageToRemove);
     }
@@ -101,14 +107,14 @@ class News extends \GeorgRinger\News\Domain\Model\News
      * Removes a FileReference from falRelatedFiles
      *
      * TODO:
-     * Somehow this does not set the entry in sys_file_reference to deleted but removes 
+     * Somehow this does not set the entry in sys_file_reference to deleted but removes
      * uid_foreign, tablenames and fieldname
      * Is this the intended behaviour???
      *
-     * @param \TYPO3\CMS\Extbase\Domain\Model\FileReference $fileToRemove The FileReference to be removed
+     * @param FileReference $fileToRemove The FileReference to be removed
      * @return void
      */
-    public function removeFalRelatedFiles(\TYPO3\CMS\Extbase\Domain\Model\FileReference $fileToRemove)
+    public function removeFalRelatedFiles(FileReference $fileToRemove)
     {
         $this->falRelatedFiles->detach($fileToRemove);
     }

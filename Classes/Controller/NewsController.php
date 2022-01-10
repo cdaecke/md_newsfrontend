@@ -15,6 +15,8 @@ namespace Mediadreams\MdNewsfrontend\Controller;
  *
  */
 
+use DateTime;
+use Mediadreams\MdNewsfrontend\Domain\Model\News;
 use Mediadreams\MdNewsfrontend\Event\CreateActionAfterPersistEvent;
 use Mediadreams\MdNewsfrontend\Event\CreateActionBeforeSaveEvent;
 use Mediadreams\MdNewsfrontend\Event\DeleteActionBeforeDeleteEvent;
@@ -96,16 +98,16 @@ class NewsController extends BaseController
     /**
      * action create
      *
-     * @param \Mediadreams\MdNewsfrontend\Domain\Model\News $newNews
+     * @param News $newNews
      * @return void
      */
-    public function createAction(\Mediadreams\MdNewsfrontend\Domain\Model\News $newNews)
+    public function createAction(News $newNews)
     {
         $arguments = $this->request->getArgument('newNews');
 
         // if no value is provided for field datetime, use current date
         if (!isset($arguments['datetime']) || empty($arguments['datetime'])) {
-            $newNews->setDatetime(new \DateTime()); // make sure, that you have set the correct timezone for $GLOBALS['TYPO3_CONF_VARS']['SYS']['phpTimeZone']
+            $newNews->setDatetime(new DateTime()); // make sure, that you have set the correct timezone for $GLOBALS['TYPO3_CONF_VARS']['SYS']['phpTimeZone']
         }
 
         $newNews->setTxMdNewsfrontendFeuser($this->feuserObj);
@@ -172,11 +174,11 @@ class NewsController extends BaseController
     /**
      * action edit
      *
-     * @param \Mediadreams\MdNewsfrontend\Domain\Model\News $news
+     * @param News $news
      * @TYPO3\CMS\Extbase\Annotation\IgnoreValidation("news")
      * @return void
      */
-    public function editAction(\Mediadreams\MdNewsfrontend\Domain\Model\News $news)
+    public function editAction(News $news)
     {
         $this->checkAccess($news);
 
@@ -207,10 +209,10 @@ class NewsController extends BaseController
     /**
      * action update
      *
-     * @param \Mediadreams\MdNewsfrontend\Domain\Model\News $news
+     * @param News $news
      * @return void
      */
-    public function updateAction(\Mediadreams\MdNewsfrontend\Domain\Model\News $news)
+    public function updateAction(News $news)
     {
         $this->checkAccess($news);
 
@@ -261,10 +263,10 @@ class NewsController extends BaseController
     /**
      * action delete
      *
-     * @param \Mediadreams\MdNewsfrontend\Domain\Model\News $news
+     * @param News $news
      * @return void
      */
-    public function deleteAction(\Mediadreams\MdNewsfrontend\Domain\Model\News $news)
+    public function deleteAction(News $news)
     {
         $this->checkAccess($news);
 

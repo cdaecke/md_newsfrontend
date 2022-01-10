@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Mediadreams\MdNewsfrontend\Utility;
 
 /**
@@ -12,19 +15,19 @@ namespace Mediadreams\MdNewsfrontend\Utility;
  *
  */
 
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Resource\StorageRepository;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
+use TYPO3\CMS\Core\Resource\StorageRepository;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 class FileUpload
 {
     /**
      * Handle the file upload and attach the file to the given object
      * ATTENTION: This class is just doing the file upload. Validation of file has to be done by a validator!
-     * 
-     * Since \TYPO3\CMS\Core\DataHandling\DataHandler can not be used in the frontend, 
+     *
+     * Since \TYPO3\CMS\Core\DataHandling\DataHandler can not be used in the frontend,
      * we have to build it on our own: https://docs.typo3.org/typo3cms/CoreApiReference/ApiOverview/Fal/UsingFal/ExamplesFileFolder.html#in-the-frontend-context
      * Backend file upload: https://docs.typo3.org/typo3cms/CoreApiReference/ApiOverview/Fal/UsingFal/ExamplesFileFolder.html#in-the-backend-context
      *
@@ -38,13 +41,13 @@ class FileUpload
     public static function handleUpload($requestArguments, $obj, $propertyName, $settings, $subfolder = '')
     {
         $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        /** @var \TYPO3\CMS\Core\Resource\StorageRepository $storageRepository */         
+        /** @var StorageRepository $storageRepository */
         $storageRepository = $objectManager->get(StorageRepository::class);
-        $storage = $storageRepository->findByUid('1');
+        $storage = $storageRepository->findByUid(1);
         $folder = rtrim($settings['uploadPath'], '/');
 
         if ($subfolder) {
-            $folder = $folder.'/'.$subfolder;
+            $folder = $folder . '/' . $subfolder;
         }
 
         if ($storage->hasFolder($folder)) {
@@ -61,7 +64,7 @@ class FileUpload
             $movedNewFile = $storage->addFile($originalFilePath, $targetFolder, $newFileName);
 
             // create file references
-            self::updateFileReferences($requestArguments, $obj, $propertyName, $movedNewFile->getUid());            
+            self::updateFileReferences($requestArguments, $obj, $propertyName, $movedNewFile->getUid());
         }
     }
 
@@ -77,13 +80,13 @@ class FileUpload
     protected static function updateFileReferences($requestArguments, $obj, $propertyName, $fileUid)
     {
         $timestamp = time();
-        $showinpreview = !isset($requestArguments[$propertyName]['showinpreview'])? 0:$requestArguments[$propertyName]['showinpreview'];
+        $showinpreview = !isset($requestArguments[$propertyName]['showinpreview']) ? 0 : $requestArguments[$propertyName]['showinpreview'];
 
         $dbField = self::camelCase2unserScore($propertyName);
 
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-                        ->getQueryBuilderForTable('sys_file_reference');
+            ->getQueryBuilderForTable('sys_file_reference');
 
         // delete old file references
         $queryBuilder
@@ -100,25 +103,25 @@ class FileUpload
         $queryBuilder
             ->insert('sys_file_reference')
             ->values([
-                'pid'               => $obj->getPid(),
-                'tstamp'            => $timestamp,
-                'crdate'            => $timestamp,
-                'uid_local'         => $fileUid,
-                'uid_foreign'       => $obj->getUid(),
-                'tablenames'        => 'tx_news_domain_model_news',
-                'fieldname'         => $dbField,
-                'sorting_foreign'   => 1,
-                'table_local'       => 'sys_file',
-                'title'             => $requestArguments[$propertyName]['title'],
-                'description'       => $requestArguments[$propertyName]['description'],
-                'showinpreview'     => (int)$showinpreview
+                'pid' => $obj->getPid(),
+                'tstamp' => $timestamp,
+                'crdate' => $timestamp,
+                'uid_local' => $fileUid,
+                'uid_foreign' => $obj->getUid(),
+                'tablenames' => 'tx_news_domain_model_news',
+                'fieldname' => $dbField,
+                'sorting_foreign' => 1,
+                'table_local' => 'sys_file',
+                'title' => $requestArguments[$propertyName]['title'],
+                'description' => $requestArguments[$propertyName]['description'],
+                'showinpreview' => (int)$showinpreview
             ])
             ->execute();
 
         // update news record
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-                        ->getQueryBuilderForTable('tx_news_domain_model_news');
-        
+            ->getQueryBuilderForTable('tx_news_domain_model_news');
+
         $queryBuilder
             ->update('tx_news_domain_model_news')
             ->where(
@@ -134,7 +137,8 @@ class FileUpload
      * @param string $input The camelCase input string
      * @return string The under_score string
      */
-    protected static function camelCase2unserScore($input) {
+    protected static function camelCase2unserScore($input)
+    {
         preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
         $ret = $matches[0];
 

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Mediadreams\MdNewsfrontend\Service;
 
 /**
@@ -37,7 +40,12 @@ class NewsSlugHelper
     public function __construct()
     {
         $fieldConfig = $GLOBALS['TCA'][$this->tableName]['columns']['path_segment']['config'];
-        $this->slugService = GeneralUtility::makeInstance(SlugHelper::class, $this->tableName, 'path_segment', $fieldConfig);
+        $this->slugService = GeneralUtility::makeInstance(
+            SlugHelper::class,
+            $this->tableName,
+            'path_segment',
+            $fieldConfig
+        );
     }
 
     /**
@@ -52,7 +60,7 @@ class NewsSlugHelper
             'title' => $obj->getTitle(),
         ];
 
-        $slug = $this->slugService->generate($newsArr,  $obj->getPid());
+        $slug = $this->slugService->generate($newsArr, $obj->getPid());
 
         $state = RecordStateFactory::forName($this->tableName)
             ->fromArray($newsArr, $obj->getPid(), $obj->getUid());

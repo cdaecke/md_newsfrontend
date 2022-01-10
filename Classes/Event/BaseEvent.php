@@ -35,7 +35,7 @@ abstract class BaseEvent
     private $newsController;
 
     /**
-     * CreateActionBeforeSaveEvent constructor.
+     * BaseEvent constructor.
      *
      * @param News $news
      * @param NewsController $newsController
