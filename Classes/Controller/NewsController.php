@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mediadreams\MdNewsfrontend\Controller;
 
 /**
@@ -51,13 +53,15 @@ class NewsController extends BaseController
      */
     public function listAction()
     {
-        $news = $this->newsRepository->findByTxMdNewsfrontendFeuser($this->feuserUid);
+        if ((int)$this->feuserUid > 0) {
+            $news = $this->newsRepository->findByFeuserId($this->feuserUid, (int)$this->settings['allowNotEnabledNews']);
 
-        $this->assignPagination(
-            $news,
-            $this->settings['paginate']['itemsPerPage'],
-            $this->settings['paginate']['maximumNumberOfLinks']
-        );
+            $this->assignPagination(
+                $news,
+                (int)$this->settings['paginate']['itemsPerPage'],
+                (int)$this->settings['paginate']['maximumNumberOfLinks']
+            );
+        }
     }
 
     /**
@@ -156,6 +160,16 @@ class NewsController extends BaseController
     }
 
     /**
+     * initializeEditAction
+     *
+     * This is needed in order to get disabled news as well!
+     */
+    public function initializeEditAction(): void
+    {
+        $this->setEnableFieldsTypeConverter('news');
+    }
+
+    /**
      * action edit
      *
      * @param \Mediadreams\MdNewsfrontend\Domain\Model\News $news
@@ -182,6 +196,8 @@ class NewsController extends BaseController
      */
     public function initializeUpdateAction()
     {
+        $this->setEnableFieldsTypeConverter('news');
+
         $this->initializeCreateUpdate(
             $this->request->getArguments(),
             $this->arguments['news']
@@ -235,6 +251,11 @@ class NewsController extends BaseController
         );
 
         $this->redirect('list');
+    }
+
+    public function initializeDeleteAction()
+    {
+        $this->setEnableFieldsTypeConverter('news');
     }
 
     /**

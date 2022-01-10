@@ -48,6 +48,8 @@ plugin.tx_mdnewsfrontend_newsfe {
         formatDatetime = {$plugin.tx_mdnewsfrontend_newsfe.settings.formatDatetime}
         formatArchive = {$plugin.tx_mdnewsfrontend_newsfe.settings.formatArchive}
 
+        allowNotEnabledNews = {$plugin.tx_mdnewsfrontend_newsfe.settings.allowNotEnabledNews}
+
         paginate {
             itemsPerPage = {$plugin.tx_mdnewsfrontend_newsfe.settings.paginate.itemsPerPage}
             insertAbove = {$plugin.tx_mdnewsfrontend_newsfe.settings.paginate.insertAbove}

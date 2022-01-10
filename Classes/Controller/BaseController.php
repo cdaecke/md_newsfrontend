@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mediadreams\MdNewsfrontend\Controller;
 
 /**
@@ -15,6 +17,7 @@ namespace Mediadreams\MdNewsfrontend\Controller;
 
 use GeorgRinger\NumberedPagination\NumberedPagination;
 use Mediadreams\MdNewsfrontend\Domain\Repository\NewsRepository;
+use Mediadreams\MdNewsfrontend\Property\TypeConverter\EnableFieldsObjectConverter;
 use Mediadreams\MdNewsfrontend\Utility\FileUpload;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -206,6 +209,42 @@ class BaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
                 DateTimeConverter::CONFIGURATION_DATE_FORMAT,
                 $this->settings['formatArchive']
             );
+
+        // use correct format for starttime
+        $argument
+            ->getPropertyMappingConfiguration()
+            ->forProperty('starttime')
+            ->setTypeConverterOption(
+                'TYPO3\\CMS\\Extbase\\Property\\TypeConverter\\DateTimeConverter',
+                DateTimeConverter::CONFIGURATION_DATE_FORMAT,
+                $this->settings['formatDatetime']
+            );
+
+        // use correct format for endtime
+        $argument
+            ->getPropertyMappingConfiguration()
+            ->forProperty('endtime')
+            ->setTypeConverterOption(
+                'TYPO3\\CMS\\Extbase\\Property\\TypeConverter\\DateTimeConverter',
+                DateTimeConverter::CONFIGURATION_DATE_FORMAT,
+                $this->settings['formatDatetime']
+            );
+    }
+
+    /**
+     * Set type converter for enable fields
+     * This is needed, in order to edit/show/delete hidden records
+     *
+     * @param string $object
+     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\NoSuchArgumentException
+     */
+    protected function setEnableFieldsTypeConverter(string $object): void
+    {
+        if ((int)$this->settings['allowNotEnabledNews'] === 1) {
+            $this->arguments->getArgument('news')
+                ->getPropertyMappingConfiguration()
+                ->setTypeConverter($this->objectManager->get(EnableFieldsObjectConverter::class));
+        }
     }
 
     /**

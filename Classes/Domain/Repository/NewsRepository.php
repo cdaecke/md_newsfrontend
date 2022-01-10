@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Mediadreams\MdNewsfrontend\Domain\Repository;
 
 /**
@@ -12,17 +15,43 @@ namespace Mediadreams\MdNewsfrontend\Domain\Repository;
  *
  */
 
+use TYPO3\CMS\Extbase\Persistence\QueryInterface;
+use TYPO3\CMS\Extbase\Persistence\Repository;
+
 /**
- * The repository for News
+ * Class NewsRepository
+ * @package Mediadreams\MdNewsfrontend\Domain\Repository
  */
-class NewsRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
+class NewsRepository extends Repository
 {
     /**
      * Default orderings
      *
      */
     protected $defaultOrderings = [
-        'datetime' => \TYPO3\CMS\Extbase\Persistence\QueryInterface::ORDER_DESCENDING,
-        'uid' => \TYPO3\CMS\Extbase\Persistence\QueryInterface::ORDER_DESCENDING,
+        'datetime' => QueryInterface::ORDER_DESCENDING,
+        'uid' => QueryInterface::ORDER_DESCENDING,
     ];
+
+    /**
+     * Get news according to given frontend user and allow disabled records as well
+     *
+     * @param int $userId
+     * @param int $allowNotEnabledNews
+     * @return mixed
+     */
+    public function findByFeuserId(int $userId, int $allowNotEnabledNews = 0)
+    {
+        $query = $this->createQuery();
+        $constraints = [];
+
+        if ($allowNotEnabledNews === 1) {
+            $query->getQuerySettings()->setIgnoreEnableFields(true);
+        }
+
+        $constraints[] = $query->equals('tx_md_newsfrontend_feuser', $userId);
+
+        $query->matching($query->logicalAnd($constraints));
+        return $query->execute();
+    }
 }
