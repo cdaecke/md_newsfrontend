@@ -23,8 +23,8 @@ Templates are ready to use with the [bootstrap framework](https://getbootstrap.c
 
 ### Signal slots
 
-<mark>Signal slots are deprecated and will be removed in TYPO3 v12.0.
-Please use PSR-14 Events instead (see below)!</mark>
+**Signal slots are deprecated and will be removed in TYPO3 v12.0.
+Please use PSR-14 Events instead (see below)!**
 
 Following signal slots are available:
 
@@ -90,7 +90,7 @@ services:
     tags:
       - name: event.listener
         identifier: 'ext-mdnewsfrontend/createActionBeforeSaveEvent'
-        method: 'yourMethod'
+        method: 'enrichNews'
         event: Mediadreams\MdNewsfrontend\Event\CreateActionBeforeSaveEvent
 ```
 
@@ -103,7 +103,7 @@ use Mediadreams\MdNewsfrontend\Event\CreateActionBeforeSaveEvent;
 
 final class MyListener
 {
-    public function yourMethod(CreateActionBeforeSaveEvent $obj)
+    public function enrichNews(CreateActionBeforeSaveEvent $obj)
     {
         // Get news object 
         $news = $obj->getNews();
