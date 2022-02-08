@@ -16,7 +16,6 @@ namespace Mediadreams\MdNewsfrontend\Domain\Model;
  */
 
 use TYPO3\CMS\Extbase\Domain\Model\FileReference;
-use TYPO3\CMS\Extbase\Domain\Model\FrontendUser;
 
 /**
  * News
@@ -25,15 +24,16 @@ class News extends \GeorgRinger\News\Domain\Model\News
 {
     /**
      * Uid of feUser
+     * Do not replace qualifier with an import, because it will try to use `FrontendUser` of ext:news
      *
-     * @var FrontendUser
+     * @var \TYPO3\CMS\Extbase\Domain\Model\FrontendUser
      */
     protected $txMdNewsfrontendFeuser = null;
 
     /**
      * Returns the txMdNewsfrontendFeuser
      *
-     * @return FrontendUser $txMdNewsfrontendFeuser
+     * @return \TYPO3\CMS\Extbase\Domain\Model\FrontendUser $txMdNewsfrontendFeuser
      */
     public function getTxMdNewsfrontendFeuser()
     {
@@ -43,10 +43,10 @@ class News extends \GeorgRinger\News\Domain\Model\News
     /**
      * Sets the txMdNewsfrontendFeuser
      *
-     * @param FrontendUser $txMdNewsfrontendFeuser
+     * @param \TYPO3\CMS\Extbase\Domain\Model\FrontendUser $txMdNewsfrontendFeuser
      * @return void
      */
-    public function setTxMdNewsfrontendFeuser(FrontendUser $txMdNewsfrontendFeuser)
+    public function setTxMdNewsfrontendFeuser(\TYPO3\CMS\Extbase\Domain\Model\FrontendUser $txMdNewsfrontendFeuser)
     {
         $this->txMdNewsfrontendFeuser = $txMdNewsfrontendFeuser;
     }
