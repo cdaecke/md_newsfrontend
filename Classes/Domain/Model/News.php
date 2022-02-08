@@ -15,7 +15,6 @@ namespace Mediadreams\MdNewsfrontend\Domain\Model;
  *
  */
 
-use TYPO3\CMS\Extbase\Domain\Model\FileReference;
 
 /**
  * News
@@ -53,8 +52,9 @@ class News extends \GeorgRinger\News\Domain\Model\News
 
     /**
      * Get first falMedia element of news
+     * Do not replace qualifier with an import, because it will try to use `FileReference` of ext:news
      *
-     * @return FileReference|null
+     * @return \TYPO3\CMS\Extbase\Domain\Model\FileReference|null
      */
     public function getFirstFalMedia()
     {
@@ -72,7 +72,7 @@ class News extends \GeorgRinger\News\Domain\Model\News
     /**
      * Get first falRelatedFiles element of news
      *
-     * @return FileReference|null
+     * @return \TYPO3\CMS\Extbase\Domain\Model\FileReference|null
      */
     public function getFirstFalRelatedFiles()
     {
@@ -95,10 +95,10 @@ class News extends \GeorgRinger\News\Domain\Model\News
      * uid_foreign, tablenames and fieldname
      * Is this the intended behaviour???
      *
-     * @param FileReference $imageToRemove The FileReference to be removed
+     * @param \TYPO3\CMS\Extbase\Domain\Model\FileReference $imageToRemove The FileReference to be removed
      * @return void
      */
-    public function removeFalMedia(FileReference $imageToRemove)
+    public function removeFalMedia(\TYPO3\CMS\Extbase\Domain\Model\FileReference $imageToRemove)
     {
         $this->falMedia->detach($imageToRemove);
     }
@@ -111,10 +111,10 @@ class News extends \GeorgRinger\News\Domain\Model\News
      * uid_foreign, tablenames and fieldname
      * Is this the intended behaviour???
      *
-     * @param FileReference $fileToRemove The FileReference to be removed
+     * @param \TYPO3\CMS\Extbase\Domain\Model\FileReference $fileToRemove The FileReference to be removed
      * @return void
      */
-    public function removeFalRelatedFiles(FileReference $fileToRemove)
+    public function removeFalRelatedFiles(\TYPO3\CMS\Extbase\Domain\Model\FileReference $fileToRemove)
     {
         $this->falRelatedFiles->detach($fileToRemove);
     }
