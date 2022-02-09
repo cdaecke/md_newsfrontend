@@ -1,3 +1,9 @@
+# Version 3.0.1 (2022-02-08)
+[BUGFIX] use full path to models `FrontendUser` and `FileReference`, otherwise it will try to use the models of ext:news
+
+All changes
+https://github.com/cdaecke/md_newsfrontend/compare/3.0.0...3.0.1
+
 # Version 3.0.0 (2022-01-14)
 - [FEATURE] TYPO3 11 compatibility
 - [FEATURE] add PSR-14 events
