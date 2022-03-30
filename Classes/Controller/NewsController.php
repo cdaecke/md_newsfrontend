@@ -216,6 +216,11 @@ class NewsController extends BaseController
     {
         $this->checkAccess($news);
 
+        // If archive date was deleted
+        if ($news->getArchive() == null) {
+            $news->setArchive(0);
+        }
+
         $requestArguments = $this->request->getArguments();
 
         // Remove file relation from news record
