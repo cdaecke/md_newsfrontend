@@ -1,3 +1,9 @@
+# Version 3.0.3 (2022-11-10)
+[TASK] Update dependency to `ext:news`
+
+All changes
+https://github.com/cdaecke/md_newsfrontend/compare/3.0.2...3.0.3
+
 # Version 3.0.2 (2022-03-31)
 [BUGFIX] Remove archive date, if no value is provided
 
