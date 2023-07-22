@@ -225,7 +225,7 @@ class NewsController extends BaseController
 
         // Remove file relation from news record
         foreach ($this->uploadFields as $fieldName) {
-            if ($requestArguments[$fieldName]['delete'] == 1) {
+            if (isset($requestArguments[$fieldName]['delete']) && $requestArguments[$fieldName]['delete'] == 1) {
                 $removeMethod = 'remove' . ucfirst($fieldName);
                 $getFirstMethod = 'getFirst' . ucfirst($fieldName);
 
