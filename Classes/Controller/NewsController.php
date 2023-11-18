@@ -112,14 +112,6 @@ class NewsController extends BaseController
 
         $newNews->setTxMdNewsfrontendFeuser($this->feuserObj);
 
-        // add signal slot BeforeSave
-        // @deprecated will be removed in TYPO3 v12.0. Use PSR-14 based events and EventDispatcherInterface instead.
-        $this->signalSlotDispatcher->dispatch(
-            __CLASS__,
-            __FUNCTION__ . 'BeforeSave',
-            [$newNews, $this]
-        );
-
         // PSR-14 Event
         $this->eventDispatcher->dispatch(new CreateActionBeforeSaveEvent($newNews, $this));
 
@@ -138,14 +130,6 @@ class NewsController extends BaseController
 
         // handle the fileupload
         $this->initializeFileUpload($requestArguments, $newNews);
-
-        // add signal slot AfterPersist
-        // @deprecated will be removed in TYPO3 v12.0. Use PSR-14 based events and EventDispatcherInterface instead.
-        $this->signalSlotDispatcher->dispatch(
-            __CLASS__,
-            __FUNCTION__ . 'AfterPersist',
-            [$newNews, $this]
-        );
 
         // PSR-14 Event
         $this->eventDispatcher->dispatch(new CreateActionAfterPersistEvent($newNews, $this));
@@ -237,14 +221,6 @@ class NewsController extends BaseController
         // handle the fileupload
         $this->initializeFileUpload($requestArguments, $news);
 
-        // add signal slot BeforeSave
-        // @deprecated will be removed in TYPO3 v12.0. Use PSR-14 based events and EventDispatcherInterface instead.
-        $this->signalSlotDispatcher->dispatch(
-            __CLASS__,
-            __FUNCTION__ . 'BeforeSave',
-            [$news, $this]
-        );
-
         // PSR-14 Event
         $this->eventDispatcher->dispatch(new UpdateActionBeforeSaveEvent($news, $this));
 
@@ -274,14 +250,6 @@ class NewsController extends BaseController
     public function deleteAction(News $news)
     {
         $this->checkAccess($news);
-
-        // add signal slot BeforeSave
-        // @deprecated will be removed in TYPO3 v12.0. Use PSR-14 based events and EventDispatcherInterface instead.
-        $this->signalSlotDispatcher->dispatch(
-            __CLASS__,
-            __FUNCTION__ . 'BeforeDelete',
-            [$news, $this]
-        );
 
         // PSR-14 Event
         $this->eventDispatcher->dispatch(new DeleteActionBeforeDeleteEvent($news, $this));
