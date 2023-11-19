@@ -37,15 +37,24 @@ class CheckFileUpload extends \TYPO3\CMS\Extbase\Validation\Validator\AbstractVa
     ];
 
     /**
+     * CheckFileUpload constructor.
+     * @param array $options
+     */
+    public function __construct(array $options = [])
+    {
+        $this->setOptions($options);
+    }
+
+    /**
      * Validates the file upload
      * - do a general verification against default TYPO3 deny pattern
      * - check for genral upload errors
      * - check allowed file extensions
      *
-     * @param obj $value The FrontendUser object
+     * @param mixed $value The News object
      * @api
      */
-    public function isValid($value)
+    public function isValid(mixed $value): void
     {
         $uploadFile = $this->options['filesArr'];
         $allowedFileExtensions = $this->options['allowedFileExtensions'];

@@ -35,10 +35,10 @@
             <label for="falMedia">
                 <f:translate key="image" />({settings.allowed_falMedia}{f:if(condition:'{settings.allowed_falMedia_size}',then:', {f:translate(key: \'image_max_filesize\', arguments: {0: \'{settings.allowed_falMedia_size}\'})}')})
             </label>
-            <f:form.upload 
-                name="falMedia" 
-                id="falMedia" 
-                class="form-control-file" 
+            <f:form.upload
+                name="falMedia"
+                id="falMedia"
+                class="form-control-file"
                 additionalAttributes="{f:if(condition:'{settings.allowed_falMedia_size}',then:'{data-parsley-trigger:\'change focusout\', data-parsley-max-file-size:\'{settings.allowed_falMedia_size}\'}')}" />
 
             <f:if condition="{news.firstFalMedia}">
@@ -63,9 +63,9 @@
         <div class="form-group">
             <label for="showinpreview"><f:translate key="image_showinpreview" /></label>
 
-            <f:form.select 
-                name="falMedia[showinpreview]" 
-                options="{showinpreviewOptions}" 
+            <f:form.select
+                name="falMedia[showinpreview]"
+                options="{showinpreviewOptions}"
                 value="{news.firstFalMedia.showinpreview}"
                 id="showinpreview"
                 class="form-control" />
@@ -74,14 +74,14 @@
 
     <fieldset class="form-group border p-3">
         <legend><f:translate key="document_legend" /></legend>
-        
+
         <div class="form-group">
             <label for="falRelatedFiles">
                 <f:translate key="document" /> ({settings.allowed_falRelatedFiles}{f:if(condition:'{settings.allowed_falRelatedFiles_size}',then:', {f:translate(key: \'document_max_filesize\', arguments: {0: \'{settings.allowed_falRelatedFiles_size}\'})}')})
             </label>
-            <f:form.upload 
-                name="falRelatedFiles" 
-                id="falRelatedFiles" 
+            <f:form.upload
+                name="falRelatedFiles"
+                id="falRelatedFiles"
                 class="form-control-file"
                 additionalAttributes="{f:if(condition:'{settings.allowed_falRelatedFiles_size}',then:'{data-parsley-trigger:\'change focusout\', data-parsley-max-file-size:\'{settings.allowed_falRelatedFiles_size}\'}')}" />
 
@@ -112,10 +112,10 @@
     <div class="form-group">
         <label for="categories"><f:translate key="categories" /></label>
 
-        <f:form.select 
-            property="categories" 
-            options="{categories}" 
-            optionValueField="uid" 
+        <f:form.select
+            property="categories"
+            options="{categories}"
+            optionValueField="uid"
             optionLabelField="title"
             id="categories"
             class="form-control"

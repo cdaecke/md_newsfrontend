@@ -152,7 +152,7 @@
                 <source>The News record was successfully updated.</source>
             </trans-unit>
             <trans-unit id="controller.delete_success">
-                <source>The News record was successfully delted.</source>
+                <source>The News record was successfully deleted.</source>
             </trans-unit>
             <trans-unit id="controller.access_error">
                 <source>You are not allowed to edit this record.</source>

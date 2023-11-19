@@ -22,6 +22,7 @@ use Mediadreams\MdNewsfrontend\Event\CreateActionBeforeSaveEvent;
 use Mediadreams\MdNewsfrontend\Event\DeleteActionBeforeDeleteEvent;
 use Mediadreams\MdNewsfrontend\Event\UpdateActionBeforeSaveEvent;
 use Mediadreams\MdNewsfrontend\Service\NewsSlugHelper;
+use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
@@ -53,7 +54,7 @@ class NewsController extends BaseController
      *
      * @return void
      */
-    public function listAction()
+    public function listAction(): ResponseInterface
     {
         if ((int)$this->feuserUid > 0) {
             $news = $this->newsRepository->findByFeuserId($this->feuserUid, (int)$this->settings['allowNotEnabledNews']);
@@ -64,6 +65,8 @@ class NewsController extends BaseController
                 (int)$this->settings['paginate']['maximumNumberOfLinks']
             );
         }
+
+        return $this->htmlResponse();
     }
 
     /**
@@ -71,7 +74,7 @@ class NewsController extends BaseController
      *
      * @return void
      */
-    public function newAction()
+    public function newAction(): ResponseInterface
     {
         $this->view->assignMultiple(
             [
@@ -79,6 +82,8 @@ class NewsController extends BaseController
                 'showinpreviewOptions' => $this->getValuesForShowinpreview()
             ]
         );
+
+        return $this->htmlResponse();
     }
 
     /**
@@ -101,7 +106,7 @@ class NewsController extends BaseController
      * @param News $newNews
      * @return void
      */
-    public function createAction(News $newNews)
+    public function createAction(News $newNews): ResponseInterface
     {
         $arguments = $this->request->getArgument('newNews');
 
@@ -129,7 +134,7 @@ class NewsController extends BaseController
         $requestArguments = $this->request->getArguments();
 
         // handle the fileupload
-        $this->initializeFileUpload($requestArguments, $newNews);
+        $this->initializeFileUpload($newNews);
 
         // PSR-14 Event
         $this->eventDispatcher->dispatch(new CreateActionAfterPersistEvent($newNews, $this));
@@ -142,7 +147,9 @@ class NewsController extends BaseController
             AbstractMessage::OK
         );
 
-        $this->redirect('list');
+        $uri = $this->uriBuilder->uriFor('list');
+        return $this->responseFactory->createResponse(307)
+            ->withHeader('Location', $uri);
     }
 
     /**
@@ -162,7 +169,7 @@ class NewsController extends BaseController
      * @TYPO3\CMS\Extbase\Annotation\IgnoreValidation("news")
      * @return void
      */
-    public function editAction(News $news)
+    public function editAction(News $news): ResponseInterface
     {
         $this->checkAccess($news);
 
@@ -172,6 +179,8 @@ class NewsController extends BaseController
                 'showinpreviewOptions' => $this->getValuesForShowinpreview()
             ]
         );
+
+        return $this->htmlResponse();
     }
 
     /**
@@ -196,7 +205,7 @@ class NewsController extends BaseController
      * @param News $news
      * @return void
      */
-    public function updateAction(News $news)
+    public function updateAction(News $news): ResponseInterface
     {
         $this->checkAccess($news);
 
@@ -217,9 +226,8 @@ class NewsController extends BaseController
             }
         }
 
-
         // handle the fileupload
-        $this->initializeFileUpload($requestArguments, $news);
+        $this->initializeFileUpload($news);
 
         // PSR-14 Event
         $this->eventDispatcher->dispatch(new UpdateActionBeforeSaveEvent($news, $this));
@@ -233,7 +241,9 @@ class NewsController extends BaseController
             AbstractMessage::OK
         );
 
-        $this->redirect('list');
+        $uri = $this->uriBuilder->uriFor('list');
+        return $this->responseFactory->createResponse(307)
+            ->withHeader('Location', $uri);
     }
 
     public function initializeDeleteAction()
@@ -247,7 +257,7 @@ class NewsController extends BaseController
      * @param News $news
      * @return void
      */
-    public function deleteAction(News $news)
+    public function deleteAction(News $news): ResponseInterface
     {
         $this->checkAccess($news);
 
@@ -264,6 +274,8 @@ class NewsController extends BaseController
             AbstractMessage::OK
         );
 
-        $this->redirect('list');
+        $uri = $this->uriBuilder->uriFor('list');
+        return $this->responseFactory->createResponse(307)
+            ->withHeader('Location', $uri);
     }
 }

@@ -51,7 +51,7 @@ class NewsRepository extends Repository
 
         $constraints[] = $query->equals('tx_md_newsfrontend_feuser', $userId);
 
-        $query->matching($query->logicalAnd($constraints));
+        $query->matching($query->logicalAnd(...$constraints));
         return $query->execute();
     }
 }

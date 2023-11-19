@@ -6,8 +6,8 @@ Templates are ready to use with the [bootstrap framework](https://getbootstrap.c
 
 ## Requirements
 
-- TYPO3 >= 10.4
-- ext:news >= 7.0
+- TYPO3 >= 11.5
+- ext:news >= 9.0
 
 ## Installation
 
@@ -55,7 +55,7 @@ final class MyListener
 {
     public function enrichNews(CreateActionBeforeSaveEvent $obj)
     {
-        // Get news object 
+        // Get news object
         $news = $obj->getNews();
         $news->setTeaser('Set some teaser...');
 

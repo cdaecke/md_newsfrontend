@@ -198,7 +198,7 @@
                 <target>Der Beitrag wurde erfolgreich aktualisiert.</target>
             </trans-unit>
             <trans-unit id="controller.delete_success">
-                <source>The News record was successfully delted.</source>
+                <source>The News record was successfully deleted.</source>
                 <target>Der Beitrag wurde erfolgreich gelöscht.</target>
             </trans-unit>
             <trans-unit id="controller.access_error">

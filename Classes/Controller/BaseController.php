@@ -15,22 +15,22 @@ namespace Mediadreams\MdNewsfrontend\Controller;
  *
  */
 
+use GeorgRinger\News\Domain\Repository\CategoryRepository;
 use GeorgRinger\NumberedPagination\NumberedPagination;
 use Mediadreams\MdNewsfrontend\Domain\Model\News;
+use Mediadreams\MdNewsfrontend\Domain\Repository\FrontendUserRepository;
 use Mediadreams\MdNewsfrontend\Domain\Repository\NewsRepository;
 use Mediadreams\MdNewsfrontend\Property\TypeConverter\EnableFieldsObjectConverter;
 use Mediadreams\MdNewsfrontend\Utility\FileUpload;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Domain\Repository\CategoryRepository;
-use TYPO3\CMS\Extbase\Domain\Repository\FrontendUserRepository;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Controller\Argument;
 use TYPO3\CMS\Extbase\Mvc\Exception\NoSuchArgumentException;
-use TYPO3\CMS\Extbase\Mvc\View\ViewInterface;
 use TYPO3\CMS\Extbase\Pagination\QueryResultPaginator;
 use TYPO3\CMS\Extbase\Property\TypeConverter\DateTimeConverter;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
@@ -68,6 +68,11 @@ class BaseController extends ActionController
     protected $userRepository = null;
 
     /**
+     * @var int
+     */
+    protected $feuserUid = 0;
+
+    /**
      * NewsController constructor.
      * @param CategoryRepository $categoryRepository
      * @param NewsRepository $newsRepository
@@ -96,9 +101,9 @@ class BaseController extends ActionController
     /**
      * Initializes the view and pass additional data to template
      *
-     * @param ViewInterface $view The view to be initialized
+     * @param $view The view to be initialized
      */
-    protected function initializeView(ViewInterface $view)
+    protected function initializeView($view)
     {
         // check if user is logged in
         if (!$GLOBALS['TSFE']->fe_user->user) {
@@ -117,14 +122,12 @@ class BaseController extends ActionController
             }
         }
 
-        if (strlen($this->settings['parentCategory']) > 0) {
+        if (!empty($this->settings['parentCategory']) > 0) {
             $categories = $this->categoryRepository->findByParent($this->settings['parentCategory']);
 
             // Assign categories to template
             $view->assign('categories', $categories);
         }
-
-        parent::initializeView($view);
     }
 
     /**
@@ -264,12 +267,12 @@ class BaseController extends ActionController
     {
         $validator = $arguments->getValidator();
 
-        $checkFileUploadValidator = $this->objectManager->get(
-            'Mediadreams\MdNewsfrontend\Domain\Validator\CheckFileUpload',
-            array(
+        $checkFileUploadValidator = GeneralUtility::makeInstance(
+            \Mediadreams\MdNewsfrontend\Domain\Validator\CheckFileUpload::class,
+            [
                 'filesArr' => $fieldName,
                 'allowedFileExtensions' => $allowedFileExtensions,
-            )
+            ]
         );
 
         $validator->addValidator($checkFileUploadValidator);
@@ -287,24 +290,28 @@ class BaseController extends ActionController
         if ((int)$this->settings['allowNotEnabledNews'] === 1) {
             $this->arguments->getArgument('news')
                 ->getPropertyMappingConfiguration()
-                ->setTypeConverter($this->objectManager->get(EnableFieldsObjectConverter::class));
+                ->setTypeConverter(GeneralUtility::makeInstance(EnableFieldsObjectConverter::class));
         }
     }
 
     /**
      * Initialize the file upload for configured fields
      *
-     * @param array $requestArguments
      * @param News $obj
      * @return void
      */
-    protected function initializeFileUpload($requestArguments, $obj)
+    protected function initializeFileUpload($obj)
     {
+        $versionInformation = GeneralUtility::makeInstance(Typo3Version::class);
+        $files = ($versionInformation->getMajorVersion() >= 12) ?
+            $this->request->getUploadedFiles():
+            $this->request->getUploadedFiles()['tx_mdnewsfrontend_newsfe'];
+
         foreach ($this->uploadFields as $fieldName) {
-            if (!empty($requestArguments[$fieldName]['tmp_name'])) {
+            if (isset($files[$fieldName])) {
                 // upload new file and update file reference (meta data)
                 FileUpload::handleUpload(
-                    $requestArguments,
+                    $files,
                     $obj,
                     $fieldName,
                     $this->settings,
@@ -312,11 +319,12 @@ class BaseController extends ActionController
                 );
             } else {
                 $methodName = 'getFirst' . ucfirst($fieldName);
+
                 if ($obj->$methodName()) {
                     // update meta data
                     $this->updateFileReference(
                         $obj->$methodName()->getUid(),
-                        $requestArguments[$fieldName]
+                        $this->request->getArguments()[$fieldName]
                     );
                 }
             }

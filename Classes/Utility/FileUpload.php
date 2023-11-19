@@ -19,7 +19,6 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 class FileUpload
 {
@@ -31,18 +30,17 @@ class FileUpload
      * we have to build it on our own: https://docs.typo3.org/typo3cms/CoreApiReference/ApiOverview/Fal/UsingFal/ExamplesFileFolder.html#in-the-frontend-context
      * Backend file upload: https://docs.typo3.org/typo3cms/CoreApiReference/ApiOverview/Fal/UsingFal/ExamplesFileFolder.html#in-the-backend-context
      *
-     * @param array $requestArguments The $_REQUEST array
+     * @param array $files An array with the uploaded files
      * @param obj $obj Object to attach the file to
      * @param string $propertyName Name of the property
      * @param array $settings Extension settings
      * @param string $subfolder Name of subfolder
      * @return void
      */
-    public static function handleUpload($requestArguments, $obj, $propertyName, $settings, $subfolder = '')
+    public static function handleUpload($files, $obj, $propertyName, $settings, $subfolder = '')
     {
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         /** @var StorageRepository $storageRepository */
-        $storageRepository = $objectManager->get(StorageRepository::class);
+        $storageRepository = GeneralUtility::makeInstance(StorageRepository::class);
         $storage = $storageRepository->findByUid(1);
         $folder = rtrim($settings['uploadPath'], '/');
 
@@ -56,31 +54,31 @@ class FileUpload
             $targetFolder = $storage->createFolder($folder);
         }
 
-        $originalFilePath = $requestArguments[$propertyName]['tmp_name'];
-        $newFileName = $requestArguments[$propertyName]['name'];
+        $originalFilePath = $files[$propertyName]->getTemporaryFileName();
+        $newFileName = $files[$propertyName]->getClientFilename();
 
         if (file_exists($originalFilePath)) {
             // upload file
             $movedNewFile = $storage->addFile($originalFilePath, $targetFolder, $newFileName);
 
             // create file references
-            self::updateFileReferences($requestArguments, $obj, $propertyName, $movedNewFile->getUid());
+            self::updateFileReferences($obj, $propertyName, $movedNewFile->getUid());
         }
     }
 
     /**
      * Handle the file upload and attach the file to the given object
      *
-     * @param array $requestArguments The $_REQUEST array
      * @param obj $obj Object to attach the file to
      * @param string $propertyName Name of the property
      * @param int $fileUid The uid of uploaded file
      * @return void
      */
-    protected static function updateFileReferences($requestArguments, $obj, $propertyName, $fileUid)
+    protected static function updateFileReferences($obj, $propertyName, $fileUid)
     {
         $timestamp = time();
-        $showinpreview = !isset($requestArguments[$propertyName]['showinpreview']) ? 0 : $requestArguments[$propertyName]['showinpreview'];
+        $fileData = $_REQUEST['tx_mdnewsfrontend_newsfe'][$propertyName];
+        $showinpreview = !isset($fileData['showinpreview']) ? 0 : $fileData['showinpreview'];
 
         $dbField = self::camelCase2unserScore($propertyName);
 
@@ -97,7 +95,7 @@ class FileUpload
             )
             ->set('tstamp', $timestamp)
             ->set('deleted', 1)
-            ->execute();
+            ->executeStatement();
 
         // add new file reference
         $queryBuilder
@@ -111,12 +109,11 @@ class FileUpload
                 'tablenames' => 'tx_news_domain_model_news',
                 'fieldname' => $dbField,
                 'sorting_foreign' => 1,
-                'table_local' => 'sys_file',
-                'title' => $requestArguments[$propertyName]['title'],
-                'description' => $requestArguments[$propertyName]['description'],
+                'title' => $fileData['title'],
+                'description' => $fileData['description'],
                 'showinpreview' => (int)$showinpreview
             ])
-            ->execute();
+            ->executeStatement();
 
         // update news record
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
@@ -128,7 +125,7 @@ class FileUpload
                 $queryBuilder->expr()->eq('uid', $obj->getUid())
             )
             ->set($dbField, 1)
-            ->execute();
+            ->executeStatement();
     }
 
     /**
