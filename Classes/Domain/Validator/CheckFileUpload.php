@@ -54,7 +54,7 @@ class CheckFileUpload extends \TYPO3\CMS\Extbase\Validation\Validator\AbstractVa
      * @param mixed $value The News object
      * @api
      */
-    public function isValid(mixed $value): void
+    public function isValid($value): void
     {
         $uploadFile = $this->options['filesArr'];
         $allowedFileExtensions = $this->options['allowedFileExtensions'];
