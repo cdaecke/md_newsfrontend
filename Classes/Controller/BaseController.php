@@ -17,6 +17,7 @@ namespace Mediadreams\MdNewsfrontend\Controller;
 
 use GeorgRinger\News\Domain\Repository\CategoryRepository;
 use GeorgRinger\NumberedPagination\NumberedPagination;
+use Mediadreams\MdNewsfrontend\Domain\Model\FrontendUser;
 use Mediadreams\MdNewsfrontend\Domain\Model\News;
 use Mediadreams\MdNewsfrontend\Domain\Repository\FrontendUserRepository;
 use Mediadreams\MdNewsfrontend\Domain\Repository\NewsRepository;
@@ -71,6 +72,11 @@ class BaseController extends ActionController
      * @var int
      */
     protected $feuserUid = 0;
+    
+    /**
+     * @var FrontendUser
+     */
+    protected $feuserObj = null;
 
     /**
      * NewsController constructor.
