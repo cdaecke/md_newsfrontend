@@ -15,6 +15,7 @@ namespace Mediadreams\MdNewsfrontend\Domain\Validator;
  *
  */
 
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Resource\Security\FileNameValidator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
@@ -42,7 +43,12 @@ class CheckFileUpload extends \TYPO3\CMS\Extbase\Validation\Validator\AbstractVa
      */
     public function __construct(array $options = [])
     {
-        $this->setOptions($options);
+        $versionInformation = GeneralUtility::makeInstance(Typo3Version::class);
+        if ($versionInformation->getMajorVersion() >= 12) {
+            $this->setOptions($options);
+        } else {
+            $this->initializeDefaultOptions($options);
+        }
     }
 
     /**
@@ -54,7 +60,7 @@ class CheckFileUpload extends \TYPO3\CMS\Extbase\Validation\Validator\AbstractVa
      * @param mixed $value The News object
      * @api
      */
-    public function isValid($value): void
+    protected function isValid($value): void
     {
         $uploadFile = $this->options['filesArr'];
         $allowedFileExtensions = $this->options['allowedFileExtensions'];

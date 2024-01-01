@@ -17,6 +17,7 @@ namespace Mediadreams\MdNewsfrontend\Utility;
 
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -35,9 +36,10 @@ class FileUpload
      * @param string $propertyName Name of the property
      * @param array $settings Extension settings
      * @param string $subfolder Name of subfolder
+     * @param array $requestArguments Array with request params // TODO: Remove as soon as TYPO3 v11 support is dropped
      * @return void
      */
-    public static function handleUpload($files, $obj, $propertyName, $settings, $subfolder = '')
+    public static function handleUpload($files, $obj, $propertyName, $settings, $subfolder = '', $requestArguments = [])
     {
         /** @var StorageRepository $storageRepository */
         $storageRepository = GeneralUtility::makeInstance(StorageRepository::class);
@@ -54,8 +56,14 @@ class FileUpload
             $targetFolder = $storage->createFolder($folder);
         }
 
-        $originalFilePath = $files[$propertyName]->getTemporaryFileName();
-        $newFileName = $files[$propertyName]->getClientFilename();
+        $versionInformation = GeneralUtility::makeInstance(Typo3Version::class);
+        if ($versionInformation->getMajorVersion() >= 12) {
+            $originalFilePath = $files[$propertyName]->getTemporaryFileName();
+            $newFileName = $files[$propertyName]->getClientFilename();
+        } else {
+            $originalFilePath = $requestArguments[$propertyName]['tmp_name'];
+            $newFileName = $requestArguments[$propertyName]['name'];
+        }
 
         if (file_exists($originalFilePath)) {
             // upload file
@@ -80,7 +88,7 @@ class FileUpload
         $fileData = $_REQUEST['tx_mdnewsfrontend_newsfe'][$propertyName];
         $showinpreview = !isset($fileData['showinpreview']) ? 0 : $fileData['showinpreview'];
 
-        $dbField = self::camelCase2unserScore($propertyName);
+        $dbField = self::camelCase2underScore($propertyName);
 
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
@@ -97,22 +105,29 @@ class FileUpload
             ->set('deleted', 1)
             ->executeStatement();
 
+        $fileReference = [
+            'pid' => $obj->getPid(),
+            'tstamp' => $timestamp,
+            'crdate' => $timestamp,
+            'uid_local' => $fileUid,
+            'uid_foreign' => $obj->getUid(),
+            'tablenames' => 'tx_news_domain_model_news',
+            'fieldname' => $dbField,
+            'sorting_foreign' => 1,
+            'title' => $fileData['title'],
+            'description' => $fileData['description'],
+            'showinpreview' => (int)$showinpreview
+        ];
+
+        $versionInformation = GeneralUtility::makeInstance(Typo3Version::class);
+        if ($versionInformation->getMajorVersion() < 12) {
+            $fileReference['table_local'] = 'sys_file';
+        }
+
         // add new file reference
         $queryBuilder
             ->insert('sys_file_reference')
-            ->values([
-                'pid' => $obj->getPid(),
-                'tstamp' => $timestamp,
-                'crdate' => $timestamp,
-                'uid_local' => $fileUid,
-                'uid_foreign' => $obj->getUid(),
-                'tablenames' => 'tx_news_domain_model_news',
-                'fieldname' => $dbField,
-                'sorting_foreign' => 1,
-                'title' => $fileData['title'],
-                'description' => $fileData['description'],
-                'showinpreview' => (int)$showinpreview
-            ])
+            ->values($fileReference)
             ->executeStatement();
 
         // update news record
@@ -134,7 +149,7 @@ class FileUpload
      * @param string $input The camelCase input string
      * @return string The under_score string
      */
-    protected static function camelCase2unserScore($input)
+    protected static function camelCase2underScore($input)
     {
         preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
         $ret = $matches[0];

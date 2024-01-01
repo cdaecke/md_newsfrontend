@@ -131,8 +131,6 @@ class NewsController extends BaseController
         $newNews->setPathSegment($slug);
         $this->newsRepository->update($newNews);
 
-        $requestArguments = $this->request->getArguments();
-
         // handle the fileupload
         $this->initializeFileUpload($newNews);
 

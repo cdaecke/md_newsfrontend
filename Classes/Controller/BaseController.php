@@ -72,7 +72,7 @@ class BaseController extends ActionController
      * @var int
      */
     protected $feuserUid = 0;
-    
+
     /**
      * @var FrontendUser
      */
@@ -321,7 +321,8 @@ class BaseController extends ActionController
                     $obj,
                     $fieldName,
                     $this->settings,
-                    $this->feuserUid
+                    $this->feuserUid,
+                    $this->request->getArguments()
                 );
             } else {
                 $methodName = 'getFirst' . ucfirst($fieldName);
