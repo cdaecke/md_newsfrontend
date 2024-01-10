@@ -309,9 +309,14 @@ class BaseController extends ActionController
     protected function initializeFileUpload($obj)
     {
         $versionInformation = GeneralUtility::makeInstance(Typo3Version::class);
-        $files = ($versionInformation->getMajorVersion() >= 12) ?
-            $this->request->getUploadedFiles():
-            $this->request->getUploadedFiles()['tx_mdnewsfrontend_newsfe'];
+        if ($versionInformation->getMajorVersion() >= 12) {
+            $files = $this->request->getUploadedFiles();
+        } else {
+            $files = [];
+            if (isset($this->request->getUploadedFiles()['tx_mdnewsfrontend_newsfe'])) {
+                $files = $this->request->getUploadedFiles()['tx_mdnewsfrontend_newsfe'];
+            }
+        }
 
         foreach ($this->uploadFields as $fieldName) {
             if (isset($files[$fieldName])) {
