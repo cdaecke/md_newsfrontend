@@ -1,3 +1,9 @@
+# Version 4.0.1 (2024-12-15)
+- [FEATURE] Update dependency to ext:news (allow v12 of ext:news)
+
+All changes
+https://github.com/cdaecke/md_newsfrontend/compare/4.0.0...4.0.1
+
 # Version 4.0.0 (2024-02-02)
 - [FEATURE] TYPO3 12 compatibility
 - [BREAKING] Signal slots removed
