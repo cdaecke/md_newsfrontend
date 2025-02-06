@@ -255,11 +255,13 @@ class BaseController extends ActionController
     protected function initializeFileValidator($requestArguments, $argument)
     {
         foreach ($this->uploadFields as $fieldName) {
-            $this->addFileuploadValidator(
-                $argument,
-                $requestArguments[$fieldName],
-                $this->settings['allowed_' . $fieldName]
-            );
+            if (isset($requestArguments[$fieldName])) {
+                $this->addFileuploadValidator(
+                    $argument,
+                    $requestArguments[$fieldName],
+                    $this->settings['allowed_' . $fieldName]
+                );
+            }
         }
     }
 
