@@ -1,3 +1,9 @@
+# Version 4.0.2 (2025-03-12)
+- [BUGFIX] check, if file upload field exists for upload validator
+
+All changes
+https://github.com/cdaecke/md_newsfrontend/compare/4.0.1...4.0.2
+
 # Version 4.0.1 (2024-12-15)
 - [FEATURE] Update dependency to ext:news (allow v12 of ext:news)
 
