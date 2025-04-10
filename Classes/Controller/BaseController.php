@@ -112,7 +112,7 @@ class BaseController extends ActionController
     protected function initializeView($view)
     {
         // check if user is logged in
-        if (!$GLOBALS['TSFE']->fe_user->user) {
+        if (!$this->request->getAttribute('frontend.user')->user) {
             $this->addFlashMessage(
                 LocalizationUtility::translate('controller.not_loggedin', 'md_newsfrontend'),
                 '',
@@ -162,8 +162,8 @@ class BaseController extends ActionController
         }
 
         // Get logged in user
-        if ($GLOBALS['TSFE']->fe_user->user) {
-            $this->feuserUid = $GLOBALS['TSFE']->fe_user->user['uid'];
+        if ($this->request->getAttribute('frontend.user')->user) {
+            $this->feuserUid = $this->request->getAttribute('frontend.user')->user['uid'];
             $this->feuserObj = $this->userRepository->findByUid($this->feuserUid);
         }
 
