@@ -56,7 +56,7 @@ class BaseController extends ActionController
      *
      * @return bool|string
      */
-    public function getErrorFlashMessage()
+    public function getErrorFlashMessage(): bool|string
     {
         return false;
     }
@@ -97,7 +97,7 @@ class BaseController extends ActionController
      * Initialize actions
      * Add possibility to overwrite settings
      */
-    protected function initializeAction()
+    protected function initializeAction(): void
     {
         // Use stdWrap for given defined settings
         // Thanks to Georg Ringer: https://github.com/georgringer/news/blob/976fe5930cea9693f6cd56b650abe4e876fc70f0/Classes/Controller/NewsController.php#L627
@@ -246,10 +246,9 @@ class BaseController extends ActionController
      * Set type converter for enable fields
      * This is needed, in order to edit/show/delete hidden records
      *
-     * @param string $object
      * @throws NoSuchArgumentException
      */
-    protected function setEnableFieldsTypeConverter(string $object): void
+    protected function setEnableFieldsTypeConverter(): void
     {
         if ((int)$this->settings['allowNotEnabledNews'] === 1) {
             $this->arguments->getArgument('news')
@@ -300,7 +299,7 @@ class BaseController extends ActionController
      * @param array $fileData All data about the file
      * @return void
      */
-    protected function updateFileReference($fileReferencesUid, $fileData)
+    protected function updateFileReference(int $fileReferencesUid, array $fileData)
     {
         $showinpreview = !isset($fileData['showinpreview']) ? 0 : $fileData['showinpreview'];
 
@@ -316,7 +315,7 @@ class BaseController extends ActionController
             ->set('title', $fileData['title'])
             ->set('description', $fileData['description'])
             ->set('showinpreview', (int)$showinpreview)
-            ->execute();
+            ->executeStatement();
     }
 
     /**

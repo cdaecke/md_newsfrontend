@@ -35,7 +35,7 @@ class NewsController extends BaseController
     /**
      * action list
      *
-     * @return void
+     * @return ResponseInterface
      */
     public function listAction(): ResponseInterface
     {
@@ -55,7 +55,7 @@ class NewsController extends BaseController
     /**
      * action new
      *
-     * @return void
+     * @return ResponseInterface
      */
     public function newAction(): ResponseInterface
     {
@@ -75,7 +75,7 @@ class NewsController extends BaseController
      *
      * @return void
      */
-    public function initializeCreateAction()
+    public function initializeCreateAction(): void
     {
         $this->initializeCreateUpdate(
             $this->request->getArguments(),
@@ -87,7 +87,7 @@ class NewsController extends BaseController
      * action create
      *
      * @param News $newNews
-     * @return void
+     * @return ResponseInterface
      */
     public function createAction(News $newNews): ResponseInterface
     {
@@ -142,7 +142,7 @@ class NewsController extends BaseController
      */
     public function initializeEditAction(): void
     {
-        $this->setEnableFieldsTypeConverter('news');
+        $this->setEnableFieldsTypeConverter();
     }
 
     /**
@@ -150,7 +150,7 @@ class NewsController extends BaseController
      *
      * @param News $news
      * @TYPO3\CMS\Extbase\Annotation\IgnoreValidation("news")
-     * @return void
+     * @return ResponseInterface
      */
     public function editAction(News $news): ResponseInterface
     {
@@ -172,9 +172,9 @@ class NewsController extends BaseController
      *
      * @return void
      */
-    public function initializeUpdateAction()
+    public function initializeUpdateAction(): void
     {
-        $this->setEnableFieldsTypeConverter('news');
+        $this->setEnableFieldsTypeConverter();
 
         $this->initializeCreateUpdate(
             $this->request->getArguments(),
@@ -186,7 +186,7 @@ class NewsController extends BaseController
      * action update
      *
      * @param News $news
-     * @return void
+     * @return ResponseInterface
      */
     public function updateAction(News $news): ResponseInterface
     {
@@ -229,16 +229,16 @@ class NewsController extends BaseController
             ->withHeader('Location', $uri);
     }
 
-    public function initializeDeleteAction()
+    public function initializeDeleteAction():void
     {
-        $this->setEnableFieldsTypeConverter('news');
+        $this->setEnableFieldsTypeConverter();
     }
 
     /**
      * action delete
      *
      * @param News $news
-     * @return void
+     * @return ResponseInterface
      */
     public function deleteAction(News $news): ResponseInterface
     {
