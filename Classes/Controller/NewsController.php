@@ -15,7 +15,6 @@ namespace Mediadreams\MdNewsfrontend\Controller;
  *
  */
 
-use DateTime;
 use Mediadreams\MdNewsfrontend\Domain\Model\News;
 use Mediadreams\MdNewsfrontend\Event\CreateActionAfterPersistEvent;
 use Mediadreams\MdNewsfrontend\Event\CreateActionBeforeSaveEvent;
@@ -25,7 +24,6 @@ use Mediadreams\MdNewsfrontend\Service\NewsSlugHelper;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
@@ -35,29 +33,14 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 class NewsController extends BaseController
 {
     /**
-     * persistenceManager
-     *
-     * @var PersistenceManager
-     */
-    protected $persistenceManager = null;
-
-    /**
-     * @param PersistenceManager $persistenceManager
-     */
-    public function injectPersistenceManager(PersistenceManager $persistenceManager)
-    {
-        $this->persistenceManager = $persistenceManager;
-    }
-
-    /**
      * action list
      *
      * @return void
      */
     public function listAction(): ResponseInterface
     {
-        if ((int)$this->feuserUid > 0) {
-            $news = $this->newsRepository->findByFeuserId($this->feuserUid, (int)$this->settings['allowNotEnabledNews']);
+        if (isset($this->feuser['uid'])) {
+            $news = $this->newsRepository->findByFeuserId($this->feuser['uid'], (int)$this->settings['allowNotEnabledNews']);
 
             $this->assignPagination(
                 $news,
@@ -78,7 +61,7 @@ class NewsController extends BaseController
     {
         $this->view->assignMultiple(
             [
-                'user' => $this->feuserObj,
+                'user' => $this->feuser,
                 'showinpreviewOptions' => $this->getValuesForShowinpreview()
             ]
         );
@@ -112,10 +95,12 @@ class NewsController extends BaseController
 
         // if no value is provided for field datetime, use current date
         if (!isset($arguments['datetime']) || empty($arguments['datetime'])) {
-            $newNews->setDatetime(new DateTime()); // make sure, that you have set the correct timezone for $GLOBALS['TYPO3_CONF_VARS']['SYS']['phpTimeZone']
+            $newNews->setDatetime(new \DateTime()); // make sure, that you have set the correct timezone for $GLOBALS['TYPO3_CONF_VARS']['SYS']['phpTimeZone']
         }
 
-        $newNews->setTxMdNewsfrontendFeuser($this->feuserObj);
+        $feuserObj = $this->userRepository->findByUid($this->feuser['uid']);
+
+        $newNews->setTxMdNewsfrontendFeuser($feuserObj);
 
         // PSR-14 Event
         $this->eventDispatcher->dispatch(new CreateActionBeforeSaveEvent($newNews, $this));

@@ -17,7 +17,6 @@ namespace Mediadreams\MdNewsfrontend\Controller;
 
 use GeorgRinger\News\Domain\Repository\CategoryRepository;
 use GeorgRinger\NumberedPagination\NumberedPagination;
-use Mediadreams\MdNewsfrontend\Domain\Model\FrontendUser;
 use Mediadreams\MdNewsfrontend\Domain\Model\News;
 use Mediadreams\MdNewsfrontend\Domain\Repository\FrontendUserRepository;
 use Mediadreams\MdNewsfrontend\Domain\Repository\NewsRepository;
@@ -33,6 +32,7 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Controller\Argument;
 use TYPO3\CMS\Extbase\Mvc\Exception\NoSuchArgumentException;
 use TYPO3\CMS\Extbase\Pagination\QueryResultPaginator;
+use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 use TYPO3\CMS\Extbase\Property\TypeConverter\DateTimeConverter;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
@@ -42,57 +42,15 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
  */
 class BaseController extends ActionController
 {
-    /**
-     * @var array
-     */
-    protected $uploadFields = ['falMedia', 'falRelatedFiles'];
+    protected array $uploadFields = ['falMedia', 'falRelatedFiles'];
+    protected array $feuser = [];
 
-    /**
-     * categoryRepository
-     *
-     * @var CategoryRepository
-     */
-    protected $categoryRepository = null;
-
-    /**
-     * newsRepository
-     *
-     * @var NewsRepository
-     */
-    protected $newsRepository = null;
-
-    /**
-     * userRepository
-     *
-     * @var FrontendUserRepository
-     */
-    protected $userRepository = null;
-
-    /**
-     * @var int
-     */
-    protected $feuserUid = 0;
-
-    /**
-     * @var FrontendUser
-     */
-    protected $feuserObj = null;
-
-    /**
-     * NewsController constructor.
-     * @param CategoryRepository $categoryRepository
-     * @param NewsRepository $newsRepository
-     * @param FrontendUserRepository $userRepository
-     */
     public function __construct(
-        CategoryRepository $categoryRepository,
-        NewsRepository $newsRepository,
-        FrontendUserRepository $userRepository
-    ) {
-        $this->categoryRepository = $categoryRepository;
-        $this->newsRepository = $newsRepository;
-        $this->userRepository = $userRepository;
-    }
+        protected CategoryRepository $categoryRepository,
+        protected NewsRepository $newsRepository,
+        protected FrontendUserRepository $userRepository,
+        protected PersistenceManager $persistenceManager
+    ) {}
 
     /**
      * Deactivate errorFlashMessage
@@ -163,8 +121,7 @@ class BaseController extends ActionController
 
         // Get logged in user
         if ($this->request->getAttribute('frontend.user')->user) {
-            $this->feuserUid = $this->request->getAttribute('frontend.user')->user['uid'];
-            $this->feuserObj = $this->userRepository->findByUid($this->feuserUid);
+            $this->feuser = $this->request->getAttribute('frontend.user')->user;
         }
 
         parent::initializeAction();
@@ -179,7 +136,7 @@ class BaseController extends ActionController
      */
     protected function checkAccess(News $newsRecord)
     {
-        if ($newsRecord->getTxMdNewsfrontendFeuser()->getUid() != $this->feuserUid) {
+        if ($newsRecord->getTxMdNewsfrontendFeuser()->getUid() != $this->feuser['uid']) {
             $this->addFlashMessage(
                 LocalizationUtility::translate('controller.access_error', 'md_newsfrontend'),
                 '',
@@ -328,7 +285,7 @@ class BaseController extends ActionController
                     $obj,
                     $fieldName,
                     $this->settings,
-                    $this->feuserUid,
+                    $this->feuser['uid'],
                     $this->request->getArguments()
                 );
             } else {
