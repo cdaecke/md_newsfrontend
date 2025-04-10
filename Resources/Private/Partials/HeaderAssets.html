@@ -1,5 +1,5 @@
-<html xmlns:f="https://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
     <f:if condition="{settings.flatpickr}">
-        <link rel="stylesheet" type="text/css" href="{f:uri.resource(path: 'Css/flatpickr.min.css')}" media="all">
+        <f:asset.css identifier="mdNewsfrontendFlatpickr" href="EXT:md_newsfrontend/Resources/Public/Css/flatpickr.min.css" />
     </f:if>
 </html>
