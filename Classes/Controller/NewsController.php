@@ -23,7 +23,7 @@ use Mediadreams\MdNewsfrontend\Event\DeleteActionBeforeDeleteEvent;
 use Mediadreams\MdNewsfrontend\Event\UpdateActionBeforeSaveEvent;
 use Mediadreams\MdNewsfrontend\Service\NewsSlugHelper;
 use Psr\Http\Message\ResponseInterface;
-use TYPO3\CMS\Core\Messaging\AbstractMessage;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
@@ -142,7 +142,7 @@ class NewsController extends BaseController
         $this->addFlashMessage(
             LocalizationUtility::translate('controller.new_success', 'md_newsfrontend'),
             '',
-            AbstractMessage::OK
+            ContextualFeedbackSeverity::OK
         );
 
         $uri = $this->uriBuilder->uriFor('list');
@@ -236,7 +236,7 @@ class NewsController extends BaseController
         $this->addFlashMessage(
             LocalizationUtility::translate('controller.edit_success', 'md_newsfrontend'),
             '',
-            AbstractMessage::OK
+            ContextualFeedbackSeverity::OK
         );
 
         $uri = $this->uriBuilder->uriFor('list');
@@ -269,7 +269,7 @@ class NewsController extends BaseController
         $this->addFlashMessage(
             LocalizationUtility::translate('controller.delete_success', 'md_newsfrontend'),
             '',
-            AbstractMessage::OK
+            ContextualFeedbackSeverity::OK
         );
 
         $uri = $this->uriBuilder->uriFor('list');

@@ -26,7 +26,7 @@ use Mediadreams\MdNewsfrontend\Utility\FileUpload;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Information\Typo3Version;
-use TYPO3\CMS\Core\Messaging\AbstractMessage;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
@@ -116,14 +116,14 @@ class BaseController extends ActionController
             $this->addFlashMessage(
                 LocalizationUtility::translate('controller.not_loggedin', 'md_newsfrontend'),
                 '',
-                AbstractMessage::ERROR
+                ContextualFeedbackSeverity::ERROR
             );
         } else {
             if (!isset($this->settings['uploadPath'])) { // check if TypoScript is loaded
                 $this->addFlashMessage(
                     LocalizationUtility::translate('controller.typoscript_missing', 'md_newsfrontend'),
                     '',
-                    AbstractMessage::ERROR
+                    ContextualFeedbackSeverity::ERROR
                 );
             }
         }
@@ -143,7 +143,7 @@ class BaseController extends ActionController
     protected function initializeAction()
     {
         // Use stdWrap for given defined settings
-        // Thanks to Georg Ringer: https://github.com/georgringer/news/blob/2c8522ad508fa92ad39a5effe4301f7d872238a5/Classes/Controller/NewsController.php#L597
+        // Thanks to Georg Ringer: https://github.com/georgringer/news/blob/976fe5930cea9693f6cd56b650abe4e876fc70f0/Classes/Controller/NewsController.php#L627
         if (
             isset($this->settings['useStdWrap'])
             && !empty($this->settings['useStdWrap'])
@@ -152,9 +152,9 @@ class BaseController extends ActionController
             $typoScriptArray = $typoScriptService->convertPlainArrayToTypoScriptArray($this->settings);
             $stdWrapProperties = GeneralUtility::trimExplode(',', $this->settings['useStdWrap'], true);
             foreach ($stdWrapProperties as $key) {
-                if (is_array($typoScriptArray[$key . '.'])) {
-                    $this->settings[$key] = $this->configurationManager->getContentObject()->stdWrap(
-                        $typoScriptArray[$key],
+                if (is_array($typoScriptArray[$key . '.'] ?? null)) {
+                    $this->settings[$key] = $this->request->getAttribute('currentContentObject')->stdWrap(
+                        $typoScriptArray[$key] ?? '',
                         $typoScriptArray[$key . '.']
                     );
                 }
@@ -183,7 +183,7 @@ class BaseController extends ActionController
             $this->addFlashMessage(
                 LocalizationUtility::translate('controller.access_error', 'md_newsfrontend'),
                 '',
-                AbstractMessage::ERROR
+                ContextualFeedbackSeverity::ERROR
             );
 
             $this->redirect('list');
