@@ -24,7 +24,6 @@ use Mediadreams\MdNewsfrontend\Property\TypeConverter\EnableFieldsObjectConverte
 use Mediadreams\MdNewsfrontend\Utility\FileUpload;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -265,17 +264,9 @@ class BaseController extends ActionController
      * @param News $obj
      * @return void
      */
-    protected function initializeFileUpload($obj)
+    protected function initializeFileUpload(News $obj)
     {
-        $versionInformation = GeneralUtility::makeInstance(Typo3Version::class);
-        if ($versionInformation->getMajorVersion() >= 12) {
-            $files = $this->request->getUploadedFiles();
-        } else {
-            $files = [];
-            if (isset($this->request->getUploadedFiles()['tx_mdnewsfrontend_newsfe'])) {
-                $files = $this->request->getUploadedFiles()['tx_mdnewsfrontend_newsfe'];
-            }
-        }
+        $files = $this->request->getUploadedFiles();
 
         foreach ($this->uploadFields as $fieldName) {
             if (isset($files[$fieldName])) {
@@ -285,7 +276,7 @@ class BaseController extends ActionController
                     $obj,
                     $fieldName,
                     $this->settings,
-                    $this->feuser['uid'],
+                    (string)$this->feuser['uid'],
                     $this->request->getArguments()
                 );
             } else {

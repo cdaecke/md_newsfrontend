@@ -17,7 +17,6 @@ namespace Mediadreams\MdNewsfrontend\Utility;
 
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
-use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -39,8 +38,14 @@ class FileUpload
      * @param array $requestArguments Array with request params // TODO: Remove as soon as TYPO3 v11 support is dropped
      * @return void
      */
-    public static function handleUpload($files, $obj, $propertyName, $settings, $subfolder = '', $requestArguments = [])
-    {
+    public static function handleUpload(
+        array $files,
+        \Mediadreams\MdNewsfrontend\Domain\Model\News $obj,
+        string $propertyName,
+        array $settings,
+        string $subfolder = '',
+        array $requestArguments = []
+    ) {
         /** @var StorageRepository $storageRepository */
         $storageRepository = GeneralUtility::makeInstance(StorageRepository::class);
         $storage = $storageRepository->findByUid(1);
@@ -56,14 +61,8 @@ class FileUpload
             $targetFolder = $storage->createFolder($folder);
         }
 
-        $versionInformation = GeneralUtility::makeInstance(Typo3Version::class);
-        if ($versionInformation->getMajorVersion() >= 12) {
-            $originalFilePath = $files[$propertyName]->getTemporaryFileName();
-            $newFileName = $files[$propertyName]->getClientFilename();
-        } else {
-            $originalFilePath = $requestArguments[$propertyName]['tmp_name'];
-            $newFileName = $requestArguments[$propertyName]['name'];
-        }
+        $originalFilePath = $files[$propertyName]->getTemporaryFileName();
+        $newFileName = $files[$propertyName]->getClientFilename();
 
         if (file_exists($originalFilePath)) {
             // upload file
@@ -118,11 +117,6 @@ class FileUpload
             'description' => $fileData['description'],
             'showinpreview' => (int)$showinpreview
         ];
-
-        $versionInformation = GeneralUtility::makeInstance(Typo3Version::class);
-        if ($versionInformation->getMajorVersion() < 12) {
-            $fileReference['table_local'] = 'sys_file';
-        }
 
         // add new file reference
         $queryBuilder
