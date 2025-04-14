@@ -24,6 +24,7 @@ use Mediadreams\MdNewsfrontend\Property\TypeConverter\EnableFieldsObjectConverte
 use Mediadreams\MdNewsfrontend\Utility\FileUpload;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Http\PropagateResponseException;
 use TYPO3\CMS\Core\Page\AssetCollector;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
@@ -35,6 +36,7 @@ use TYPO3\CMS\Extbase\Pagination\QueryResultPaginator;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 use TYPO3\CMS\Extbase\Property\TypeConverter\DateTimeConverter;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+use TYPO3\CMS\Fluid\View\FluidViewAdapter;
 
 /**
  * Class BaseController
@@ -43,7 +45,7 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 class BaseController extends ActionController
 {
     protected array $uploadFields = ['falMedia', 'falRelatedFiles'];
-    protected array $feuser = [];
+    protected array $feUser = [];
 
     public function __construct(
         protected CategoryRepository $categoryRepository,
@@ -66,9 +68,9 @@ class BaseController extends ActionController
     /**
      * Initializes the view and pass additional data to template
      *
-     * @param $view The view to be initialized
+     * @param FluidViewAdapter $view The view to be initialized
      */
-    protected function initializeView($view)
+    protected function initializeView(FluidViewAdapter $view)
     {
         // check if user is logged in
         if (!$this->request->getAttribute('frontend.user')->user) {
@@ -122,7 +124,7 @@ class BaseController extends ActionController
 
         // Get logged in user
         if ($this->request->getAttribute('frontend.user')->user) {
-            $this->feuser = $this->request->getAttribute('frontend.user')->user;
+            $this->feUser = $this->request->getAttribute('frontend.user')->user;
         }
 
         parent::initializeAction();
@@ -135,16 +137,18 @@ class BaseController extends ActionController
      * @param News $newsRecord
      * @return void
      */
-    protected function checkAccess(News $newsRecord)
+    protected function checkAccess(News $newsRecord): void
     {
-        if ($newsRecord->getTxMdNewsfrontendFeuser()->getUid() != $this->feuser['uid']) {
+        if ($newsRecord->getTxMdNewsfrontendFeuser()->getUid() != $this->feUser['uid']) {
             $this->addFlashMessage(
                 LocalizationUtility::translate('controller.access_error', 'md_newsfrontend'),
                 '',
                 ContextualFeedbackSeverity::ERROR
             );
 
-            $this->redirect('list');
+            $response = $this->redirect('list');
+
+            throw new PropagateResponseException($response, 200);
         }
     }
 
@@ -260,7 +264,7 @@ class BaseController extends ActionController
                     $obj,
                     $fieldName,
                     $this->settings,
-                    (string)$this->feuser['uid'],
+                    (string)$this->feUser['uid'],
                     $this->request->getArguments()
                 );
             } else {
@@ -325,7 +329,7 @@ class BaseController extends ActionController
      * @param int $newsUid Uid of news record
      * @param int $newsPid Pid of news record
      */
-    protected function clearNewsCache($newsUid, $newsPid)
+    protected function clearNewsCache(int $newsUid, int $newsPid): void
     {
         $cacheTagsToFlush = [];
 
@@ -397,9 +401,8 @@ class BaseController extends ActionController
      * @param $items
      * @param int $itemsPerPage
      * @param int $maximumNumberOfLinks
-     * @throws NoSuchArgumentException
      */
-    protected function assignPagination($items, $itemsPerPage = 10, $maximumNumberOfLinks = 5)
+    protected function assignPagination($items, int $itemsPerPage = 10, int $maximumNumberOfLinks = 5): void
     {
         $currentPage = $this->request->hasArgument('currentPage') ? (int)$this->request->getArgument('currentPage') : 1;
 

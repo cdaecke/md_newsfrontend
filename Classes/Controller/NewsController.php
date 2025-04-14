@@ -39,8 +39,8 @@ class NewsController extends BaseController
      */
     public function listAction(): ResponseInterface
     {
-        if (isset($this->feuser['uid'])) {
-            $news = $this->newsRepository->findByFeuserId($this->feuser['uid'], (int)$this->settings['allowNotEnabledNews']);
+        if (isset($this->feUser['uid'])) {
+            $news = $this->newsRepository->findByFeuserId($this->feUser['uid'], (int)$this->settings['allowNotEnabledNews']);
 
             $this->assignPagination(
                 $news,
@@ -63,7 +63,7 @@ class NewsController extends BaseController
 
         $this->view->assignMultiple(
             [
-                'user' => $this->feuser,
+                'user' => $this->feUser,
                 'showinpreviewOptions' => $this->getValuesForShowinpreview()
             ]
         );
@@ -97,9 +97,9 @@ class NewsController extends BaseController
             $newNews->setDatetime(new \DateTime()); // make sure, that you have set the correct timezone for $GLOBALS['TYPO3_CONF_VARS']['SYS']['phpTimeZone']
         }
 
-        $feuserObj = $this->userRepository->findByUid($this->feuser['uid']);
+        $feUserObj = $this->userRepository->findByUid($this->feUser['uid']);
 
-        $newNews->setTxMdNewsfrontendFeuser($feuserObj);
+        $newNews->setTxMdNewsfrontendfeUser($feUserObj);
 
         // PSR-14 Event
         $this->eventDispatcher->dispatch(new CreateActionBeforeSaveEvent($newNews, $this));
@@ -129,9 +129,7 @@ class NewsController extends BaseController
             ContextualFeedbackSeverity::OK
         );
 
-        $uri = $this->uriBuilder->uriFor('list');
-        return $this->responseFactory->createResponse(307)
-            ->withHeader('Location', $uri);
+        return $this->redirect('list');
     }
 
     /**
@@ -221,9 +219,7 @@ class NewsController extends BaseController
             ContextualFeedbackSeverity::OK
         );
 
-        $uri = $this->uriBuilder->uriFor('list');
-        return $this->responseFactory->createResponse(307)
-            ->withHeader('Location', $uri);
+        return $this->redirect('list');
     }
 
     public function initializeDeleteAction():void
@@ -254,8 +250,6 @@ class NewsController extends BaseController
             ContextualFeedbackSeverity::OK
         );
 
-        $uri = $this->uriBuilder->uriFor('list');
-        return $this->responseFactory->createResponse(307)
-            ->withHeader('Location', $uri);
+        return $this->redirect('list');
     }
 }
