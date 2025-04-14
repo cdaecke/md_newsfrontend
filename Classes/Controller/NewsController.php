@@ -77,10 +77,7 @@ class NewsController extends BaseController
      */
     public function initializeCreateAction(): void
     {
-        $this->initializeCreateUpdate(
-            $this->request->getArguments(),
-            $this->arguments['newNews']
-        );
+        $this->initializeCreateUpdate($this->arguments['newNews']);
     }
 
     /**
@@ -94,7 +91,7 @@ class NewsController extends BaseController
         $arguments = $this->request->getArgument('newNews');
 
         // if no value is provided for field datetime, use current date
-        if (!isset($arguments['datetime']) || empty($arguments['datetime'])) {
+        if (empty($arguments['datetime'])) {
             $newNews->setDatetime(new \DateTime()); // make sure, that you have set the correct timezone for $GLOBALS['TYPO3_CONF_VARS']['SYS']['phpTimeZone']
         }
 
@@ -176,10 +173,7 @@ class NewsController extends BaseController
     {
         $this->setEnableFieldsTypeConverter();
 
-        $this->initializeCreateUpdate(
-            $this->request->getArguments(),
-            $this->arguments['news']
-        );
+        $this->initializeCreateUpdate($this->arguments['news']);
     }
 
     /**

@@ -15,6 +15,7 @@ namespace Mediadreams\MdNewsfrontend\Utility;
  *
  */
 
+use Mediadreams\MdNewsfrontend\Domain\Model\News;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Resource\StorageRepository;
@@ -31,20 +32,18 @@ class FileUpload
      * Backend file upload: https://docs.typo3.org/typo3cms/CoreApiReference/ApiOverview/Fal/UsingFal/ExamplesFileFolder.html#in-the-backend-context
      *
      * @param array $files An array with the uploaded files
-     * @param obj $obj Object to attach the file to
+     * @param News $obj Object to attach the file to
      * @param string $propertyName Name of the property
      * @param array $settings Extension settings
      * @param string $subfolder Name of subfolder
-     * @param array $requestArguments Array with request params // TODO: Remove as soon as TYPO3 v11 support is dropped
      * @return void
      */
     public static function handleUpload(
         array $files,
-        \Mediadreams\MdNewsfrontend\Domain\Model\News $obj,
+        News $obj,
         string $propertyName,
         array $settings,
-        string $subfolder = '',
-        array $requestArguments = []
+        string $subfolder = ''
     ) {
         /** @var StorageRepository $storageRepository */
         $storageRepository = GeneralUtility::makeInstance(StorageRepository::class);

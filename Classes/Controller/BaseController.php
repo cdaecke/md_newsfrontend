@@ -149,22 +149,21 @@ class BaseController extends ActionController
     /**
      * This will initialize everything which is needed in create or update action
      *
-     * @param array $requestArguments
      * @param Argument $argument
      * @return void
      */
-    protected function initializeCreateUpdate($requestArguments, $argument)
+    protected function initializeCreateUpdate(Argument $argument)
     {
         // add validator for upload fields
-        $this->initializeFileValidator($requestArguments, $argument);
+        $this->initializeFileValidator($argument);
 
-        if (!empty($requestArguments[$argument->getName()]['datetime'])) {
+        if (!empty($this->request->getArguments()[$argument->getName()]['datetime'])) {
             // use correct format for datetime
             $argument
                 ->getPropertyMappingConfiguration()
                 ->forProperty('datetime')
                 ->setTypeConverterOption(
-                    'TYPO3\\CMS\\Extbase\\Property\\TypeConverter\\DateTimeConverter',
+                    DateTimeConverter::class,
                     DateTimeConverter::CONFIGURATION_DATE_FORMAT,
                     $this->settings['formatDatetime']
                 );
@@ -175,7 +174,7 @@ class BaseController extends ActionController
             ->getPropertyMappingConfiguration()
             ->forProperty('archive')
             ->setTypeConverterOption(
-                'TYPO3\\CMS\\Extbase\\Property\\TypeConverter\\DateTimeConverter',
+                DateTimeConverter::class,
                 DateTimeConverter::CONFIGURATION_DATE_FORMAT,
                 $this->settings['formatArchive']
             );
@@ -185,7 +184,7 @@ class BaseController extends ActionController
             ->getPropertyMappingConfiguration()
             ->forProperty('starttime')
             ->setTypeConverterOption(
-                'TYPO3\\CMS\\Extbase\\Property\\TypeConverter\\DateTimeConverter',
+                DateTimeConverter::class,
                 DateTimeConverter::CONFIGURATION_DATE_FORMAT,
                 $this->settings['formatDatetime']
             );
@@ -195,7 +194,7 @@ class BaseController extends ActionController
             ->getPropertyMappingConfiguration()
             ->forProperty('endtime')
             ->setTypeConverterOption(
-                'TYPO3\\CMS\\Extbase\\Property\\TypeConverter\\DateTimeConverter',
+                DateTimeConverter::class,
                 DateTimeConverter::CONFIGURATION_DATE_FORMAT,
                 $this->settings['formatDatetime']
             );
@@ -204,42 +203,26 @@ class BaseController extends ActionController
     /**
      * Initialize the upload validators for configured fields
      *
-     * @param array $requestArguments
      * @param Argument $argument
      * @return void
      */
-    protected function initializeFileValidator($requestArguments, $argument)
+    protected function initializeFileValidator(Argument $argument)
     {
+        $validator = $argument->getValidator();
+
         foreach ($this->uploadFields as $fieldName) {
-            if (isset($requestArguments[$fieldName])) {
-                $this->addFileuploadValidator(
-                    $argument,
-                    $requestArguments[$fieldName],
-                    $this->settings['allowed_' . $fieldName]
+            if (isset($this->request->getUploadedFiles()[$fieldName])) {
+                $checkFileUploadValidator = GeneralUtility::makeInstance(
+                    \Mediadreams\MdNewsfrontend\Domain\Validator\CheckFileUpload::class,
+                    [
+                        'filesArr' => $this->request->getUploadedFiles()[$fieldName],
+                        'allowedFileExtensions' => $this->settings['allowed_' . $fieldName],
+                    ]
                 );
+
+                $validator->addValidator($checkFileUploadValidator);
             }
         }
-    }
-
-    /**
-     * Add the file upload validator for given object and field
-     *
-     * @param News $news
-     * @return void
-     */
-    protected function addFileuploadValidator($arguments, $fieldName, $allowedFileExtensions)
-    {
-        $validator = $arguments->getValidator();
-
-        $checkFileUploadValidator = GeneralUtility::makeInstance(
-            \Mediadreams\MdNewsfrontend\Domain\Validator\CheckFileUpload::class,
-            [
-                'filesArr' => $fieldName,
-                'allowedFileExtensions' => $allowedFileExtensions,
-            ]
-        );
-
-        $validator->addValidator($checkFileUploadValidator);
     }
 
     /**
