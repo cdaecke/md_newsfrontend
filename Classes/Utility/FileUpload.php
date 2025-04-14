@@ -27,10 +27,6 @@ class FileUpload
      * Handle the file upload and attach the file to the given object
      * ATTENTION: This class is just doing the file upload. Validation of file has to be done by a validator!
      *
-     * Since \TYPO3\CMS\Core\DataHandling\DataHandler can not be used in the frontend,
-     * we have to build it on our own: https://docs.typo3.org/typo3cms/CoreApiReference/ApiOverview/Fal/UsingFal/ExamplesFileFolder.html#in-the-frontend-context
-     * Backend file upload: https://docs.typo3.org/typo3cms/CoreApiReference/ApiOverview/Fal/UsingFal/ExamplesFileFolder.html#in-the-backend-context
-     *
      * @param array $files An array with the uploaded files
      * @param News $obj Object to attach the file to
      * @param string $propertyName Name of the property
@@ -44,7 +40,8 @@ class FileUpload
         string $propertyName,
         array $settings,
         string $subfolder = ''
-    ) {
+    ): void
+    {
         /** @var StorageRepository $storageRepository */
         $storageRepository = GeneralUtility::makeInstance(StorageRepository::class);
         $storage = $storageRepository->findByUid(1);
@@ -75,12 +72,12 @@ class FileUpload
     /**
      * Handle the file upload and attach the file to the given object
      *
-     * @param obj $obj Object to attach the file to
+     * @param News $obj Object to attach the file to
      * @param string $propertyName Name of the property
      * @param int $fileUid The uid of uploaded file
      * @return void
      */
-    protected static function updateFileReferences($obj, $propertyName, $fileUid)
+    protected static function updateFileReferences(News $obj, string $propertyName, int $fileUid): void
     {
         $timestamp = time();
         $fileData = $_REQUEST['tx_mdnewsfrontend_newsfe'][$propertyName];
@@ -142,7 +139,7 @@ class FileUpload
      * @param string $input The camelCase input string
      * @return string The under_score string
      */
-    protected static function camelCase2underScore($input)
+    protected static function camelCase2underScore(string $input): string
     {
         preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
         $ret = $matches[0];
