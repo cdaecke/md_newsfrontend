@@ -59,6 +59,8 @@ class NewsController extends BaseController
      */
     public function newAction(): ResponseInterface
     {
+        $this->addFrontendAssets();
+
         $this->view->assignMultiple(
             [
                 'user' => $this->feuser,
@@ -152,6 +154,7 @@ class NewsController extends BaseController
     public function editAction(News $news): ResponseInterface
     {
         $this->checkAccess($news);
+        $this->addFrontendAssets();
 
         $this->view->assignMultiple(
             [

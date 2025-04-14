@@ -24,6 +24,7 @@ use Mediadreams\MdNewsfrontend\Property\TypeConverter\EnableFieldsObjectConverte
 use Mediadreams\MdNewsfrontend\Utility\FileUpload;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Page\AssetCollector;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -48,7 +49,8 @@ class BaseController extends ActionController
         protected CategoryRepository $categoryRepository,
         protected NewsRepository $newsRepository,
         protected FrontendUserRepository $userRepository,
-        protected PersistenceManager $persistenceManager
+        protected PersistenceManager $persistenceManager,
+        protected AssetCollector $assetCollector,
     ) {}
 
     /**
@@ -338,6 +340,54 @@ class BaseController extends ActionController
         $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
         foreach ($cacheTagsToFlush as $cacheTag) {
             $cacheManager->flushCachesInGroupByTag('pages', $cacheTag);
+        }
+    }
+
+    /**
+     * Add frontend assets (JS, CSS) to view
+     *
+     * @return void
+     */
+    protected function addFrontendAssets(): void
+    {
+        if ($this->settings['jquery']) {
+            $this->assetCollector->addJavaScript(
+                'md_newsfrontend_jquery',
+                'EXT:md_newsfrontend/Resources/Public/Js/jquery-3.7.1.slim.min.js'
+            );
+        }
+
+        if ($this->settings['tinymce']) {
+            $this->assetCollector->addJavaScript(
+                'md_newsfrontend_tinymce',
+                'EXT:md_newsfrontend/Resources/Public/Js/tinymce/tinymce.min.js'
+            );
+        }
+
+        if ($this->settings['flatpickr']) {
+            $this->assetCollector->addStyleSheet(
+                'md_newsfrontend_flatpickrCss',
+                'EXT:md_newsfrontend/Resources/Public/Css/flatpickr.min.css'
+            );
+
+            $this->assetCollector->addJavaScript(
+                'md_newsfrontend_flatpickr',
+                'EXT:md_newsfrontend/Resources/Public/Js/flatpickr.js'
+            );
+        }
+
+        if ($this->settings['parsleyjs']) {
+            $this->assetCollector->addJavaScript(
+                'md_newsfrontend_parsley',
+                'EXT:md_newsfrontend/Resources/Public/Js/Parsley/parsley.min.js'
+            );
+
+            if ($this->settings['parsleyjsLang'] != 'en') {
+                $this->assetCollector->addJavaScript(
+                    'md_newsfrontend_parsleyjsLang',
+                    'EXT:md_newsfrontend/Resources/Public/Js/Parsley/i18n/' . $this->settings['parsleyjsLang'] . '.js'
+                );
+            }
         }
     }
 
