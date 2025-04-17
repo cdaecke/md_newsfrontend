@@ -1,3 +1,21 @@
+# Version 5.0.0 (2025-04-17)
+- [FEATURE] TYPO3 13 compatibility
+- [FEATURE] ext:news 12 compatibility
+- [BREAKING] Some Templates and Partials have been changed. See [this commit](https://github.com/cdaecke/md_newsfrontend/commit/069a2ab).
+- [BREAKING] Pagination has changed. See [this commit](https://github.com/cdaecke/md_newsfrontend/commit/91a1dd5).
+
+## Migration
+If you have changed the following files of the extension, please update your templates accordingly
+- `Resources/Private/Partials/FooterAssets.html`: Loading of the JS libraries is now done in the controller
+- `Resources/Private/Partials/HeaderAssets.html`: This file was removed and the CSS is loaded in the controller
+- `Resources/Private/Templates/News/Edit.html`: `f:section name="HeaderAssets"` removed
+- `Resources/Private/Templates/News/News.html`: `f:section name="HeaderAssets"` removed
+- `Resources/Private/Templates/News/List.html`: Since we use the `SlidingWindowPagination` from the core now, the template needs to be updated
+- `Resources/Private/Partials/Pagination.html`: Since we use the `SlidingWindowPagination` from the core now, the template needs to be updated
+
+All changes
+https://github.com/cdaecke/md_newsfrontend/compare/4.0.2...5.0.0
+
 # Version 4.0.2 (2025-03-12)
 - [BUGFIX] check, if file upload field exists for upload validator
 
