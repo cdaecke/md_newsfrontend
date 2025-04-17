@@ -1,67 +1,41 @@
-<f:if condition="{pagination.firstPageNumber} != {pagination.lastPageNumber}">
-    <f:then>
+<f:if condition="{pagination.displayRangeStart} != {pagination.displayRangeEnd}">
+    <nav class="pagination-wrapper" aria-label="Pagination">
+        <p class="pagination-info"><f:translate key="pagination.overall" arguments="{0:paginator.currentPageNumber, 1:pagination.paginator.numberOfPages}" /></p>
 
-        <nav class="pagination-wrapper" aria-label="Pagination">
-            <p class="pagination-info"><f:translate key="pagination.overall" arguments="{0:paginator.currentPageNumber, 1:pagination.paginator.numberOfPages}" /></p>
+        <ul class="f3-widget-paginator pagination">
+            <f:if condition="{pagination.displayRangeStart} > 1">
+                <li class="page-item first">
+                    <f:link.page class="page-link" additionalAttributes="{aria-label:'{f:translate(key:\'pagination.first\')}'}">
+                        {f:translate(key: 'pagination.first')}
+                    </f:link.page>
+                </li>
+                <li class="page-item previous">
+                    <f:link.action arguments="{currentPageNumber:pagination.previousPageNumber}" class="page-link" additionalAttributes="{aria-label:'{f:translate(key:\'pagination.previous\')}'}">
+                        {f:translate(key: 'pagination.previous')}
+                    </f:link.action>
+                </li>
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+            </f:if>
 
-            <ul class="f3-widget-paginator pagination">
-                <f:if condition="{pagination.previousPageNumber} && {pagination.previousPageNumber} >= {pagination.firstPageNumber}">
-                    <f:then>
-                        <li class="page-item first">
-                            <a href="{f:uri.action(action:actionName, arguments:{currentPage: 1})}" class="page-link" title="{f:translate(key:'pagination.first')}">
-                                {f:translate(key: 'pagination.first')}
-                            </a>
-                        </li>
-                        <li class="page-item previous">
-                            <a href="{f:uri.action(action:actionName, arguments:{currentPage: pagination.previousPageNumber})}" class="page-link" title="{f:translate(key:'pagination.previous')}">
-                                {f:translate(key: 'pagination.previous')}
-                            </a>
-                        </li>
-                    </f:then>
-                    <f:else>
-                        <li class="page-item first disabled">
-                            <span class="page-link">{f:translate(key: 'pagination.first')}</span>
-                        </li>
-                        <li class="page-item previous disabled">
-                            <span class="page-link">{f:translate(key: 'pagination.previous')}</span>
-                        </li>
-                    </f:else>
-                </f:if>
-                <f:if condition="{pagination.hasLessPages}">
-                    <li class="page-item disabled"><span class="page-link">...</span></li>
-                </f:if>
-                <f:for each="{pagination.allPageNumbers}" as="page">
-                    <li class="page-item {f:if(condition: '{page} == {paginator.currentPageNumber}', then:'current active')}">
-                        <a href="{f:uri.action(action:actionName, arguments:{currentPage: page})}" class="page-link">{page}</a>
-                    </li>
-                </f:for>
-                <f:if condition="{pagination.hasMorePages}">
-                    <li class="page-item disabled"><span class="page-link">...</span></li>
-                </f:if>
-                <f:if condition="{pagination.nextPageNumber} && {pagination.nextPageNumber} <= {pagination.lastPageNumber}">
-                    <f:then>
-                        <li class="page-item next">
-                            <a href="{f:uri.action(action:actionName, arguments:{currentPage: pagination.nextPageNumber})}" class="page-link" title="{f:translate(key:'pagination.next')}">
-                                {f:translate(key: 'pagination.next')}
-                            </a>
-                        </li>
-                        <li class="page-item last">
-                            <a href="{f:uri.action(action:actionName, arguments:{currentPage: pagination.lastPageNumber})}" class="page-link" title="{f:translate(key:'pagination.last')}">
-                                {f:translate(key: 'pagination.last')}
-                            </a>
-                        </li>
-                    </f:then>
-                    <f:else>
-                        <li class="page-item next disabled">
-                            <span class="page-link">{f:translate(key: 'pagination.next')}</span>
-                        </li>
-                        <li class="page-item last disabled">
-                            <span class="page-link">{f:translate(key: 'pagination.last')}</span>
-                        </li>
-                    </f:else>
-                </f:if>
-            </ul>
-        </nav>
+            <f:for each="{pagination.allPageNumbers}" as="page">
+                <li class="page-item {f:if(condition:'{currentPageNumber}=={page}',then:'active')}" {f:if(condition:'{currentPageNumber}=={page}',then:'aria-current="page"')}>
+                <f:link.action arguments="{currentPageNumber:page}" class="page-link">{page}</f:link.action>
+                </li>
+            </f:for>
 
-    </f:then>
+            <f:if condition="{pagination.displayRangeEnd} < {paginator.numberOfPages}">
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+                <li class="page-item next">
+                    <f:link.action arguments="{currentPageNumber:pagination.nextPageNumber}" class="page-link" additionalAttributes="{aria-label:'{f:translate(key:\'pagination.next\')}'}">
+                        {f:translate(key: 'pagination.next')}
+                    </f:link.action>
+                </li>
+                <li class="page-item last">
+                    <f:link.action arguments="{currentPageNumber:pagination.lastPageNumber}" class="page-link" additionalAttributes="{aria-label:'{f:translate(key:\'pagination.last\')}'}">
+                        {f:translate(key: 'pagination.last')}
+                    </f:link.action>
+                </li>
+            </f:if>
+        </ul>
+    </nav>
 </f:if>

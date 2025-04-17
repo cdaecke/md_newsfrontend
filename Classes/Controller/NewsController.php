@@ -42,11 +42,7 @@ class NewsController extends BaseController
         if (isset($this->feUser['uid'])) {
             $news = $this->newsRepository->findByFeuserId($this->feUser['uid'], (int)$this->settings['allowNotEnabledNews']);
 
-            $this->assignPagination(
-                $news,
-                (int)$this->settings['paginate']['itemsPerPage'],
-                (int)$this->settings['paginate']['maximumNumberOfLinks']
-            );
+            $this->view->assignMultiple($this->getPaginatedItems($news));
         }
 
         return $this->htmlResponse();

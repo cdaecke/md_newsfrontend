@@ -16,7 +16,6 @@ namespace Mediadreams\MdNewsfrontend\Controller;
  */
 
 use GeorgRinger\News\Domain\Repository\CategoryRepository;
-use GeorgRinger\NumberedPagination\NumberedPagination;
 use Mediadreams\MdNewsfrontend\Domain\Model\News;
 use Mediadreams\MdNewsfrontend\Domain\Repository\FrontendUserRepository;
 use Mediadreams\MdNewsfrontend\Domain\Repository\NewsRepository;
@@ -26,6 +25,7 @@ use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Http\PropagateResponseException;
 use TYPO3\CMS\Core\Page\AssetCollector;
+use TYPO3\CMS\Core\Pagination\SlidingWindowPagination;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -34,6 +34,7 @@ use TYPO3\CMS\Extbase\Mvc\Controller\Argument;
 use TYPO3\CMS\Extbase\Mvc\Exception\NoSuchArgumentException;
 use TYPO3\CMS\Extbase\Pagination\QueryResultPaginator;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
+use TYPO3\CMS\Extbase\Persistence\Generic\QueryResult;
 use TYPO3\CMS\Extbase\Property\TypeConverter\DateTimeConverter;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\CMS\Fluid\View\FluidViewAdapter;
@@ -398,30 +399,34 @@ class BaseController extends ActionController
     }
 
     /**
-     * Assign pagination to current view object
+     * Get paginated items and paginator for query result
      *
-     * @param $items
-     * @param int $itemsPerPage
-     * @param int $maximumNumberOfLinks
+     * @param QueryResult $items
+     * @return array
      */
-    protected function assignPagination($items, int $itemsPerPage = 10, int $maximumNumberOfLinks = 5): void
+    protected function getPaginatedItems(QueryResult $items): array
     {
-        $currentPage = $this->request->hasArgument('currentPage') ? (int)$this->request->getArgument('currentPage') : 1;
+        $currentPage = $this->request->hasArgument('currentPageNumber')
+            ? (int)$this->request->getArgument('currentPageNumber')
+            : 1;
+
+        $itemsPerPage = isset($this->settings['paginate']['itemsPerPage'])? (int)$this->settings['paginate']['itemsPerPage'] : 10;
+        $maxNumPages = isset($this->settings['paginate']['maximumNumberOfLinks'])? (int)$this->settings['paginate']['maximumNumberOfLinks'] : 5;
 
         $paginator = new QueryResultPaginator(
             $items,
             $currentPage,
-            $itemsPerPage
+            $itemsPerPage,
         );
-
-        $pagination = new NumberedPagination(
+        $pagination = new SlidingWindowPagination(
             $paginator,
-            $maximumNumberOfLinks
+            $maxNumPages,
         );
 
-        $this->view->assign('pagination', [
-            'paginator' => $paginator,
+        return [
             'pagination' => $pagination,
-        ]);
+            'paginator' => $paginator,
+            'currentPageNumber' => $paginator->getCurrentPageNumber(),
+        ];
     }
 }

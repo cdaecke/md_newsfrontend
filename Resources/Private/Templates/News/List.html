@@ -27,7 +27,7 @@
                 <p><f:link.action action="new" class="btn btn-primary"><f:translate key="new" /></f:link.action></p>
 
                 <f:if condition="{settings.paginate.insertBelow}">
-                    <f:render partial="Pagination" arguments="{pagination: pagination.pagination, paginator: pagination.paginator}" />
+                    <f:render partial="Pagination" arguments="{_all}" />
                 </f:if>
             </f:then>
             <f:else>

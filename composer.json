@@ -24,8 +24,7 @@
     },
     "require": {
         "typo3/cms-core": "^12.4 || ^13.4",
-        "georgringer/news": "^11.0 || ^12.0",
-		"georgringer/numbered-pagination": ">=1.0.1,<3.0.0"
+        "georgringer/news": "^11.0 || ^12.0"
 	},
     "autoload": {
         "psr-4": {
