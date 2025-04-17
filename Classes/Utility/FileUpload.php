@@ -15,9 +15,9 @@ namespace Mediadreams\MdNewsfrontend\Utility;
  *
  */
 
+use Mediadreams\MdNewsfrontend\Domain\Model\News;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
-use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -27,19 +27,20 @@ class FileUpload
      * Handle the file upload and attach the file to the given object
      * ATTENTION: This class is just doing the file upload. Validation of file has to be done by a validator!
      *
-     * Since \TYPO3\CMS\Core\DataHandling\DataHandler can not be used in the frontend,
-     * we have to build it on our own: https://docs.typo3.org/typo3cms/CoreApiReference/ApiOverview/Fal/UsingFal/ExamplesFileFolder.html#in-the-frontend-context
-     * Backend file upload: https://docs.typo3.org/typo3cms/CoreApiReference/ApiOverview/Fal/UsingFal/ExamplesFileFolder.html#in-the-backend-context
-     *
      * @param array $files An array with the uploaded files
-     * @param obj $obj Object to attach the file to
+     * @param News $obj Object to attach the file to
      * @param string $propertyName Name of the property
      * @param array $settings Extension settings
      * @param string $subfolder Name of subfolder
-     * @param array $requestArguments Array with request params // TODO: Remove as soon as TYPO3 v11 support is dropped
      * @return void
      */
-    public static function handleUpload($files, $obj, $propertyName, $settings, $subfolder = '', $requestArguments = [])
+    public static function handleUpload(
+        array $files,
+        News $obj,
+        string $propertyName,
+        array $settings,
+        string $subfolder = ''
+    ): void
     {
         /** @var StorageRepository $storageRepository */
         $storageRepository = GeneralUtility::makeInstance(StorageRepository::class);
@@ -56,14 +57,8 @@ class FileUpload
             $targetFolder = $storage->createFolder($folder);
         }
 
-        $versionInformation = GeneralUtility::makeInstance(Typo3Version::class);
-        if ($versionInformation->getMajorVersion() >= 12) {
-            $originalFilePath = $files[$propertyName]->getTemporaryFileName();
-            $newFileName = $files[$propertyName]->getClientFilename();
-        } else {
-            $originalFilePath = $requestArguments[$propertyName]['tmp_name'];
-            $newFileName = $requestArguments[$propertyName]['name'];
-        }
+        $originalFilePath = $files[$propertyName]->getTemporaryFileName();
+        $newFileName = $files[$propertyName]->getClientFilename();
 
         if (file_exists($originalFilePath)) {
             // upload file
@@ -77,12 +72,12 @@ class FileUpload
     /**
      * Handle the file upload and attach the file to the given object
      *
-     * @param obj $obj Object to attach the file to
+     * @param News $obj Object to attach the file to
      * @param string $propertyName Name of the property
      * @param int $fileUid The uid of uploaded file
      * @return void
      */
-    protected static function updateFileReferences($obj, $propertyName, $fileUid)
+    protected static function updateFileReferences(News $obj, string $propertyName, int $fileUid): void
     {
         $timestamp = time();
         $fileData = $_REQUEST['tx_mdnewsfrontend_newsfe'][$propertyName];
@@ -119,11 +114,6 @@ class FileUpload
             'showinpreview' => (int)$showinpreview
         ];
 
-        $versionInformation = GeneralUtility::makeInstance(Typo3Version::class);
-        if ($versionInformation->getMajorVersion() < 12) {
-            $fileReference['table_local'] = 'sys_file';
-        }
-
         // add new file reference
         $queryBuilder
             ->insert('sys_file_reference')
@@ -149,7 +139,7 @@ class FileUpload
      * @param string $input The camelCase input string
      * @return string The under_score string
      */
-    protected static function camelCase2underScore($input)
+    protected static function camelCase2underScore(string $input): string
     {
         preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
         $ret = $matches[0];

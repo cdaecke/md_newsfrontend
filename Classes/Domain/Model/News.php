@@ -27,14 +27,14 @@ class News extends \GeorgRinger\News\Domain\Model\News
      *
      * @var \Mediadreams\MdNewsfrontend\Domain\Model\FrontendUser
      */
-    protected $txMdNewsfrontendFeuser = null;
+    protected ?\Mediadreams\MdNewsfrontend\Domain\Model\FrontendUser $txMdNewsfrontendFeuser = null;
 
     /**
      * Returns the txMdNewsfrontendFeuser
      *
      * @return \Mediadreams\MdNewsfrontend\Domain\Model\FrontendUser $txMdNewsfrontendFeuser
      */
-    public function getTxMdNewsfrontendFeuser()
+    public function getTxMdNewsfrontendFeuser(): ?\Mediadreams\MdNewsfrontend\Domain\Model\FrontendUser
     {
         return $this->txMdNewsfrontendFeuser;
     }
@@ -45,7 +45,7 @@ class News extends \GeorgRinger\News\Domain\Model\News
      * @param \Mediadreams\MdNewsfrontend\Domain\Model\FrontendUser $txMdNewsfrontendFeuser
      * @return void
      */
-    public function setTxMdNewsfrontendFeuser(\Mediadreams\MdNewsfrontend\Domain\Model\FrontendUser $txMdNewsfrontendFeuser)
+    public function setTxMdNewsfrontendFeuser(\Mediadreams\MdNewsfrontend\Domain\Model\FrontendUser $txMdNewsfrontendFeuser): void
     {
         $this->txMdNewsfrontendFeuser = $txMdNewsfrontendFeuser;
     }

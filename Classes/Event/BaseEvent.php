@@ -27,7 +27,7 @@ abstract class BaseEvent
     /**
      * @var News
      */
-    private $news;
+    private News $news;
 
     /**
      * @var NewsController

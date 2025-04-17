@@ -15,7 +15,6 @@ namespace Mediadreams\MdNewsfrontend\Controller;
  *
  */
 
-use DateTime;
 use Mediadreams\MdNewsfrontend\Domain\Model\News;
 use Mediadreams\MdNewsfrontend\Event\CreateActionAfterPersistEvent;
 use Mediadreams\MdNewsfrontend\Event\CreateActionBeforeSaveEvent;
@@ -23,9 +22,8 @@ use Mediadreams\MdNewsfrontend\Event\DeleteActionBeforeDeleteEvent;
 use Mediadreams\MdNewsfrontend\Event\UpdateActionBeforeSaveEvent;
 use Mediadreams\MdNewsfrontend\Service\NewsSlugHelper;
 use Psr\Http\Message\ResponseInterface;
-use TYPO3\CMS\Core\Messaging\AbstractMessage;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
@@ -35,29 +33,14 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 class NewsController extends BaseController
 {
     /**
-     * persistenceManager
-     *
-     * @var PersistenceManager
-     */
-    protected $persistenceManager = null;
-
-    /**
-     * @param PersistenceManager $persistenceManager
-     */
-    public function injectPersistenceManager(PersistenceManager $persistenceManager)
-    {
-        $this->persistenceManager = $persistenceManager;
-    }
-
-    /**
      * action list
      *
-     * @return void
+     * @return ResponseInterface
      */
     public function listAction(): ResponseInterface
     {
-        if ((int)$this->feuserUid > 0) {
-            $news = $this->newsRepository->findByFeuserId($this->feuserUid, (int)$this->settings['allowNotEnabledNews']);
+        if (isset($this->feUser['uid'])) {
+            $news = $this->newsRepository->findByFeuserId($this->feUser['uid'], (int)$this->settings['allowNotEnabledNews']);
 
             $this->assignPagination(
                 $news,
@@ -72,13 +55,15 @@ class NewsController extends BaseController
     /**
      * action new
      *
-     * @return void
+     * @return ResponseInterface
      */
     public function newAction(): ResponseInterface
     {
+        $this->addFrontendAssets();
+
         $this->view->assignMultiple(
             [
-                'user' => $this->feuserObj,
+                'user' => $this->feUser,
                 'showinpreviewOptions' => $this->getValuesForShowinpreview()
             ]
         );
@@ -92,30 +77,29 @@ class NewsController extends BaseController
      *
      * @return void
      */
-    public function initializeCreateAction()
+    public function initializeCreateAction(): void
     {
-        $this->initializeCreateUpdate(
-            $this->request->getArguments(),
-            $this->arguments['newNews']
-        );
+        $this->initializeCreateUpdate($this->arguments['newNews']);
     }
 
     /**
      * action create
      *
      * @param News $newNews
-     * @return void
+     * @return ResponseInterface
      */
     public function createAction(News $newNews): ResponseInterface
     {
         $arguments = $this->request->getArgument('newNews');
 
         // if no value is provided for field datetime, use current date
-        if (!isset($arguments['datetime']) || empty($arguments['datetime'])) {
-            $newNews->setDatetime(new DateTime()); // make sure, that you have set the correct timezone for $GLOBALS['TYPO3_CONF_VARS']['SYS']['phpTimeZone']
+        if (empty($arguments['datetime'])) {
+            $newNews->setDatetime(new \DateTime()); // make sure, that you have set the correct timezone for $GLOBALS['TYPO3_CONF_VARS']['SYS']['phpTimeZone']
         }
 
-        $newNews->setTxMdNewsfrontendFeuser($this->feuserObj);
+        $feUserObj = $this->userRepository->findByUid($this->feUser['uid']);
+
+        $newNews->setTxMdNewsfrontendfeUser($feUserObj);
 
         // PSR-14 Event
         $this->eventDispatcher->dispatch(new CreateActionBeforeSaveEvent($newNews, $this));
@@ -142,12 +126,10 @@ class NewsController extends BaseController
         $this->addFlashMessage(
             LocalizationUtility::translate('controller.new_success', 'md_newsfrontend'),
             '',
-            AbstractMessage::OK
+            ContextualFeedbackSeverity::OK
         );
 
-        $uri = $this->uriBuilder->uriFor('list');
-        return $this->responseFactory->createResponse(307)
-            ->withHeader('Location', $uri);
+        return $this->redirect('list');
     }
 
     /**
@@ -157,7 +139,7 @@ class NewsController extends BaseController
      */
     public function initializeEditAction(): void
     {
-        $this->setEnableFieldsTypeConverter('news');
+        $this->setEnableFieldsTypeConverter();
     }
 
     /**
@@ -165,11 +147,12 @@ class NewsController extends BaseController
      *
      * @param News $news
      * @TYPO3\CMS\Extbase\Annotation\IgnoreValidation("news")
-     * @return void
+     * @return ResponseInterface
      */
     public function editAction(News $news): ResponseInterface
     {
         $this->checkAccess($news);
+        $this->addFrontendAssets();
 
         $this->view->assignMultiple(
             [
@@ -187,21 +170,18 @@ class NewsController extends BaseController
      *
      * @return void
      */
-    public function initializeUpdateAction()
+    public function initializeUpdateAction(): void
     {
-        $this->setEnableFieldsTypeConverter('news');
+        $this->setEnableFieldsTypeConverter();
 
-        $this->initializeCreateUpdate(
-            $this->request->getArguments(),
-            $this->arguments['news']
-        );
+        $this->initializeCreateUpdate($this->arguments['news']);
     }
 
     /**
      * action update
      *
      * @param News $news
-     * @return void
+     * @return ResponseInterface
      */
     public function updateAction(News $news): ResponseInterface
     {
@@ -236,24 +216,22 @@ class NewsController extends BaseController
         $this->addFlashMessage(
             LocalizationUtility::translate('controller.edit_success', 'md_newsfrontend'),
             '',
-            AbstractMessage::OK
+            ContextualFeedbackSeverity::OK
         );
 
-        $uri = $this->uriBuilder->uriFor('list');
-        return $this->responseFactory->createResponse(307)
-            ->withHeader('Location', $uri);
+        return $this->redirect('list');
     }
 
-    public function initializeDeleteAction()
+    public function initializeDeleteAction():void
     {
-        $this->setEnableFieldsTypeConverter('news');
+        $this->setEnableFieldsTypeConverter();
     }
 
     /**
      * action delete
      *
      * @param News $news
-     * @return void
+     * @return ResponseInterface
      */
     public function deleteAction(News $news): ResponseInterface
     {
@@ -269,11 +247,9 @@ class NewsController extends BaseController
         $this->addFlashMessage(
             LocalizationUtility::translate('controller.delete_success', 'md_newsfrontend'),
             '',
-            AbstractMessage::OK
+            ContextualFeedbackSeverity::OK
         );
 
-        $uri = $this->uriBuilder->uriFor('list');
-        return $this->responseFactory->createResponse(307)
-            ->withHeader('Location', $uri);
+        return $this->redirect('list');
     }
 }

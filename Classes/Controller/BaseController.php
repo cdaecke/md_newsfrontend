@@ -17,7 +17,6 @@ namespace Mediadreams\MdNewsfrontend\Controller;
 
 use GeorgRinger\News\Domain\Repository\CategoryRepository;
 use GeorgRinger\NumberedPagination\NumberedPagination;
-use Mediadreams\MdNewsfrontend\Domain\Model\FrontendUser;
 use Mediadreams\MdNewsfrontend\Domain\Model\News;
 use Mediadreams\MdNewsfrontend\Domain\Repository\FrontendUserRepository;
 use Mediadreams\MdNewsfrontend\Domain\Repository\NewsRepository;
@@ -25,16 +24,20 @@ use Mediadreams\MdNewsfrontend\Property\TypeConverter\EnableFieldsObjectConverte
 use Mediadreams\MdNewsfrontend\Utility\FileUpload;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Information\Typo3Version;
-use TYPO3\CMS\Core\Messaging\AbstractMessage;
+use TYPO3\CMS\Core\Http\PropagateResponseException;
+use TYPO3\CMS\Core\Page\AssetCollector;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Controller\Argument;
 use TYPO3\CMS\Extbase\Mvc\Exception\NoSuchArgumentException;
 use TYPO3\CMS\Extbase\Pagination\QueryResultPaginator;
+use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 use TYPO3\CMS\Extbase\Property\TypeConverter\DateTimeConverter;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+use TYPO3\CMS\Fluid\View\FluidViewAdapter;
+use TYPO3\CMS\Fluid\View\TemplateView;
 
 /**
  * Class BaseController
@@ -42,88 +45,48 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
  */
 class BaseController extends ActionController
 {
-    /**
-     * @var array
-     */
-    protected $uploadFields = ['falMedia', 'falRelatedFiles'];
+    protected array $uploadFields = ['falMedia', 'falRelatedFiles'];
+    protected array $feUser = [];
 
-    /**
-     * categoryRepository
-     *
-     * @var CategoryRepository
-     */
-    protected $categoryRepository = null;
-
-    /**
-     * newsRepository
-     *
-     * @var NewsRepository
-     */
-    protected $newsRepository = null;
-
-    /**
-     * userRepository
-     *
-     * @var FrontendUserRepository
-     */
-    protected $userRepository = null;
-
-    /**
-     * @var int
-     */
-    protected $feuserUid = 0;
-
-    /**
-     * @var FrontendUser
-     */
-    protected $feuserObj = null;
-
-    /**
-     * NewsController constructor.
-     * @param CategoryRepository $categoryRepository
-     * @param NewsRepository $newsRepository
-     * @param FrontendUserRepository $userRepository
-     */
     public function __construct(
-        CategoryRepository $categoryRepository,
-        NewsRepository $newsRepository,
-        FrontendUserRepository $userRepository
-    ) {
-        $this->categoryRepository = $categoryRepository;
-        $this->newsRepository = $newsRepository;
-        $this->userRepository = $userRepository;
-    }
+        protected CategoryRepository $categoryRepository,
+        protected NewsRepository $newsRepository,
+        protected FrontendUserRepository $userRepository,
+        protected PersistenceManager $persistenceManager,
+        protected AssetCollector $assetCollector,
+    ) {}
 
     /**
      * Deactivate errorFlashMessage
      *
      * @return bool|string
      */
-    public function getErrorFlashMessage()
+    public function getErrorFlashMessage(): bool|string
     {
         return false;
     }
 
     /**
      * Initializes the view and pass additional data to template
+     * TODO: Remove type declaration `TemplateView` as soon as TYPO3 v12 is not supported anymore!
      *
-     * @param $view The view to be initialized
+     * @param TemplateView|FluidViewAdapter $view The view to be initialized
      */
-    protected function initializeView($view)
+    protected function initializeView(TemplateView|FluidViewAdapter $view)
     {
         // check if user is logged in
-        if (!$GLOBALS['TSFE']->fe_user->user) {
+        if (!$this->request->getAttribute('frontend.user')->user) {
             $this->addFlashMessage(
                 LocalizationUtility::translate('controller.not_loggedin', 'md_newsfrontend'),
                 '',
-                AbstractMessage::ERROR
+                ContextualFeedbackSeverity::ERROR
             );
         } else {
             if (!isset($this->settings['uploadPath'])) { // check if TypoScript is loaded
                 $this->addFlashMessage(
                     LocalizationUtility::translate('controller.typoscript_missing', 'md_newsfrontend'),
                     '',
-                    AbstractMessage::ERROR
+                    ContextualFeedbackSeverity::ERROR
                 );
             }
         }
@@ -140,10 +103,10 @@ class BaseController extends ActionController
      * Initialize actions
      * Add possibility to overwrite settings
      */
-    protected function initializeAction()
+    protected function initializeAction(): void
     {
         // Use stdWrap for given defined settings
-        // Thanks to Georg Ringer: https://github.com/georgringer/news/blob/2c8522ad508fa92ad39a5effe4301f7d872238a5/Classes/Controller/NewsController.php#L597
+        // Thanks to Georg Ringer: https://github.com/georgringer/news/blob/976fe5930cea9693f6cd56b650abe4e876fc70f0/Classes/Controller/NewsController.php#L627
         if (
             isset($this->settings['useStdWrap'])
             && !empty($this->settings['useStdWrap'])
@@ -152,9 +115,9 @@ class BaseController extends ActionController
             $typoScriptArray = $typoScriptService->convertPlainArrayToTypoScriptArray($this->settings);
             $stdWrapProperties = GeneralUtility::trimExplode(',', $this->settings['useStdWrap'], true);
             foreach ($stdWrapProperties as $key) {
-                if (is_array($typoScriptArray[$key . '.'])) {
-                    $this->settings[$key] = $this->configurationManager->getContentObject()->stdWrap(
-                        $typoScriptArray[$key],
+                if (is_array($typoScriptArray[$key . '.'] ?? null)) {
+                    $this->settings[$key] = $this->request->getAttribute('currentContentObject')->stdWrap(
+                        $typoScriptArray[$key] ?? '',
                         $typoScriptArray[$key . '.']
                     );
                 }
@@ -162,9 +125,8 @@ class BaseController extends ActionController
         }
 
         // Get logged in user
-        if ($GLOBALS['TSFE']->fe_user->user) {
-            $this->feuserUid = $GLOBALS['TSFE']->fe_user->user['uid'];
-            $this->feuserObj = $this->userRepository->findByUid($this->feuserUid);
+        if ($this->request->getAttribute('frontend.user')->user) {
+            $this->feUser = $this->request->getAttribute('frontend.user')->user;
         }
 
         parent::initializeAction();
@@ -177,38 +139,39 @@ class BaseController extends ActionController
      * @param News $newsRecord
      * @return void
      */
-    protected function checkAccess(News $newsRecord)
+    protected function checkAccess(News $newsRecord): void
     {
-        if ($newsRecord->getTxMdNewsfrontendFeuser()->getUid() != $this->feuserUid) {
+        if ($newsRecord->getTxMdNewsfrontendFeuser()->getUid() != $this->feUser['uid']) {
             $this->addFlashMessage(
                 LocalizationUtility::translate('controller.access_error', 'md_newsfrontend'),
                 '',
-                AbstractMessage::ERROR
+                ContextualFeedbackSeverity::ERROR
             );
 
-            $this->redirect('list');
+            $response = $this->redirect('list');
+
+            throw new PropagateResponseException($response, 200);
         }
     }
 
     /**
      * This will initialize everything which is needed in create or update action
      *
-     * @param array $requestArguments
      * @param Argument $argument
      * @return void
      */
-    protected function initializeCreateUpdate($requestArguments, $argument)
+    protected function initializeCreateUpdate(Argument $argument)
     {
         // add validator for upload fields
-        $this->initializeFileValidator($requestArguments, $argument);
+        $this->initializeFileValidator($argument);
 
-        if (!empty($requestArguments[$argument->getName()]['datetime'])) {
+        if (!empty($this->request->getArguments()[$argument->getName()]['datetime'])) {
             // use correct format for datetime
             $argument
                 ->getPropertyMappingConfiguration()
                 ->forProperty('datetime')
                 ->setTypeConverterOption(
-                    'TYPO3\\CMS\\Extbase\\Property\\TypeConverter\\DateTimeConverter',
+                    DateTimeConverter::class,
                     DateTimeConverter::CONFIGURATION_DATE_FORMAT,
                     $this->settings['formatDatetime']
                 );
@@ -219,7 +182,7 @@ class BaseController extends ActionController
             ->getPropertyMappingConfiguration()
             ->forProperty('archive')
             ->setTypeConverterOption(
-                'TYPO3\\CMS\\Extbase\\Property\\TypeConverter\\DateTimeConverter',
+                DateTimeConverter::class,
                 DateTimeConverter::CONFIGURATION_DATE_FORMAT,
                 $this->settings['formatArchive']
             );
@@ -229,7 +192,7 @@ class BaseController extends ActionController
             ->getPropertyMappingConfiguration()
             ->forProperty('starttime')
             ->setTypeConverterOption(
-                'TYPO3\\CMS\\Extbase\\Property\\TypeConverter\\DateTimeConverter',
+                DateTimeConverter::class,
                 DateTimeConverter::CONFIGURATION_DATE_FORMAT,
                 $this->settings['formatDatetime']
             );
@@ -239,7 +202,7 @@ class BaseController extends ActionController
             ->getPropertyMappingConfiguration()
             ->forProperty('endtime')
             ->setTypeConverterOption(
-                'TYPO3\\CMS\\Extbase\\Property\\TypeConverter\\DateTimeConverter',
+                DateTimeConverter::class,
                 DateTimeConverter::CONFIGURATION_DATE_FORMAT,
                 $this->settings['formatDatetime']
             );
@@ -248,52 +211,35 @@ class BaseController extends ActionController
     /**
      * Initialize the upload validators for configured fields
      *
-     * @param array $requestArguments
      * @param Argument $argument
      * @return void
      */
-    protected function initializeFileValidator($requestArguments, $argument)
+    protected function initializeFileValidator(Argument $argument)
     {
+        $validator = $argument->getValidator();
+
         foreach ($this->uploadFields as $fieldName) {
-            if (isset($requestArguments[$fieldName])) {
-                $this->addFileuploadValidator(
-                    $argument,
-                    $requestArguments[$fieldName],
-                    $this->settings['allowed_' . $fieldName]
+            if (isset($this->request->getUploadedFiles()[$fieldName])) {
+                $checkFileUploadValidator = GeneralUtility::makeInstance(
+                    \Mediadreams\MdNewsfrontend\Domain\Validator\CheckFileUpload::class,
+                    [
+                        'filesArr' => $this->request->getUploadedFiles()[$fieldName],
+                        'allowedFileExtensions' => $this->settings['allowed_' . $fieldName],
+                    ]
                 );
+
+                $validator->addValidator($checkFileUploadValidator);
             }
         }
-    }
-
-    /**
-     * Add the file upload validator for given object and field
-     *
-     * @param News $news
-     * @return void
-     */
-    protected function addFileuploadValidator($arguments, $fieldName, $allowedFileExtensions)
-    {
-        $validator = $arguments->getValidator();
-
-        $checkFileUploadValidator = GeneralUtility::makeInstance(
-            \Mediadreams\MdNewsfrontend\Domain\Validator\CheckFileUpload::class,
-            [
-                'filesArr' => $fieldName,
-                'allowedFileExtensions' => $allowedFileExtensions,
-            ]
-        );
-
-        $validator->addValidator($checkFileUploadValidator);
     }
 
     /**
      * Set type converter for enable fields
      * This is needed, in order to edit/show/delete hidden records
      *
-     * @param string $object
      * @throws NoSuchArgumentException
      */
-    protected function setEnableFieldsTypeConverter(string $object): void
+    protected function setEnableFieldsTypeConverter(): void
     {
         if ((int)$this->settings['allowNotEnabledNews'] === 1) {
             $this->arguments->getArgument('news')
@@ -308,17 +254,9 @@ class BaseController extends ActionController
      * @param News $obj
      * @return void
      */
-    protected function initializeFileUpload($obj)
+    protected function initializeFileUpload(News $obj)
     {
-        $versionInformation = GeneralUtility::makeInstance(Typo3Version::class);
-        if ($versionInformation->getMajorVersion() >= 12) {
-            $files = $this->request->getUploadedFiles();
-        } else {
-            $files = [];
-            if (isset($this->request->getUploadedFiles()['tx_mdnewsfrontend_newsfe'])) {
-                $files = $this->request->getUploadedFiles()['tx_mdnewsfrontend_newsfe'];
-            }
-        }
+        $files = $this->request->getUploadedFiles();
 
         foreach ($this->uploadFields as $fieldName) {
             if (isset($files[$fieldName])) {
@@ -328,7 +266,7 @@ class BaseController extends ActionController
                     $obj,
                     $fieldName,
                     $this->settings,
-                    $this->feuserUid,
+                    (string)$this->feUser['uid'],
                     $this->request->getArguments()
                 );
             } else {
@@ -352,7 +290,7 @@ class BaseController extends ActionController
      * @param array $fileData All data about the file
      * @return void
      */
-    protected function updateFileReference($fileReferencesUid, $fileData)
+    protected function updateFileReference(int $fileReferencesUid, array $fileData)
     {
         $showinpreview = !isset($fileData['showinpreview']) ? 0 : $fileData['showinpreview'];
 
@@ -368,7 +306,7 @@ class BaseController extends ActionController
             ->set('title', $fileData['title'])
             ->set('description', $fileData['description'])
             ->set('showinpreview', (int)$showinpreview)
-            ->execute();
+            ->executeStatement();
     }
 
     /**
@@ -393,7 +331,7 @@ class BaseController extends ActionController
      * @param int $newsUid Uid of news record
      * @param int $newsPid Pid of news record
      */
-    protected function clearNewsCache($newsUid, $newsPid)
+    protected function clearNewsCache(int $newsUid, int $newsPid): void
     {
         $cacheTagsToFlush = [];
 
@@ -412,14 +350,61 @@ class BaseController extends ActionController
     }
 
     /**
+     * Add frontend assets (JS, CSS) to view
+     *
+     * @return void
+     */
+    protected function addFrontendAssets(): void
+    {
+        if ($this->settings['jquery']) {
+            $this->assetCollector->addJavaScript(
+                'md_newsfrontend_jquery',
+                'EXT:md_newsfrontend/Resources/Public/Js/jquery-3.7.1.slim.min.js'
+            );
+        }
+
+        if ($this->settings['tinymce']) {
+            $this->assetCollector->addJavaScript(
+                'md_newsfrontend_tinymce',
+                'EXT:md_newsfrontend/Resources/Public/Js/tinymce/tinymce.min.js'
+            );
+        }
+
+        if ($this->settings['flatpickr']) {
+            $this->assetCollector->addStyleSheet(
+                'md_newsfrontend_flatpickrCss',
+                'EXT:md_newsfrontend/Resources/Public/Css/flatpickr.min.css'
+            );
+
+            $this->assetCollector->addJavaScript(
+                'md_newsfrontend_flatpickr',
+                'EXT:md_newsfrontend/Resources/Public/Js/flatpickr.js'
+            );
+        }
+
+        if ($this->settings['parsleyjs']) {
+            $this->assetCollector->addJavaScript(
+                'md_newsfrontend_parsley',
+                'EXT:md_newsfrontend/Resources/Public/Js/Parsley/parsley.min.js'
+            );
+
+            if ($this->settings['parsleyjsLang'] != 'en') {
+                $this->assetCollector->addJavaScript(
+                    'md_newsfrontend_parsleyjsLang',
+                    'EXT:md_newsfrontend/Resources/Public/Js/Parsley/i18n/' . $this->settings['parsleyjsLang'] . '.js'
+                );
+            }
+        }
+    }
+
+    /**
      * Assign pagination to current view object
      *
      * @param $items
      * @param int $itemsPerPage
      * @param int $maximumNumberOfLinks
-     * @throws NoSuchArgumentException
      */
-    protected function assignPagination($items, $itemsPerPage = 10, $maximumNumberOfLinks = 5)
+    protected function assignPagination($items, int $itemsPerPage = 10, int $maximumNumberOfLinks = 5): void
     {
         $currentPage = $this->request->hasArgument('currentPage') ? (int)$this->request->getArgument('currentPage') : 1;
 

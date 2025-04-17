@@ -15,6 +15,7 @@ namespace Mediadreams\MdNewsfrontend\Service;
  *
  */
 
+use Mediadreams\MdNewsfrontend\Domain\Model\News;
 use TYPO3\CMS\Core\DataHandling\Model\RecordStateFactory;
 use TYPO3\CMS\Core\DataHandling\SlugHelper;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -25,14 +26,14 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class NewsSlugHelper
 {
     /**
-     * @var tableName
+     * @var string $tableName
      */
-    protected $tableName = 'tx_news_domain_model_news';
+    protected string $tableName = 'tx_news_domain_model_news';
 
     /**
-     * @var slugService
+     * @var SlugHelper slugService
      */
-    protected $slugService;
+    protected SlugHelper $slugService;
 
     /**
      * NewsSlugHelper constructor.
@@ -51,10 +52,10 @@ class NewsSlugHelper
     /**
      * Get unique slug for entry
      *
-     * @param object $obj
+     * @param News $obj
      * @return string
      */
-    public function getSlug($obj): string
+    public function getSlug(News $obj): string
     {
         $newsArr = [
             'title' => $obj->getTitle(),
@@ -65,8 +66,6 @@ class NewsSlugHelper
         $state = RecordStateFactory::forName($this->tableName)
             ->fromArray($newsArr, $obj->getPid(), $obj->getUid());
 
-        $slug = $this->slugService->buildSlugForUniqueInSite($slug, $state);
-
-        return $slug;
+        return $this->slugService->buildSlugForUniqueInSite($slug, $state);
     }
 }

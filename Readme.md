@@ -6,8 +6,8 @@ Templates are ready to use with the [bootstrap framework](https://getbootstrap.c
 
 ## Requirements
 
-- TYPO3 >= 11.5
-- ext:news >= 9.0
+- TYPO3 >= 12.4
+- ext:news >= 11.0
 
 ## Installation
 
