@@ -31,7 +31,7 @@ class FrontendUserGroup extends AbstractEntity
     /**
      * @var ObjectStorage<FrontendUserGroup>
      */
-    protected ObjectStorage $subgroup;
+    protected ?ObjectStorage $subgroup = null;
 
     /**
      * Constructs a new Frontend User Group
@@ -121,7 +121,7 @@ class FrontendUserGroup extends AbstractEntity
      *
      * @return ObjectStorage<FrontendUserGroup> An object storage containing the subgroups
      */
-    public function getSubgroup(): ObjectStorage
+    public function getSubgroup(): ?ObjectStorage
     {
         return $this->subgroup;
     }
