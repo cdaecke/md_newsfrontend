@@ -1,3 +1,9 @@
+# Version 5.0.1 (2025-05-20)
+- [BUGFIX] Could not get value of property "Mediadreams\MdNewsfrontend\Domain\Model\FrontendUserGroup::subgroup"
+
+All changes
+https://github.com/cdaecke/md_newsfrontend/compare/5.0.0...5.0.1
+
 # Version 5.0.0 (2025-04-17)
 - [FEATURE] TYPO3 13 compatibility
 - [FEATURE] ext:news 12 compatibility
