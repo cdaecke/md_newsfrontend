@@ -47,12 +47,12 @@ class FrontendUser extends AbstractEntity
     /**
      * @var ObjectStorage<FrontendUserGroup>
      */
-    protected ObjectStorage $usergroup;
+    protected ?ObjectStorage $usergroup = null;
 
     /**
      * @var ObjectStorage<FileReference>
      */
-    protected ObjectStorage $image;
+    protected ?ObjectStorage $image = null;
 
     /**
      * Constructs a new Front-End User
@@ -154,7 +154,7 @@ class FrontendUser extends AbstractEntity
      *
      * @return ObjectStorage<FrontendUserGroup> An object storage containing the usergroup
      */
-    public function getUsergroup(): ObjectStorage
+    public function getUsergroup(): ?ObjectStorage
     {
         return $this->usergroup;
     }
@@ -454,7 +454,7 @@ class FrontendUser extends AbstractEntity
      *
      * @return ObjectStorage<FileReference>
      */
-    public function getImage(): ObjectStorage
+    public function getImage(): ?ObjectStorage
     {
         return $this->image;
     }
