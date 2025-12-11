@@ -1,3 +1,9 @@
+# Version 5.0.2 (2025-12-11)
+- [TASK] Raise dependency to ext:news, allow v13
+
+All changes
+https://github.com/cdaecke/md_newsfrontend/compare/5.0.1...5.0.2
+
 # Version 5.0.1 (2025-05-20)
 - [BUGFIX] Could not get value of property "Mediadreams\MdNewsfrontend\Domain\Model\FrontendUserGroup::subgroup"
 
