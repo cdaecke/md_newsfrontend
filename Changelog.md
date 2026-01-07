@@ -1,3 +1,9 @@
+# Version 5.0.3 (2026-01-07)
+- [TASK] Allow ext:news v14
+
+All changes
+https://github.com/cdaecke/md_newsfrontend/compare/5.0.2...5.0.3
+
 # Version 5.0.2 (2025-12-11)
 - [TASK] Raise dependency to ext:news, allow v13
 
