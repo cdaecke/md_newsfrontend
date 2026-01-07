@@ -7,7 +7,7 @@ Templates are ready to use with the [bootstrap framework](https://getbootstrap.c
 ## Requirements
 
 - TYPO3 ^12.4 || ^13.4
-- ext:news ^11.0 || ^12.0
+- ext:news ^11.0 || ^13.0 || ^14.0
 
 ## Installation
 
