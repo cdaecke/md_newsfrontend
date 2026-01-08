@@ -1,3 +1,9 @@
+# Version 5.0.4 (2026-01-08)
+- [BUGFIX] Allow ext:news v12 in composer.json again, which got lost in version 5.0.2. Thanks to [h-e-l-l-o-w-o-r-l-d](https://github.com/h-e-l-l-o-w-o-r-l-d)!
+
+All changes
+https://github.com/cdaecke/md_newsfrontend/compare/5.0.3...5.0.4
+
 # Version 5.0.3 (2026-01-07)
 - [TASK] Allow ext:news v14
 
