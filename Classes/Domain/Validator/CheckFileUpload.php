@@ -105,7 +105,7 @@ class CheckFileUpload extends \TYPO3\CMS\Extbase\Validation\Validator\AbstractVa
             case \UPLOAD_ERR_INI_SIZE:
             case \UPLOAD_ERR_FORM_SIZE:
             case \UPLOAD_ERR_PARTIAL:
-                $this->addError(LocalizationUtility::translate('validator.partial', 'md_newsfrontend') . ' ' . $uploadFile['error'], 1540929726);
+                $this->addError(LocalizationUtility::translate('validator.partial', 'md_newsfrontend') . ' ' . $uploadFile->getError(), 1540929726);
                 return false;
             default:
                 $this->addError(LocalizationUtility::translate('validator.unknown', 'md_newsfrontend'), 1540929756);
