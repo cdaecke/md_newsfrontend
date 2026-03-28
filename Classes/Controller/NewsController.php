@@ -22,6 +22,7 @@ use Mediadreams\MdNewsfrontend\Event\DeleteActionBeforeDeleteEvent;
 use Mediadreams\MdNewsfrontend\Event\UpdateActionBeforeSaveEvent;
 use Mediadreams\MdNewsfrontend\Service\NewsSlugHelper;
 use Psr\Http\Message\ResponseInterface;
+use TYPO3\CMS\Core\Http\UploadedFile;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Annotation\IgnoreValidation;
@@ -112,8 +113,14 @@ class NewsController extends BaseController
         $newNews->setPathSegment($slug);
         $this->newsRepository->update($newNews);
 
-        // handle the fileupload
-        $this->initializeFileUpload($newNews);
+        // process file uploads and update file reference metadata
+        foreach ($this->uploadFields as $fieldName) {
+            $fileReferenceUid = $this->processUploadedFile($fieldName, $newNews->getUid(), $newNews->getPid());
+            $fileData = $this->request->getArguments()[$fieldName] ?? [];
+            if ($fileReferenceUid > 0 && is_array($fileData)) {
+                $this->updateFileReference($fileReferenceUid, $fileData);
+            }
+        }
 
         // PSR-14 Event
         $this->eventDispatcher->dispatch(new CreateActionAfterPersistEvent($newNews, $this));
@@ -189,25 +196,51 @@ class NewsController extends BaseController
             $news->setArchive(0);
         }
 
-        $requestArguments = $this->request->getArguments();
-
-        // Remove file relation from news record
+        // Detach existing file references when the user checks "delete" or uploads a replacement.
+        // The physical FAL file is deleted first; Extbase handles sys_file_reference deletion during persistAll().
         foreach ($this->uploadFields as $fieldName) {
-            if (is_array($requestArguments[$fieldName]) && isset($requestArguments[$fieldName]['delete']) && $requestArguments[$fieldName]['delete'] == 1) {
-                $removeMethod = 'remove' . ucfirst($fieldName);
-                $getFirstMethod = 'getFirst' . ucfirst($fieldName);
+            $shouldDelete = ($this->request->getArguments()[$fieldName . 'Delete'] ?? '') === '1';
+            $uploadedFile = $this->request->getUploadedFiles()[$fieldName] ?? null;
+            $hasNewUpload = $uploadedFile instanceof UploadedFile && $uploadedFile->getError() === UPLOAD_ERR_OK;
 
-                $news->$removeMethod($news->$getFirstMethod());
+            if ($shouldDelete || $hasNewUpload) {
+                $existingRef = $news->{'getFirst' . ucfirst($fieldName)}();
+                if ($existingRef !== null) {
+                    try {
+                        $falFile = $existingRef->getOriginalResource()->getOriginalFile();
+                        $falFile->getStorage()->deleteFile($falFile);
+                    } catch (\Exception $e) {
+                        // File already gone or storage inaccessible — continue
+                    }
+                    $news->{'get' . ucfirst($fieldName)}()->detach($existingRef);
+                }
             }
         }
-
-        // handle the fileupload
-        $this->initializeFileUpload($news);
 
         // PSR-14 Event
         $this->eventDispatcher->dispatch(new UpdateActionBeforeSaveEvent($news, $this));
 
         $this->newsRepository->update($news);
+        $this->persistenceManager->persistAll();
+
+        // Process new file uploads and update file reference metadata
+        foreach ($this->uploadFields as $fieldName) {
+            $fileData = $this->request->getArguments()[$fieldName] ?? [];
+            $newFileRefUid = $this->processUploadedFile($fieldName, $news->getUid(), $news->getPid());
+            if ($newFileRefUid > 0) {
+                // New file uploaded: update its metadata
+                if (is_array($fileData)) {
+                    $this->updateFileReference($newFileRefUid, $fileData);
+                }
+            } else {
+                // No new upload: update metadata of the still-existing file reference (if any)
+                $fileReference = $news->{'getFirst' . ucfirst($fieldName)}();
+                if ($fileReference !== null && $fileReference->getUid() > 0 && is_array($fileData)) {
+                    $this->updateFileReference($fileReference->getUid(), $fileData);
+                }
+            }
+        }
+
         $this->clearNewsCache($news->getUid(), $news->getPid());
 
         $this->addFlashMessage(

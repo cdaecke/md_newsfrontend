@@ -17,15 +17,19 @@ namespace Mediadreams\MdNewsfrontend\Controller;
 
 use GeorgRinger\News\Domain\Repository\CategoryRepository;
 use Mediadreams\MdNewsfrontend\Domain\Model\News;
+use Mediadreams\MdNewsfrontend\Event\ModifyAllowedMimeTypesEvent;
 use Mediadreams\MdNewsfrontend\Domain\Repository\FrontendUserRepository;
 use Mediadreams\MdNewsfrontend\Domain\Repository\NewsRepository;
 use Mediadreams\MdNewsfrontend\Property\TypeConverter\EnableFieldsObjectConverter;
-use Mediadreams\MdNewsfrontend\Utility\FileUpload;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Http\PropagateResponseException;
+use TYPO3\CMS\Core\Http\UploadedFile;
 use TYPO3\CMS\Core\Page\AssetCollector;
 use TYPO3\CMS\Core\Pagination\SlidingWindowPagination;
+use TYPO3\CMS\Core\Resource\DuplicationBehavior;
+use TYPO3\CMS\Core\Resource\Exception\FolderDoesNotExistException;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -46,6 +50,14 @@ class BaseController extends ActionController
 {
     protected array $uploadFields = ['falMedia', 'falRelatedFiles'];
     protected array $feUser = [];
+
+    /**
+     * Maps Extbase property names to FAL fieldnames in sys_file_reference / tx_news_domain_model_news.
+     */
+    protected array $uploadFieldMapping = [
+        'falMedia' => 'fal_media',
+        'falRelatedFiles' => 'fal_related_files',
+    ];
 
     public function __construct(
         protected CategoryRepository $categoryRepository,
@@ -160,8 +172,8 @@ class BaseController extends ActionController
      */
     protected function initializeCreateUpdate(Argument $argument)
     {
-        // add validator for upload fields
-        $this->initializeFileValidator($argument);
+        // Upload fields are handled manually via processUploadedFile(); skip them in PropertyMapper.
+        $argument->getPropertyMappingConfiguration()->skipProperties(...$this->uploadFields);
 
         if (!empty($this->request->getArguments()[$argument->getName()]['datetime'])) {
             // use correct format for datetime
@@ -207,28 +219,136 @@ class BaseController extends ActionController
     }
 
     /**
-     * Initialize the upload validators for configured fields
+     * Process an uploaded file for a given field:
+     * validates extension/size, moves the file into the FAL upload folder,
+     * creates the sys_file_reference record and updates the count on the news record.
      *
-     * @param Argument $argument
-     * @return void
+     * The form upload field must use name="<fieldName>" (top-level, not property-bound)
+     * so the file is available at $request->getUploadedFiles()[$fieldName].
+     *
+     * @param string $fieldName  Extbase property name (e.g. 'falMedia')
+     * @param int    $newsUid    UID of the persisted news record
+     * @param int    $newsPid    PID of the persisted news record
+     * @return int               UID of the created sys_file_reference record, 0 on no upload or error
      */
-    protected function initializeFileValidator(Argument $argument)
+    protected function processUploadedFile(string $fieldName, int $newsUid, int $newsPid): int
     {
-        $validator = $argument->getValidator();
+        $uploadedFile = $this->request->getUploadedFiles()[$fieldName] ?? null;
 
-        foreach ($this->uploadFields as $fieldName) {
-            if (isset($this->request->getUploadedFiles()[$fieldName])) {
-                $checkFileUploadValidator = GeneralUtility::makeInstance(
-                    \Mediadreams\MdNewsfrontend\Domain\Validator\CheckFileUpload::class,
-                    [
-                        'filesArr' => $this->request->getUploadedFiles()[$fieldName],
-                        'allowedFileExtensions' => $this->settings['allowed_' . $fieldName],
-                    ]
+        if (!($uploadedFile instanceof UploadedFile) || $uploadedFile->getError() !== UPLOAD_ERR_OK) {
+            return 0;
+        }
+
+        // Require configured allowed extensions — reject upload if not configured
+        $allowedExtensions = GeneralUtility::trimExplode(',', $this->settings['allowed_' . $fieldName] ?? '', true);
+        if (empty($allowedExtensions)) {
+            $this->addFlashMessage(
+                LocalizationUtility::translate('controller.file_upload_not_configured', 'md_newsfrontend') ?? 'File upload is not configured.',
+                '',
+                ContextualFeedbackSeverity::ERROR
+            );
+            return 0;
+        }
+
+        // Sanitize client filename: strip path components, keep only safe characters
+        $safeFilename = preg_replace('/[^a-zA-Z0-9_\-.]/', '_', basename((string)$uploadedFile->getClientFilename()));
+        if ($safeFilename === '' || $safeFilename === '.') {
+            $safeFilename = 'upload_' . time();
+        }
+
+        // Validate file extension from sanitized filename
+        $ext = strtolower(pathinfo($safeFilename, PATHINFO_EXTENSION));
+        if (!in_array($ext, $allowedExtensions, true)) {
+            $this->addFlashMessage(
+                LocalizationUtility::translate('controller.file_extension_not_allowed', 'md_newsfrontend') ?? 'File extension not allowed.',
+                '',
+                ContextualFeedbackSeverity::ERROR
+            );
+            return 0;
+        }
+
+        // Validate file size
+        $maxSizeKb = (int)($this->settings['allowed_' . $fieldName . '_size'] ?? 0);
+        if ($maxSizeKb > 0 && $uploadedFile->getSize() > $maxSizeKb * 1024) {
+            $this->addFlashMessage(
+                LocalizationUtility::translate('controller.file_too_large', 'md_newsfrontend') ?? 'File is too large.',
+                '',
+                ContextualFeedbackSeverity::ERROR
+            );
+            return 0;
+        }
+
+        // Move to temp file, so we can inspect the actual content
+        $tmpFile = GeneralUtility::tempnam('tx_mdnewsfrontend_');
+        $uploadedFile->moveTo($tmpFile);
+
+        // Validate actual MIME type from file content — prevents disguised file uploads
+        $allowedMimeTypes = $this->getAllowedMimeTypesForExtension($ext);
+        if (!empty($allowedMimeTypes)) {
+            $actualMimeType = (new \finfo(FILEINFO_MIME_TYPE))->file($tmpFile);
+            if (!in_array($actualMimeType, $allowedMimeTypes, true)) {
+                unlink($tmpFile);
+                $this->addFlashMessage(
+                    LocalizationUtility::translate('controller.file_mime_type_not_allowed', 'md_newsfrontend') ?? 'File content does not match the file extension.',
+                    '',
+                    ContextualFeedbackSeverity::ERROR
                 );
-
-                $validator->addValidator($checkFileUploadValidator);
+                return 0;
             }
         }
+
+        // Resolve FAL upload folder, create it if necessary
+        $uploadPath = rtrim($this->settings['uploadPath'], '/') . '/' . $this->feUser['uid'] . '/';
+        $resourceFactory = GeneralUtility::makeInstance(ResourceFactory::class);
+
+        try {
+            $folder = $resourceFactory->getFolderObjectFromCombinedIdentifier($uploadPath);
+        } catch (FolderDoesNotExistException $e) {
+            [$storageUid, $folderPath] = explode(':', $uploadPath, 2);
+            $storage = $resourceFactory->getStorageObject((int)$storageUid);
+            $folder = $storage->createFolder(ltrim($folderPath, '/'));
+        }
+
+        $file = $folder->addFile(
+            $tmpFile,
+            $safeFilename,
+            DuplicationBehavior::RENAME
+        );
+
+        $falFieldName = $this->uploadFieldMapping[$fieldName];
+
+        // Create sys_file_reference record
+        $connection = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getConnectionForTable('sys_file_reference');
+        $connection->insert('sys_file_reference', [
+            'tstamp' => time(),
+            'crdate' => time(),
+            'uid_local' => $file->getUid(),
+            'uid_foreign' => $newsUid,
+            'tablenames' => 'tx_news_domain_model_news',
+            'fieldname' => $falFieldName,
+            'pid' => $newsPid,
+            'sorting_foreign' => 1,
+            'l10n_diffsource' => '',
+        ]);
+        $fileReferenceUid = (int)$connection->lastInsertId();
+
+        // Increment the file-count column on the news record
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable('tx_news_domain_model_news');
+        $queryBuilder->getRestrictions()->removeAll();
+        $currentCount = (int)$queryBuilder
+            ->select($falFieldName)
+            ->from('tx_news_domain_model_news')
+            ->where($queryBuilder->expr()->eq('uid', $newsUid))
+            ->executeQuery()
+            ->fetchOne();
+
+        GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getConnectionForTable('tx_news_domain_model_news')
+            ->update('tx_news_domain_model_news', [$falFieldName => $currentCount + 1], ['uid' => $newsUid]);
+
+        return $fileReferenceUid;
     }
 
     /**
@@ -243,41 +363,6 @@ class BaseController extends ActionController
             $this->arguments->getArgument('news')
                 ->getPropertyMappingConfiguration()
                 ->setTypeConverter(GeneralUtility::makeInstance(EnableFieldsObjectConverter::class));
-        }
-    }
-
-    /**
-     * Initialize the file upload for configured fields
-     *
-     * @param News $obj
-     * @return void
-     */
-    protected function initializeFileUpload(News $obj)
-    {
-        $files = $this->request->getUploadedFiles();
-
-        foreach ($this->uploadFields as $fieldName) {
-            if (isset($files[$fieldName])) {
-                // upload new file and update file reference (meta data)
-                FileUpload::handleUpload(
-                    $files,
-                    $obj,
-                    $fieldName,
-                    $this->settings,
-                    (string)$this->feUser['uid'],
-                    $this->request->getArguments()
-                );
-            } else {
-                $methodName = 'getFirst' . ucfirst($fieldName);
-
-                if ($obj->$methodName()) {
-                    // update meta data
-                    $this->updateFileReference(
-                        $obj->$methodName()->getUid(),
-                        $this->request->getArguments()[$fieldName]
-                    );
-                }
-            }
         }
     }
 
@@ -305,6 +390,38 @@ class BaseController extends ActionController
             ->set('description', $fileData['description'])
             ->set('showinpreview', (int)$showinpreview)
             ->executeStatement();
+    }
+
+    /**
+     * Returns the expected MIME types for a given file extension.
+     * Used to verify that the actual file content matches the claimed extension.
+     * Extensions not listed here skip the MIME check (unknown/uncommon types).
+     */
+    protected function getAllowedMimeTypesForExtension(string $extension): array
+    {
+        $map = [
+            'gif'  => ['image/gif'],
+            'jpg'  => ['image/jpeg'],
+            'jpeg' => ['image/jpeg'],
+            'png'  => ['image/png'],
+            'webp' => ['image/webp'],
+            'pdf'  => ['application/pdf'],
+            'txt'  => ['text/plain'],
+            'csv'  => ['text/csv', 'text/plain'],
+            'mp3'  => ['audio/mpeg'],
+            'mp4'  => ['video/mp4'],
+            // Office Open XML formats are ZIP containers — finfo returns application/zip
+            'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip'],
+            'xlsx' => ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/zip'],
+            'pptx' => ['application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/zip'],
+            'zip'  => ['application/zip', 'application/x-zip-compressed'],
+        ];
+
+        $mimeTypes = $map[$extension] ?? [];
+
+        $event = $this->eventDispatcher->dispatch(new ModifyAllowedMimeTypesEvent($extension, $mimeTypes));
+
+        return $event->getMimeTypes();
     }
 
     /**
