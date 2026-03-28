@@ -8,7 +8,6 @@ $additionalFields = [
         'label' => 'LLL:EXT:md_newsfrontend/Resources/Private/Language/locallang_db.xlf:tx_mdnewsfrontend_domain_model_news.tx_md_newsfrontend_feuser',
         'config' => [
             'type' => 'group',
-            'internal_type' => 'db',
             'allowed' => 'fe_users',
             'foreign_table' => 'fe_users',
             'size' => 1,

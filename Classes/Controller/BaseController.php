@@ -37,8 +37,6 @@ use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 use TYPO3\CMS\Extbase\Persistence\Generic\QueryResult;
 use TYPO3\CMS\Extbase\Property\TypeConverter\DateTimeConverter;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
-use TYPO3\CMS\Fluid\View\FluidViewAdapter;
-use TYPO3\CMS\Fluid\View\TemplateView;
 
 /**
  * Class BaseController
@@ -69,11 +67,10 @@ class BaseController extends ActionController
 
     /**
      * Initializes the view and pass additional data to template
-     * TODO: Remove type declaration `TemplateView` as soon as TYPO3 v12 is not supported anymore!
      *
-     * @param TemplateView|FluidViewAdapter $view The view to be initialized
+     * @param \TYPO3Fluid\Fluid\View\ViewInterface $view The view to be initialized
      */
-    protected function initializeView(TemplateView|FluidViewAdapter $view)
+    protected function initializeView($view)
     {
         // check if user is logged in
         if (!$this->request->getAttribute('frontend.user')->user) {
@@ -93,7 +90,7 @@ class BaseController extends ActionController
         }
 
         if (!empty($this->settings['parentCategory']) > 0) {
-            $categories = $this->categoryRepository->findByParent($this->settings['parentCategory']);
+            $categories = $this->categoryRepository->findBy(['parent' => $this->settings['parentCategory']]);
 
             // Assign categories to template
             $view->assign('categories', $categories);

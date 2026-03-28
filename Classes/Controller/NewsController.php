@@ -24,6 +24,7 @@ use Mediadreams\MdNewsfrontend\Service\NewsSlugHelper;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Annotation\IgnoreValidation;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
@@ -142,9 +143,9 @@ class NewsController extends BaseController
      * action edit
      *
      * @param News $news
-     * @TYPO3\CMS\Extbase\Annotation\IgnoreValidation("news")
      * @return ResponseInterface
      */
+    #[IgnoreValidation(['argumentName' => 'news'])]
     public function editAction(News $news): ResponseInterface
     {
         $this->checkAccess($news);
