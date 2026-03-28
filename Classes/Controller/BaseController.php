@@ -27,9 +27,10 @@ use TYPO3\CMS\Core\Http\PropagateResponseException;
 use TYPO3\CMS\Core\Http\UploadedFile;
 use TYPO3\CMS\Core\Page\AssetCollector;
 use TYPO3\CMS\Core\Pagination\SlidingWindowPagination;
-use TYPO3\CMS\Core\Resource\DuplicationBehavior;
+use TYPO3\CMS\Core\Resource\Enum\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\Exception\FolderDoesNotExistException;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
+use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -305,7 +306,15 @@ class BaseController extends ActionController
             $folder = $resourceFactory->getFolderObjectFromCombinedIdentifier($uploadPath);
         } catch (FolderDoesNotExistException $e) {
             [$storageUid, $folderPath] = explode(':', $uploadPath, 2);
-            $storage = $resourceFactory->getStorageObject((int)$storageUid);
+            $storage = GeneralUtility::makeInstance(StorageRepository::class)->findByUid((int)$storageUid);
+            if ($storage === null) {
+                $this->addFlashMessage(
+                    LocalizationUtility::translate('controller.file_upload_storage_not_found', 'md_newsfrontend') ?? 'Upload storage not found.',
+                    '',
+                    ContextualFeedbackSeverity::ERROR
+                );
+                return 0;
+            }
             $folder = $storage->createFolder(ltrim($folderPath, '/'));
         }
 

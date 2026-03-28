@@ -221,6 +221,10 @@
                 <source>The file content does not match the file extension.</source>
                 <target>Der Dateiinhalt stimmt nicht mit der Dateiendung überein.</target>
             </trans-unit>
+            <trans-unit id="controller.file_upload_storage_not_found">
+                <source>The configured upload storage could not be found. Please check the uploadPath setting.</source>
+                <target>Der konfigurierte Upload-Speicher wurde nicht gefunden. Bitte die uploadPath-Einstellung prüfen.</target>
+            </trans-unit>
 
             <trans-unit id="validator.allowed_file_extensions">
                 <source>Only the following file extensions are allowed:</source>

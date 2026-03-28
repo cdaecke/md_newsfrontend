@@ -169,6 +169,9 @@
             <trans-unit id="controller.file_mime_type_not_allowed">
                 <source>The file content does not match the file extension.</source>
             </trans-unit>
+            <trans-unit id="controller.file_upload_storage_not_found">
+                <source>The configured upload storage could not be found. Please check the uploadPath setting.</source>
+            </trans-unit>
 
             <trans-unit id="validator.allowed_file_extensions">
                 <source>Only the following file extensions are allowed:</source>
