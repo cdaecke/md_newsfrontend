@@ -20,7 +20,8 @@ call_user_func(
             // non-cacheable actions
             [
                 \Mediadreams\MdNewsfrontend\Controller\NewsController::class => 'list, create, edit, update, delete'
-            ]
+            ],
+            \TYPO3\CMS\Extbase\Utility\ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT
         );
 
     }
