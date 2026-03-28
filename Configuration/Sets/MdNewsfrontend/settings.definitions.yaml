@@ -1,0 +1,166 @@
+# =============================================================================
+# Site Set settings definitions for EXT:md_newsfrontend
+#
+# These settings are available in the TYPO3 Site Settings GUI and can be
+# overridden per site via config/sites/<site>/settings.yaml.
+#
+# The setting keys intentionally match the TypoScript constant paths
+# (plugin.tx_mdnewsfrontend_newsfe.*) so that the same setup.typoscript
+# works for both Site Set users and legacy TypoScript users without
+# any additional mapping.
+#
+# Legacy users (TypoScript template record) get their defaults from:
+#   Configuration/TypoScript/constants.typoscript
+# =============================================================================
+
+categories:
+  md_newsfrontend:
+    label: 'News Frontend'
+  md_newsfrontend.templates:
+    parent: md_newsfrontend
+    label: 'Templates'
+  md_newsfrontend.upload:
+    parent: md_newsfrontend
+    label: 'File Upload'
+  md_newsfrontend.assets:
+    parent: md_newsfrontend
+    label: 'Frontend Assets'
+  md_newsfrontend.formatting:
+    parent: md_newsfrontend
+    label: 'Formatting'
+  md_newsfrontend.pagination:
+    parent: md_newsfrontend
+    label: 'Pagination'
+
+settings:
+  plugin.tx_mdnewsfrontend_newsfe.view.templateRootPath:
+    label: 'Path to template root (FE)'
+    type: string
+    default: 'EXT:md_newsfrontend/Resources/Private/Templates/'
+    category: md_newsfrontend.templates
+
+  plugin.tx_mdnewsfrontend_newsfe.view.partialRootPath:
+    label: 'Path to template partials (FE)'
+    type: string
+    default: 'EXT:md_newsfrontend/Resources/Private/Partials/'
+    category: md_newsfrontend.templates
+
+  plugin.tx_mdnewsfrontend_newsfe.view.layoutRootPath:
+    label: 'Path to template layouts (FE)'
+    type: string
+    default: 'EXT:md_newsfrontend/Resources/Private/Layouts/'
+    category: md_newsfrontend.templates
+
+  plugin.tx_mdnewsfrontend_newsfe.settings.parentCategory:
+    label: 'Show categories which have this parent uid. The categories will be shown in the select box of the new and edit form. If no parent category was defined, there will be nothing to select in the frontend.'
+    type: int
+    default: 0
+    category: md_newsfrontend
+
+  plugin.tx_mdnewsfrontend_newsfe.settings.uploadPath:
+    label: 'FAL combined identifier for the upload folder (e.g. 1:/user_upload/md_newsfrontend). Will be extended by a subfolder named after the fe_user uid.'
+    type: string
+    default: '1:/user_upload/md_newsfrontend'
+    category: md_newsfrontend.upload
+
+  plugin.tx_mdnewsfrontend_newsfe.settings.allowed_falMedia:
+    label: 'Comma separated file extensions which are allowed for file upload in field fal_media.'
+    type: string
+    default: 'gif,jpg,jpeg,png'
+    category: md_newsfrontend.upload
+
+  plugin.tx_mdnewsfrontend_newsfe.settings.allowed_falMedia_size:
+    label: 'Max file upload size in KB for image (0 = no limit).'
+    type: int
+    default: 0
+    category: md_newsfrontend.upload
+
+  plugin.tx_mdnewsfrontend_newsfe.settings.allowed_falRelatedFiles:
+    label: 'Comma separated file extensions which are allowed for file upload in field fal_related_files.'
+    type: string
+    default: 'pdf'
+    category: md_newsfrontend.upload
+
+  plugin.tx_mdnewsfrontend_newsfe.settings.allowed_falRelatedFiles_size:
+    label: 'Max file upload size in KB for related file (0 = no limit).'
+    type: int
+    default: 0
+    category: md_newsfrontend.upload
+
+  plugin.tx_mdnewsfrontend_newsfe.settings.jquery:
+    label: 'Load jQuery library. Use this if you do not have jQuery loaded already.'
+    type: bool
+    default: 0
+    category: md_newsfrontend.assets
+
+  plugin.tx_mdnewsfrontend_newsfe.settings.flatpickr:
+    label: 'Load flatpickr for picking of datetime. This is used to enrich fields with a datepicker.'
+    type: bool
+    default: 1
+    category: md_newsfrontend.assets
+
+  plugin.tx_mdnewsfrontend_newsfe.settings.parsleyjs:
+    label: 'Load Parsley.js library. This is used for validating form fields.'
+    type: bool
+    default: 1
+    category: md_newsfrontend.assets
+
+  plugin.tx_mdnewsfrontend_newsfe.settings.parsleyjsLang:
+    label: 'Language for Parsley.js error messages (e.g. de).'
+    type: string
+    default: 'en'
+    category: md_newsfrontend.assets
+
+  plugin.tx_mdnewsfrontend_newsfe.settings.tinymce:
+    label: 'Load TinyMCE library. This is used for rich text editing in textareas.'
+    type: bool
+    default: 1
+    category: md_newsfrontend.assets
+
+  plugin.tx_mdnewsfrontend_newsfe.settings.tinymceLang:
+    label: 'Language for TinyMCE.'
+    type: string
+    default: 'en'
+    category: md_newsfrontend.assets
+
+  plugin.tx_mdnewsfrontend_newsfe.settings.formatDatetime:
+    label: 'Format of input for field datetime.'
+    type: string
+    default: 'd.m.Y H:i'
+    category: md_newsfrontend.formatting
+
+  plugin.tx_mdnewsfrontend_newsfe.settings.formatArchive:
+    label: 'Format of input for field archive date.'
+    type: string
+    default: 'd.m.Y'
+    category: md_newsfrontend.formatting
+
+  plugin.tx_mdnewsfrontend_newsfe.settings.allowNotEnabledNews:
+    label: 'Show entries outside of startTS and/or stopTS in list.'
+    type: bool
+    default: 0
+    category: md_newsfrontend
+
+  plugin.tx_mdnewsfrontend_newsfe.settings.paginate.itemsPerPage:
+    label: 'Pagination: items per page.'
+    type: int
+    default: 10
+    category: md_newsfrontend.pagination
+
+  plugin.tx_mdnewsfrontend_newsfe.settings.paginate.insertAbove:
+    label: 'Pagination: insert pagination above list.'
+    type: bool
+    default: 0
+    category: md_newsfrontend.pagination
+
+  plugin.tx_mdnewsfrontend_newsfe.settings.paginate.insertBelow:
+    label: 'Pagination: insert pagination below list.'
+    type: bool
+    default: 1
+    category: md_newsfrontend.pagination
+
+  plugin.tx_mdnewsfrontend_newsfe.settings.paginate.maximumNumberOfLinks:
+    label: 'Pagination: maximum number of page links.'
+    type: int
+    default: 6
+    category: md_newsfrontend.pagination

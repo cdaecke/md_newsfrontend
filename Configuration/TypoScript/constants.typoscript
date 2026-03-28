@@ -1,3 +1,13 @@
+# =============================================================================
+# Legacy TypoScript constants for EXT:md_newsfrontend
+#
+# This file exists for backwards compatibility with installations that include
+# TypoScript via the template record rather than via Site Sets.
+#
+# Site Set users get their defaults from:
+#   Configuration/Sets/MdNewsfrontend/settings.definitions.yaml
+# =============================================================================
+
 plugin.tx_mdnewsfrontend_newsfe {
   view {
     # cat=plugin.tx_mdnewsfrontend_newsfe/file; type=string; label=Path to template root (FE)

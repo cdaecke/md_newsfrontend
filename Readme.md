@@ -6,14 +6,20 @@ Templates are ready to use with the [bootstrap framework](https://getbootstrap.c
 
 ## Requirements
 
-- TYPO3 ^12.4 || ^13.4
+- TYPO3 ^13.4 || ^14.0
 - ext:news ^11.0 || ^12.0 || ^13.0 || ^14.0
 
 ## Installation
 
-- Install the extension by using the extension manager or use composer
-- Include the static TypoScript of the extension
-- Configure the extension by setting your own constants
+- Install the extension via Composer or the Extension Manager
+- Add the Site Set **"News Frontend" (`mediadreams/md-newsfrontend`)** to your site configuration (`config/sites/<yoursite>/config.yaml`)
+- Configure the extension settings directly in the site configuration GUI or via `settings.yaml`
+
+> **Important:** If a TypoScript template record exists on your root page, make sure the checkboxes **"Clear constants"** and **"Clear setup"** are **unchecked**. When checked, they wipe all TypoScript loaded by Site Sets before the template record is processed, which results in empty extension settings.
+
+### Legacy TypoScript include
+
+If you prefer the classic approach, you can still include the TypoScript manually from `EXT:md_newsfrontend/Configuration/TypoScript/` and override constants as needed.
 
 ## Usage
 
