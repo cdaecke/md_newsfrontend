@@ -149,7 +149,9 @@ class BaseController extends ActionController
      */
     protected function checkAccess(News $newsRecord): void
     {
-        if ($newsRecord->getTxMdNewsfrontendFeuser()->getUid() !== $this->feUser['uid']) {
+        if ($newsRecord->getTxMdNewsfrontendFeuser() === null
+            || $newsRecord->getTxMdNewsfrontendFeuser()->getUid() !== (int)$this->feUser['uid']
+        ) {
             $this->addFlashMessage(
                 LocalizationUtility::translate('controller.access_error', 'md_newsfrontend'),
                 '',
@@ -339,20 +341,15 @@ class BaseController extends ActionController
         ]);
         $fileReferenceUid = (int)$connection->lastInsertId();
 
-        // Increment the file-count column on the news record
+        // Increment the file-count column on the news record (atomic: no read-modify-write race)
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('tx_news_domain_model_news');
         $queryBuilder->getRestrictions()->removeAll();
-        $currentCount = (int)$queryBuilder
-            ->select($falFieldName)
-            ->from('tx_news_domain_model_news')
+        $queryBuilder
+            ->update('tx_news_domain_model_news')
+            ->set($falFieldName, $queryBuilder->quoteIdentifier($falFieldName) . ' + 1', false)
             ->where($queryBuilder->expr()->eq('uid', $newsUid))
-            ->executeQuery()
-            ->fetchOne();
-
-        GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getConnectionForTable('tx_news_domain_model_news')
-            ->update('tx_news_domain_model_news', [$falFieldName => $currentCount + 1], ['uid' => $newsUid]);
+            ->executeStatement();
 
         return $fileReferenceUid;
     }
