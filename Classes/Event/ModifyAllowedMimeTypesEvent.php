@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace Mediadreams\MdNewsfrontend\Event;
 
 /**
- *
  * This file is part of the "News frontend" Extension for TYPO3 CMS.
  *
  * For the full copyright and license information, please read the
  * LICENSE.txt file that was distributed with this source code.
  *
  * (c) 2019 Christoph Daecke <typo3@mediadreams.org>
- *
  */
 
 /**
@@ -43,7 +41,8 @@ final class ModifyAllowedMimeTypesEvent
     public function __construct(
         private readonly string $extension,
         private array $mimeTypes,
-    ) {}
+    ) {
+    }
 
     public function getExtension(): string
     {

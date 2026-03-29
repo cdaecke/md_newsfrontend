@@ -1,6 +1,8 @@
 <?php
 
-defined('TYPO3') or die();
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+
+defined('TYPO3') || die();
 
 $additionalFields = [
     'tx_md_newsfrontend_feuser' => [
@@ -18,12 +20,12 @@ $additionalFields = [
             'suggestOptions' => [
                 'type' => 'suggest',
                 'default' => [
-                    'searchWholePhrase' => true
-                ]
+                    'searchWholePhrase' => true,
+                ],
             ],
-        ]
-    ]
+        ],
+    ],
 ];
 
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('tx_news_domain_model_news', $additionalFields);
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('tx_news_domain_model_news', 'tx_md_newsfrontend_feuser', '', 'after:bodytext');
+ExtensionManagementUtility::addTCAcolumns('tx_news_domain_model_news', $additionalFields);
+ExtensionManagementUtility::addToAllTCAtypes('tx_news_domain_model_news', 'tx_md_newsfrontend_feuser', '', 'after:bodytext');

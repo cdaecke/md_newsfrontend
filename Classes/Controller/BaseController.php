@@ -5,21 +5,18 @@ declare(strict_types=1);
 namespace Mediadreams\MdNewsfrontend\Controller;
 
 /**
- *
  * This file is part of the "News frontend" Extension for TYPO3 CMS.
  *
  * For the full copyright and license information, please read the
  * LICENSE.txt file that was distributed with this source code.
  *
  * (c) 2019 Christoph Daecke <typo3@mediadreams.org>
- *
  */
-
 use GeorgRinger\News\Domain\Repository\CategoryRepository;
 use Mediadreams\MdNewsfrontend\Domain\Model\News;
-use Mediadreams\MdNewsfrontend\Event\ModifyAllowedMimeTypesEvent;
 use Mediadreams\MdNewsfrontend\Domain\Repository\FrontendUserRepository;
 use Mediadreams\MdNewsfrontend\Domain\Repository\NewsRepository;
+use Mediadreams\MdNewsfrontend\Event\ModifyAllowedMimeTypesEvent;
 use Mediadreams\MdNewsfrontend\Property\TypeConverter\EnableFieldsObjectConverter;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -42,14 +39,15 @@ use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 use TYPO3\CMS\Extbase\Persistence\Generic\QueryResult;
 use TYPO3\CMS\Extbase\Property\TypeConverter\DateTimeConverter;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+use TYPO3Fluid\Fluid\View\ViewInterface;
 
 /**
  * Class BaseController
- * @package Mediadreams\MdNewsfrontend\Controller
  */
 class BaseController extends ActionController
 {
     protected array $uploadFields = ['falMedia', 'falRelatedFiles'];
+
     protected array $feUser = [];
 
     /**
@@ -66,14 +64,15 @@ class BaseController extends ActionController
         protected FrontendUserRepository $userRepository,
         protected PersistenceManager $persistenceManager,
         protected AssetCollector $assetCollector,
-    ) {}
+    ) {
+    }
 
     /**
      * Deactivate errorFlashMessage
      *
      * @return bool|string
      */
-    public function getErrorFlashMessage(): bool|string
+    protected function getErrorFlashMessage(): bool|string
     {
         return false;
     }
@@ -81,28 +80,27 @@ class BaseController extends ActionController
     /**
      * Initializes the view and pass additional data to template
      *
-     * @param \TYPO3Fluid\Fluid\View\ViewInterface $view The view to be initialized
+     * @param ViewInterface $view The view to be initialized
      */
-    protected function initializeView($view)
+    protected function initializeView(ViewInterface $view): void
     {
         // check if user is logged in
-        if (!$this->request->getAttribute('frontend.user')->user) {
+        if ($this->request->getAttribute('frontend.user')->user === null) {
             $this->addFlashMessage(
                 LocalizationUtility::translate('controller.not_loggedin', 'md_newsfrontend'),
                 '',
                 ContextualFeedbackSeverity::ERROR
             );
-        } else {
-            if (!isset($this->settings['uploadPath'])) { // check if TypoScript is loaded
-                $this->addFlashMessage(
-                    LocalizationUtility::translate('controller.typoscript_missing', 'md_newsfrontend'),
-                    '',
-                    ContextualFeedbackSeverity::ERROR
-                );
-            }
+        } elseif (!isset($this->settings['uploadPath'])) {
+            // check if TypoScript is loaded
+            $this->addFlashMessage(
+                LocalizationUtility::translate('controller.typoscript_missing', 'md_newsfrontend'),
+                '',
+                ContextualFeedbackSeverity::ERROR
+            );
         }
 
-        if (!empty($this->settings['parentCategory']) > 0) {
+        if ((int)($this->settings['parentCategory'] ?? 0) > 0) {
             $categories = $this->categoryRepository->findBy(['parent' => $this->settings['parentCategory']]);
 
             // Assign categories to template
@@ -120,7 +118,7 @@ class BaseController extends ActionController
         // Thanks to Georg Ringer: https://github.com/georgringer/news/blob/976fe5930cea9693f6cd56b650abe4e876fc70f0/Classes/Controller/NewsController.php#L627
         if (
             isset($this->settings['useStdWrap'])
-            && !empty($this->settings['useStdWrap'])
+            && $this->settings['useStdWrap'] !== ''
         ) {
             $typoScriptService = GeneralUtility::makeInstance(TypoScriptService::class);
             $typoScriptArray = $typoScriptService->convertPlainArrayToTypoScriptArray($this->settings);
@@ -136,7 +134,7 @@ class BaseController extends ActionController
         }
 
         // Get logged in user
-        if ($this->request->getAttribute('frontend.user')->user) {
+        if ($this->request->getAttribute('frontend.user')->user !== null) {
             $this->feUser = $this->request->getAttribute('frontend.user')->user;
         }
 
@@ -148,11 +146,10 @@ class BaseController extends ActionController
      * If news record does not belong to user, redirect to list action
      *
      * @param News $newsRecord
-     * @return void
      */
     protected function checkAccess(News $newsRecord): void
     {
-        if ($newsRecord->getTxMdNewsfrontendFeuser()->getUid() != $this->feUser['uid']) {
+        if ($newsRecord->getTxMdNewsfrontendFeuser()->getUid() !== $this->feUser['uid']) {
             $this->addFlashMessage(
                 LocalizationUtility::translate('controller.access_error', 'md_newsfrontend'),
                 '',
@@ -169,14 +166,13 @@ class BaseController extends ActionController
      * This will initialize everything which is needed in create or update action
      *
      * @param Argument $argument
-     * @return void
      */
-    protected function initializeCreateUpdate(Argument $argument)
+    protected function initializeCreateUpdate(Argument $argument): void
     {
         // Upload fields are handled manually via processUploadedFile(); skip them in PropertyMapper.
         $argument->getPropertyMappingConfiguration()->skipProperties(...$this->uploadFields);
 
-        if (!empty($this->request->getArguments()[$argument->getName()]['datetime'])) {
+        if (($this->request->getArguments()[$argument->getName()]['datetime'] ?? '') !== '') {
             // use correct format for datetime
             $argument
                 ->getPropertyMappingConfiguration()
@@ -242,7 +238,7 @@ class BaseController extends ActionController
 
         // Require configured allowed extensions — reject upload if not configured
         $allowedExtensions = GeneralUtility::trimExplode(',', $this->settings['allowed_' . $fieldName] ?? '', true);
-        if (empty($allowedExtensions)) {
+        if ($allowedExtensions === []) {
             $this->addFlashMessage(
                 LocalizationUtility::translate('controller.file_upload_not_configured', 'md_newsfrontend') ?? 'File upload is not configured.',
                 '',
@@ -258,7 +254,7 @@ class BaseController extends ActionController
         }
 
         // Validate file extension from sanitized filename
-        $ext = strtolower(pathinfo($safeFilename, PATHINFO_EXTENSION));
+        $ext = strtolower(pathinfo((string)$safeFilename, PATHINFO_EXTENSION));
         if (!in_array($ext, $allowedExtensions, true)) {
             $this->addFlashMessage(
                 LocalizationUtility::translate('controller.file_extension_not_allowed', 'md_newsfrontend') ?? 'File extension not allowed.',
@@ -285,7 +281,7 @@ class BaseController extends ActionController
 
         // Validate actual MIME type from file content — prevents disguised file uploads
         $allowedMimeTypes = $this->getAllowedMimeTypesForExtension($ext);
-        if (!empty($allowedMimeTypes)) {
+        if ($allowedMimeTypes !== []) {
             $actualMimeType = (new \finfo(FILEINFO_MIME_TYPE))->file($tmpFile);
             if (!in_array($actualMimeType, $allowedMimeTypes, true)) {
                 unlink($tmpFile);
@@ -299,12 +295,12 @@ class BaseController extends ActionController
         }
 
         // Resolve FAL upload folder, create it if necessary
-        $uploadPath = rtrim($this->settings['uploadPath'], '/') . '/' . $this->feUser['uid'] . '/';
+        $uploadPath = rtrim((string)$this->settings['uploadPath'], '/') . '/' . $this->feUser['uid'] . '/';
         $resourceFactory = GeneralUtility::makeInstance(ResourceFactory::class);
 
         try {
             $folder = $resourceFactory->getFolderObjectFromCombinedIdentifier($uploadPath);
-        } catch (FolderDoesNotExistException $e) {
+        } catch (FolderDoesNotExistException) {
             [$storageUid, $folderPath] = explode(':', $uploadPath, 2);
             $storage = GeneralUtility::makeInstance(StorageRepository::class)->findByUid((int)$storageUid);
             if ($storage === null) {
@@ -315,6 +311,7 @@ class BaseController extends ActionController
                 );
                 return 0;
             }
+
             $folder = $storage->createFolder(ltrim($folderPath, '/'));
         }
 
@@ -380,11 +377,10 @@ class BaseController extends ActionController
      *
      * @param int $fileReferencesUid uid of sys_file_reference record
      * @param array $fileData All data about the file
-     * @return void
      */
-    protected function updateFileReference(int $fileReferencesUid, array $fileData)
+    protected function updateFileReference(int $fileReferencesUid, array $fileData): void
     {
-        $showinpreview = !isset($fileData['showinpreview']) ? 0 : $fileData['showinpreview'];
+        $showinpreview = $fileData['showinpreview'] ?? 0;
 
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('sys_file_reference');
@@ -438,13 +434,12 @@ class BaseController extends ActionController
      *
      * @return array
      */
-
-    protected function getValuesForShowinpreview()
+    protected function getValuesForShowinpreview(): array
     {
         return [
             0 => LocalizationUtility::translate('image_showinpreview.0', 'md_newsfrontend'),
             1 => LocalizationUtility::translate('image_showinpreview.1', 'md_newsfrontend'),
-            2 => LocalizationUtility::translate('image_showinpreview.2', 'md_newsfrontend')
+            2 => LocalizationUtility::translate('image_showinpreview.2', 'md_newsfrontend'),
         ];
     }
 
@@ -459,11 +454,11 @@ class BaseController extends ActionController
     {
         $cacheTagsToFlush = [];
 
-        if ($newsUid) {
+        if ($newsUid !== 0) {
             $cacheTagsToFlush[] = 'tx_news_uid_' . $newsUid;
         }
 
-        if ($newsPid) {
+        if ($newsPid !== 0) {
             $cacheTagsToFlush[] = 'tx_news_pid_' . $newsPid;
         }
 
@@ -475,8 +470,6 @@ class BaseController extends ActionController
 
     /**
      * Add frontend assets (JS, CSS) to view
-     *
-     * @return void
      */
     protected function addFrontendAssets(): void
     {
@@ -512,7 +505,7 @@ class BaseController extends ActionController
                 'EXT:md_newsfrontend/Resources/Public/Js/Parsley/parsley.min.js'
             );
 
-            if ($this->settings['parsleyjsLang'] != 'en') {
+            if ($this->settings['parsleyjsLang'] !== 'en') {
                 $this->assetCollector->addJavaScript(
                     'md_newsfrontend_parsleyjsLang',
                     'EXT:md_newsfrontend/Resources/Public/Js/Parsley/i18n/' . $this->settings['parsleyjsLang'] . '.js'
@@ -524,7 +517,7 @@ class BaseController extends ActionController
     /**
      * Get paginated items and paginator for query result
      *
-     * @param QueryResult $items
+     * @param QueryResult<News> $items
      * @return array
      */
     protected function getPaginatedItems(QueryResult $items): array
@@ -533,8 +526,8 @@ class BaseController extends ActionController
             ? (int)$this->request->getArgument('currentPageNumber')
             : 1;
 
-        $itemsPerPage = isset($this->settings['paginate']['itemsPerPage'])? (int)$this->settings['paginate']['itemsPerPage'] : 10;
-        $maxNumPages = isset($this->settings['paginate']['maximumNumberOfLinks'])? (int)$this->settings['paginate']['maximumNumberOfLinks'] : 5;
+        $itemsPerPage = isset($this->settings['paginate']['itemsPerPage']) ? (int)$this->settings['paginate']['itemsPerPage'] : 10;
+        $maxNumPages = isset($this->settings['paginate']['maximumNumberOfLinks']) ? (int)$this->settings['paginate']['maximumNumberOfLinks'] : 5;
 
         $paginator = new QueryResultPaginator(
             $items,

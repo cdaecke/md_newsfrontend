@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace Mediadreams\MdNewsfrontend\Property\TypeConverter;
 
 /**
- *
  * This file is part of the "News frontend" Extension for TYPO3 CMS.
  *
  * For the full copyright and license information, please read the
  * LICENSE.txt file that was distributed with this source code.
  *
  * (c) 2022 Christoph Daecke <typo3@mediadreams.org>
- *
  */
 
 use TYPO3\CMS\Extbase\Property\Exception\InvalidSourceException;
@@ -33,7 +31,7 @@ class EnableFieldsObjectConverter extends PersistentObjectConverter
     protected function fetchObjectFromPersistence($identity, string $targetType): object
     {
         if (ctype_digit((string)$identity)) {
-            $query = $this->persistenceManager->createQueryForType($targetType);
+            $query = $this->persistenceManager->createQueryForType($targetType); // @phpstan-ignore argument.templateType
             $query->getQuerySettings()->setIgnoreEnableFields(true);
             $constraints = $query->equals('uid', $identity);
             $object = $query->matching($constraints)->execute()->getFirst();
@@ -43,7 +41,8 @@ class EnableFieldsObjectConverter extends PersistentObjectConverter
 
         if ($object === null) {
             throw new TargetNotFoundException(
-                'Object with identity "' . print_r($identity, true) . '" not found.', 1641843538
+                'Object with identity "' . print_r($identity, true) . '" not found.',
+                1641843538
             );
         }
 

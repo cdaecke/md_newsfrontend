@@ -1,0 +1,24 @@
+includes:
+    - phpstan-baseline.neon
+
+parameters:
+    parallel:
+        # Don't be overly greedy on machines with more CPU's to be a good neighbor especially on CI
+        maximumNumberOfProcesses: 5
+
+    level: 6
+
+    ignoreErrors:
+        - identifier: missingType.iterableValue
+
+    bootstrapFiles:
+        - .Build/vendor/autoload.php
+
+    paths:
+        - Classes
+        - Configuration
+
+    type_coverage:
+        return_type: 80
+        param_type: 80
+        property_type: 95

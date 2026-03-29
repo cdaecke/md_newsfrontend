@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace Mediadreams\MdNewsfrontend\Controller;
 
 /**
- *
  * This file is part of the "News frontend" Extension for TYPO3 CMS.
  *
  * For the full copyright and license information, please read the
  * LICENSE.txt file that was distributed with this source code.
  *
  * (c) 2019 Christoph Daecke <typo3@mediadreams.org>
- *
  */
 
 use Mediadreams\MdNewsfrontend\Domain\Model\News;
@@ -30,7 +28,6 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
  * Class NewsController
- * @package Mediadreams\MdNewsfrontend\Controller
  */
 class NewsController extends BaseController
 {
@@ -62,7 +59,7 @@ class NewsController extends BaseController
         $this->view->assignMultiple(
             [
                 'user' => $this->feUser,
-                'showinpreviewOptions' => $this->getValuesForShowinpreview()
+                'showinpreviewOptions' => $this->getValuesForShowinpreview(),
             ]
         );
 
@@ -72,8 +69,6 @@ class NewsController extends BaseController
     /**
      * Initialize create action
      * Add custom validator for file upload
-     *
-     * @return void
      */
     public function initializeCreateAction(): void
     {
@@ -91,13 +86,15 @@ class NewsController extends BaseController
         $arguments = $this->request->getArgument('newNews');
 
         // if no value is provided for field datetime, use current date
-        if (empty($arguments['datetime'])) {
+        if (!is_array($arguments) || ($arguments['datetime'] ?? '') === '') {
             $newNews->setDatetime(new \DateTime()); // make sure, that you have set the correct timezone for $GLOBALS['TYPO3_CONF_VARS']['SYS']['phpTimeZone']
         }
 
         $feUserObj = $this->userRepository->findByUid($this->feUser['uid']);
 
-        $newNews->setTxMdNewsfrontendfeUser($feUserObj);
+        if ($feUserObj !== null) {
+            $newNews->setTxMdNewsfrontendFeuser($feUserObj);
+        }
 
         // PSR-14 Event
         $this->eventDispatcher->dispatch(new CreateActionBeforeSaveEvent($newNews, $this));
@@ -161,7 +158,7 @@ class NewsController extends BaseController
         $this->view->assignMultiple(
             [
                 'news' => $news,
-                'showinpreviewOptions' => $this->getValuesForShowinpreview()
+                'showinpreviewOptions' => $this->getValuesForShowinpreview(),
             ]
         );
 
@@ -171,8 +168,6 @@ class NewsController extends BaseController
     /**
      * Initialize update action
      * Add custom validator for file upload
-     *
-     * @return void
      */
     public function initializeUpdateAction(): void
     {
@@ -192,8 +187,8 @@ class NewsController extends BaseController
         $this->checkAccess($news);
 
         // If archive date was deleted
-        if ($news->getArchive() == null) {
-            $news->setArchive(0);
+        if (!$news->getArchive() instanceof \DateTime) {
+            $news->setArchive(0); // @phpstan-ignore argument.type
         }
 
         // Detach existing file references when the user checks "delete" or uploads a replacement.
@@ -204,15 +199,16 @@ class NewsController extends BaseController
             $hasNewUpload = $uploadedFile instanceof UploadedFile && $uploadedFile->getError() === UPLOAD_ERR_OK;
 
             if ($shouldDelete || $hasNewUpload) {
-                $existingRef = $news->{'getFirst' . ucfirst($fieldName)}();
+                $existingRef = $news->{'getFirst' . ucfirst((string)$fieldName)}(); // @phpstan-ignore method.dynamicName
                 if ($existingRef !== null) {
                     try {
                         $falFile = $existingRef->getOriginalResource()->getOriginalFile();
                         $falFile->getStorage()->deleteFile($falFile);
-                    } catch (\Exception $e) {
+                    } catch (\Exception) {
                         // File already gone or storage inaccessible — continue
                     }
-                    $news->{'get' . ucfirst($fieldName)}()->detach($existingRef);
+
+                    $news->{'get' . ucfirst((string)$fieldName)}()->detach($existingRef); // @phpstan-ignore method.dynamicName
                 }
             }
         }
@@ -234,7 +230,7 @@ class NewsController extends BaseController
                 }
             } else {
                 // No new upload: update metadata of the still-existing file reference (if any)
-                $fileReference = $news->{'getFirst' . ucfirst($fieldName)}();
+                $fileReference = $news->{'getFirst' . ucfirst((string)$fieldName)}(); // @phpstan-ignore method.dynamicName
                 if ($fileReference !== null && $fileReference->getUid() > 0 && is_array($fileData)) {
                     $this->updateFileReference($fileReference->getUid(), $fileData);
                 }
@@ -252,7 +248,7 @@ class NewsController extends BaseController
         return $this->redirect('list');
     }
 
-    public function initializeDeleteAction():void
+    public function initializeDeleteAction(): void
     {
         $this->setEnableFieldsTypeConverter();
     }
