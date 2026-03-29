@@ -65,6 +65,7 @@
         }
     },
     "scripts": {
+        "build:assets": "npm install && npm run build",
         "ci:composer:normalize": "@composer normalize --no-check-lock --dry-run",
         "ci:composer:psr-verify": "@composer dumpautoload --optimize --strict-psr --no-plugins",
         "ci:php": [
@@ -83,9 +84,11 @@
             "@ci:php:stan"
         ],
         "fix:php:cs": "php-cs-fixer fix --config .php-cs-fixer.php",
-        "fix:php:rector": "./.Build/bin/rector process --config ./rector.php"
+        "fix:php:rector": "./.Build/bin/rector process --config ./rector.php",
+        "update:assets": "npm update && npm run build"
     },
     "scripts-descriptions": {
+        "build:assets": "Install npm dependencies and copy assets to Resources/Public/",
         "ci:composer:normalize": "Check composer.json is normalized (dry-run)",
         "ci:composer:psr-verify": "Verify PSR-4 autoloading is correct",
         "ci:php": "Run all PHP checks (CS Fixer, Lint, PHPStan)",
@@ -95,6 +98,7 @@
         "ci:php:stan": "Run static analysis with PHPStan",
         "ci:static": "Run all static analysis checks (composer normalize, CS Fixer, Lint, PHPStan)",
         "fix:php:cs": "Fix coding style issues with PHP CS Fixer",
-        "fix:php:rector": "Apply Rector transformations (run manually when dropping a TYPO3 version)"
+        "fix:php:rector": "Apply Rector transformations (run manually when dropping a TYPO3 version)",
+        "update:assets": "Update npm dependencies to latest versions and copy assets to Resources/Public/"
     }
 }

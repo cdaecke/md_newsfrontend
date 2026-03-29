@@ -14,19 +14,19 @@
     <f:if condition="{settings.tinymce}">
         <script>
             // initialize tinymce for frontend
-            jQuery(document).ready(function ($) {
-                if ( $('.tinymce').length ) {
+            document.addEventListener('DOMContentLoaded', function () {
+                if (document.querySelector('.tinymce')) {
                     tinymce.init(<f:format.raw>{</f:format.raw>
+                        base_url: '<f:uri.resource path="Js/tinymce" extensionName="MdNewsfrontend" />',
+                        suffix: '.min',
+                        license_key: 'gpl',
                         selector: 'textarea.tinymce',
                         language: '{settings.tinymceLang}', // get language files here: https://www.tiny.cloud/get-tiny/language-packages/
                         height: 400,
                         paste_as_text: true,
-                        plugins: [
-                            'lists link',
-                            'contextmenu paste wordcount'
-                        ],
+                        plugins: ['lists', 'link', 'wordcount'],
                         menubar: false,
-                        toolbar: "undo redo | formatselect | link unlink | bold italic | bullist numlist | removeformat",
+                        toolbar: 'undo redo | blocks | link unlink | bold italic | bullist numlist | removeformat',
                     <f:format.raw>}</f:format.raw>);
                 }
             });

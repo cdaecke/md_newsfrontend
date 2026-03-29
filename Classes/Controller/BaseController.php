@@ -473,7 +473,7 @@ class BaseController extends ActionController
         if ($this->settings['jquery']) {
             $this->assetCollector->addJavaScript(
                 'md_newsfrontend_jquery',
-                'EXT:md_newsfrontend/Resources/Public/Js/jquery-3.7.1.slim.min.js'
+                'EXT:md_newsfrontend/Resources/Public/Js/jquery.slim.min.js'
             );
         }
 
@@ -492,7 +492,7 @@ class BaseController extends ActionController
 
             $this->assetCollector->addJavaScript(
                 'md_newsfrontend_flatpickr',
-                'EXT:md_newsfrontend/Resources/Public/Js/flatpickr.js'
+                'EXT:md_newsfrontend/Resources/Public/Js/flatpickr.min.js'
             );
         }
 
