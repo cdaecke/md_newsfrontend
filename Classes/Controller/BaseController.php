@@ -214,9 +214,9 @@ class BaseController extends ActionController
     }
 
     /**
-     * Process an uploaded file for a given field:
-     * validates extension/size, moves the file into the FAL upload folder,
-     * creates the sys_file_reference record and updates the count on the news record.
+     * Guards the upload request and delegates to {@see FileUploadService::processUploadedFile()}.
+     * Returns 0 if no file was uploaded, the upload failed, or a validation error occurred
+     * (in which case a flash message is added automatically).
      *
      * The form upload field must use name="<fieldName>" (top-level, not property-bound)
      * so the file is available at $request->getUploadedFiles()[$fieldName].

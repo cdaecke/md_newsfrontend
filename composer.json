@@ -32,6 +32,7 @@
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-strict-rules": "^2.0",
+        "phpunit/phpunit": "^11.0",
         "rector/rector": "^2.0",
         "saschaegerer/phpstan-typo3": "^2.1",
         "ssch/typo3-rector": "^3.0",
@@ -43,6 +44,11 @@
     "autoload": {
         "psr-4": {
             "Mediadreams\\MdNewsfrontend\\": "Classes"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Mediadreams\\MdNewsfrontend\\Tests\\": "Tests"
         }
     },
     "config": {
@@ -77,6 +83,7 @@
         "ci:php:lint": "find .*.php *.php Classes Configuration -name '*.php' -print0 | xargs -r -0 -n 1 -P 4 php -l",
         "ci:php:rector": "./.Build/bin/rector process --config ./rector.php --dry-run",
         "ci:php:stan": "phpstan --no-progress",
+        "ci:php:unit": "./.Build/bin/phpunit --testdox",
         "ci:static": [
             "@ci:composer:normalize",
             "@ci:php:cs-fixer",
@@ -96,6 +103,7 @@
         "ci:php:lint": "Check PHP files for syntax errors",
         "ci:php:rector": "Check for pending Rector transformations (dry-run, manual use only)",
         "ci:php:stan": "Run static analysis with PHPStan",
+        "ci:php:unit": "Run PHPUnit unit tests",
         "ci:static": "Run all static analysis checks (composer normalize, CS Fixer, Lint, PHPStan)",
         "fix:php:cs": "Fix coding style issues with PHP CS Fixer",
         "fix:php:rector": "Apply Rector transformations (run manually when dropping a TYPO3 version)",

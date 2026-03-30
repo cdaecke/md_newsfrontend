@@ -24,6 +24,18 @@ use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
+/**
+ * Handles validation, storage, and FAL registration of uploaded files.
+ *
+ * Validates the file extension against the configured allow-list, optionally enforces
+ * a maximum file size, and verifies that the actual file content matches the claimed
+ * extension via MIME type inspection. On success, the file is moved into the configured
+ * FAL upload folder and a sys_file_reference record is created for the given news record.
+ *
+ * All validation failures are reported as {@see FileUploadException} with a translation
+ * key so the calling controller can display a localised error message without catching
+ * unrelated exceptions.
+ */
 class FileUploadService
 {
     public function __construct(
@@ -74,13 +86,13 @@ class FileUploadService
         }
 
         // Move to temp file, so we can inspect the actual content
-        $tmpFile = GeneralUtility::tempnam('tx_mdnewsfrontend_');
+        $tmpFile = $this->createTempFile();
         $uploadedFile->moveTo($tmpFile);
 
         // Validate actual MIME type from file content — prevents disguised file uploads
         $allowedMimeTypes = $this->getAllowedMimeTypesForExtension($ext);
         if ($allowedMimeTypes !== []) {
-            $actualMimeType = (new \finfo(FILEINFO_MIME_TYPE))->file($tmpFile);
+            $actualMimeType = $this->detectMimeType($tmpFile);
             if (!in_array($actualMimeType, $allowedMimeTypes, true)) {
                 unlink($tmpFile);
                 throw new FileUploadException('controller.file_mime_type_not_allowed');
@@ -128,6 +140,24 @@ class FileUploadService
             ->executeStatement();
 
         return $fileReferenceUid;
+    }
+
+    /**
+     * Creates a temporary file path for the uploaded file.
+     * Extracted to allow overriding in tests without a TYPO3 bootstrap.
+     */
+    protected function createTempFile(): string
+    {
+        return GeneralUtility::tempnam('tx_mdnewsfrontend_');
+    }
+
+    /**
+     * Detects the MIME type of a file by inspecting its content.
+     * Extracted to allow overriding in tests without a real file on disk.
+     */
+    protected function detectMimeType(string $filePath): string
+    {
+        return (new \finfo(FILEINFO_MIME_TYPE))->file($filePath);
     }
 
     /**
