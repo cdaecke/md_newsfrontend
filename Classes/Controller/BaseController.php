@@ -16,18 +16,15 @@ use GeorgRinger\News\Domain\Repository\CategoryRepository;
 use Mediadreams\MdNewsfrontend\Domain\Model\News;
 use Mediadreams\MdNewsfrontend\Domain\Repository\FrontendUserRepository;
 use Mediadreams\MdNewsfrontend\Domain\Repository\NewsRepository;
-use Mediadreams\MdNewsfrontend\Event\ModifyAllowedMimeTypesEvent;
+use Mediadreams\MdNewsfrontend\Exception\FileUploadException;
 use Mediadreams\MdNewsfrontend\Property\TypeConverter\EnableFieldsObjectConverter;
+use Mediadreams\MdNewsfrontend\Service\FileUploadService;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Http\UploadedFile;
 use TYPO3\CMS\Core\Page\AssetCollector;
 use TYPO3\CMS\Core\Pagination\SlidingWindowPagination;
-use TYPO3\CMS\Core\Resource\Enum\DuplicationBehavior;
-use TYPO3\CMS\Core\Resource\Exception\FolderDoesNotExistException;
-use TYPO3\CMS\Core\Resource\ResourceFactory;
-use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -64,6 +61,7 @@ class BaseController extends ActionController
         protected FrontendUserRepository $userRepository,
         protected PersistenceManager $persistenceManager,
         protected AssetCollector $assetCollector,
+        protected FileUploadService $fileUploadService,
     ) {
     }
 
@@ -231,125 +229,28 @@ class BaseController extends ActionController
     protected function processUploadedFile(string $fieldName, int $newsUid, int $newsPid): int
     {
         $uploadedFile = $this->request->getUploadedFiles()[$fieldName] ?? null;
-
         if (!($uploadedFile instanceof UploadedFile) || $uploadedFile->getError() !== UPLOAD_ERR_OK) {
             return 0;
         }
 
-        // Require configured allowed extensions — reject upload if not configured
-        $allowedExtensions = GeneralUtility::trimExplode(',', $this->settings['allowed_' . $fieldName] ?? '', true);
-        if ($allowedExtensions === []) {
-            $this->addFlashMessage(
-                LocalizationUtility::translate('controller.file_upload_not_configured', 'md_newsfrontend') ?? 'File upload is not configured.',
-                '',
-                ContextualFeedbackSeverity::ERROR
-            );
-            return 0;
-        }
-
-        // Sanitize client filename: strip path components, keep only safe characters
-        $safeFilename = preg_replace('/[^a-zA-Z0-9_\-.]/', '_', basename((string)$uploadedFile->getClientFilename()));
-        if ($safeFilename === '' || $safeFilename === '.') {
-            $safeFilename = 'upload_' . time();
-        }
-
-        // Validate file extension from sanitized filename
-        $ext = strtolower(pathinfo((string)$safeFilename, PATHINFO_EXTENSION));
-        if (!in_array($ext, $allowedExtensions, true)) {
-            $this->addFlashMessage(
-                LocalizationUtility::translate('controller.file_extension_not_allowed', 'md_newsfrontend') ?? 'File extension not allowed.',
-                '',
-                ContextualFeedbackSeverity::ERROR
-            );
-            return 0;
-        }
-
-        // Validate file size
-        $maxSizeKb = (int)($this->settings['allowed_' . $fieldName . '_size'] ?? 0);
-        if ($maxSizeKb > 0 && $uploadedFile->getSize() > $maxSizeKb * 1024) {
-            $this->addFlashMessage(
-                LocalizationUtility::translate('controller.file_too_large', 'md_newsfrontend') ?? 'File is too large.',
-                '',
-                ContextualFeedbackSeverity::ERROR
-            );
-            return 0;
-        }
-
-        // Move to temp file, so we can inspect the actual content
-        $tmpFile = GeneralUtility::tempnam('tx_mdnewsfrontend_');
-        $uploadedFile->moveTo($tmpFile);
-
-        // Validate actual MIME type from file content — prevents disguised file uploads
-        $allowedMimeTypes = $this->getAllowedMimeTypesForExtension($ext);
-        if ($allowedMimeTypes !== []) {
-            $actualMimeType = (new \finfo(FILEINFO_MIME_TYPE))->file($tmpFile);
-            if (!in_array($actualMimeType, $allowedMimeTypes, true)) {
-                unlink($tmpFile);
-                $this->addFlashMessage(
-                    LocalizationUtility::translate('controller.file_mime_type_not_allowed', 'md_newsfrontend') ?? 'File content does not match the file extension.',
-                    '',
-                    ContextualFeedbackSeverity::ERROR
-                );
-                return 0;
-            }
-        }
-
-        // Resolve FAL upload folder, create it if necessary
-        $uploadPath = rtrim((string)$this->settings['uploadPath'], '/') . '/' . $this->feUser['uid'] . '/';
-        $resourceFactory = GeneralUtility::makeInstance(ResourceFactory::class);
-
         try {
-            $folder = $resourceFactory->getFolderObjectFromCombinedIdentifier($uploadPath);
-        } catch (FolderDoesNotExistException) {
-            [$storageUid, $folderPath] = explode(':', $uploadPath, 2);
-            $storage = GeneralUtility::makeInstance(StorageRepository::class)->findByUid((int)$storageUid);
-            if ($storage === null) {
-                $this->addFlashMessage(
-                    LocalizationUtility::translate('controller.file_upload_storage_not_found', 'md_newsfrontend') ?? 'Upload storage not found.',
-                    '',
-                    ContextualFeedbackSeverity::ERROR
-                );
-                return 0;
-            }
-
-            $folder = $storage->createFolder(ltrim($folderPath, '/'));
+            return $this->fileUploadService->processUploadedFile(
+                $uploadedFile,
+                $fieldName,
+                $this->uploadFieldMapping[$fieldName],
+                $newsUid,
+                $newsPid,
+                (int)($this->feUser['uid'] ?? 0),
+                $this->settings
+            );
+        } catch (FileUploadException $e) {
+            $this->addFlashMessage(
+                LocalizationUtility::translate($e->getTranslationKey(), 'md_newsfrontend') ?? $e->getMessage(),
+                '',
+                ContextualFeedbackSeverity::ERROR
+            );
+            return 0;
         }
-
-        $file = $folder->addFile(
-            $tmpFile,
-            $safeFilename,
-            DuplicationBehavior::RENAME
-        );
-
-        $falFieldName = $this->uploadFieldMapping[$fieldName];
-
-        // Create sys_file_reference record
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getConnectionForTable('sys_file_reference');
-        $connection->insert('sys_file_reference', [
-            'tstamp' => time(),
-            'crdate' => time(),
-            'uid_local' => $file->getUid(),
-            'uid_foreign' => $newsUid,
-            'tablenames' => 'tx_news_domain_model_news',
-            'fieldname' => $falFieldName,
-            'pid' => $newsPid,
-            'sorting_foreign' => 1,
-            'l10n_diffsource' => '',
-        ]);
-        $fileReferenceUid = (int)$connection->lastInsertId();
-
-        // Increment the file-count column on the news record (atomic: no read-modify-write race)
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable('tx_news_domain_model_news');
-        $queryBuilder->getRestrictions()->removeAll();
-        $queryBuilder
-            ->update('tx_news_domain_model_news')
-            ->set($falFieldName, $queryBuilder->quoteIdentifier($falFieldName) . ' + 1', false)
-            ->where($queryBuilder->expr()->eq('uid', $newsUid))
-            ->executeStatement();
-
-        return $fileReferenceUid;
     }
 
     /**
@@ -390,38 +291,6 @@ class BaseController extends ActionController
             ->set('description', $fileData['description'])
             ->set('showinpreview', (int)$showinpreview)
             ->executeStatement();
-    }
-
-    /**
-     * Returns the expected MIME types for a given file extension.
-     * Used to verify that the actual file content matches the claimed extension.
-     * Extensions not listed here skip the MIME check (unknown/uncommon types).
-     */
-    protected function getAllowedMimeTypesForExtension(string $extension): array
-    {
-        $map = [
-            'gif'  => ['image/gif'],
-            'jpg'  => ['image/jpeg'],
-            'jpeg' => ['image/jpeg'],
-            'png'  => ['image/png'],
-            'webp' => ['image/webp'],
-            'pdf'  => ['application/pdf'],
-            'txt'  => ['text/plain'],
-            'csv'  => ['text/csv', 'text/plain'],
-            'mp3'  => ['audio/mpeg'],
-            'mp4'  => ['video/mp4'],
-            // Office Open XML formats are ZIP containers — finfo returns application/zip
-            'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip'],
-            'xlsx' => ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/zip'],
-            'pptx' => ['application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/zip'],
-            'zip'  => ['application/zip', 'application/x-zip-compressed'],
-        ];
-
-        $mimeTypes = $map[$extension] ?? [];
-
-        $event = $this->eventDispatcher->dispatch(new ModifyAllowedMimeTypesEvent($extension, $mimeTypes));
-
-        return $event->getMimeTypes();
     }
 
     /**
