@@ -18,9 +18,9 @@ use Mediadreams\MdNewsfrontend\Domain\Repository\FrontendUserRepository;
 use Mediadreams\MdNewsfrontend\Domain\Repository\NewsRepository;
 use Mediadreams\MdNewsfrontend\Event\ModifyAllowedMimeTypesEvent;
 use Mediadreams\MdNewsfrontend\Property\TypeConverter\EnableFieldsObjectConverter;
+use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Http\PropagateResponseException;
 use TYPO3\CMS\Core\Http\UploadedFile;
 use TYPO3\CMS\Core\Page\AssetCollector;
 use TYPO3\CMS\Core\Pagination\SlidingWindowPagination;
@@ -142,26 +142,24 @@ class BaseController extends ActionController
     }
 
     /**
-     * Check, if news record belongs to user
-     * If news record does not belong to user, redirect to list action
+     * Check if the news record belongs to the logged-in frontend user.
+     * Returns a redirect response if access is denied, null if access is granted.
      *
      * @param News $newsRecord
+     * @return ResponseInterface|null
      */
-    protected function checkAccess(News $newsRecord): void
+    protected function checkAccess(News $newsRecord): ?ResponseInterface
     {
-        if ($newsRecord->getTxMdNewsfrontendFeuser() === null
-            || $newsRecord->getTxMdNewsfrontendFeuser()->getUid() !== (int)$this->feUser['uid']
-        ) {
+        $feuser = $newsRecord->getTxMdNewsfrontendFeuser();
+        if ($feuser === null || $feuser->getUid() !== (int)($this->feUser['uid'] ?? 0)) {
             $this->addFlashMessage(
                 LocalizationUtility::translate('controller.access_error', 'md_newsfrontend'),
                 '',
                 ContextualFeedbackSeverity::ERROR
             );
-
-            $response = $this->redirect('list');
-
-            throw new PropagateResponseException($response, 200);
+            return $this->redirect('list');
         }
+        return null;
     }
 
     /**

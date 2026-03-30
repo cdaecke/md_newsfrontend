@@ -42,6 +42,7 @@ class NewsController extends BaseController
             $news = $this->newsRepository->findByFeuserId($this->feUser['uid'], (int)$this->settings['allowNotEnabledNews']);
 
             $this->view->assignMultiple($this->getPaginatedItems($news));
+            $this->view->assign('loggedIn', 1);
         }
 
         return $this->htmlResponse();
@@ -152,7 +153,11 @@ class NewsController extends BaseController
     #[IgnoreValidation(['argumentName' => 'news'])]
     public function editAction(News $news): ResponseInterface
     {
-        $this->checkAccess($news);
+        $accessResponse = $this->checkAccess($news);
+        if ($accessResponse !== null) {
+            return $accessResponse;
+        }
+
         $this->addFrontendAssets();
 
         $this->view->assignMultiple(
@@ -184,7 +189,10 @@ class NewsController extends BaseController
      */
     public function updateAction(News $news): ResponseInterface
     {
-        $this->checkAccess($news);
+        $accessResponse = $this->checkAccess($news);
+        if ($accessResponse !== null) {
+            return $accessResponse;
+        }
 
         // If archive date was deleted
         if (!$news->getArchive() instanceof \DateTime) {
@@ -261,7 +269,10 @@ class NewsController extends BaseController
      */
     public function deleteAction(News $news): ResponseInterface
     {
-        $this->checkAccess($news);
+        $accessResponse = $this->checkAccess($news);
+        if ($accessResponse !== null) {
+            return $accessResponse;
+        }
 
         // PSR-14 Event
         $this->eventDispatcher->dispatch(new DeleteActionBeforeDeleteEvent($news, $this));
