@@ -114,7 +114,7 @@ class NewsController extends BaseController
         // process file uploads and update file reference metadata
         foreach ($this->uploadFields as $fieldName) {
             $fileReferenceUid = $this->processUploadedFile($fieldName, $newNews->getUid(), $newNews->getPid());
-            $fileData = $this->request->getArguments()[$fieldName] ?? [];
+            $fileData = $this->request->getArguments()[$fieldName . 'Meta'] ?? [];
             if ($fileReferenceUid > 0 && is_array($fileData)) {
                 $this->updateFileReference($fileReferenceUid, $fileData);
             }
@@ -229,7 +229,7 @@ class NewsController extends BaseController
 
         // Process new file uploads and update file reference metadata
         foreach ($this->uploadFields as $fieldName) {
-            $fileData = $this->request->getArguments()[$fieldName] ?? [];
+            $fileData = $this->request->getArguments()[$fieldName . 'Meta'] ?? [];
             $newFileRefUid = $this->processUploadedFile($fieldName, $news->getUid(), $news->getPid());
             if ($newFileRefUid > 0) {
                 // New file uploaded: update its metadata
