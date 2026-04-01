@@ -15,15 +15,17 @@ namespace Mediadreams\MdNewsfrontend\Tests\Unit\Service;
 
 use Mediadreams\MdNewsfrontend\Exception\FileUploadException;
 use Mediadreams\MdNewsfrontend\Service\FileUploadService;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Http\UploadedFile;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 
-final class FileUploadServiceTest extends TestCase
+#[CoversClass(FileUploadService::class)]
+final class FileUploadServiceTest extends UnitTestCase
 {
     private ResourceFactory $resourceFactory;
     private StorageRepository $storageRepository;
@@ -32,6 +34,8 @@ final class FileUploadServiceTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->resourceFactory = $this->createMock(ResourceFactory::class);
         $this->storageRepository = $this->createMock(StorageRepository::class);
         $this->connectionPool = $this->createMock(ConnectionPool::class);

@@ -14,10 +14,12 @@ namespace Mediadreams\MdNewsfrontend\Tests\Unit\Event;
  */
 
 use Mediadreams\MdNewsfrontend\Event\ModifyAllowedMimeTypesEvent;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
+use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
-final class ModifyAllowedMimeTypesEventTest extends TestCase
+#[CoversClass(ModifyAllowedMimeTypesEvent::class)]
+final class ModifyAllowedMimeTypesEventTest extends UnitTestCase
 {
     #[Test]
     public function addMimeTypeAppendsNewType(): void
