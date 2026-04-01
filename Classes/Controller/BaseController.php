@@ -287,8 +287,8 @@ class BaseController extends ActionController
                 $queryBuilder->expr()->eq('uid', $fileReferencesUid)
             )
             ->set('tstamp', time())
-            ->set('title', $fileData['title'])
-            ->set('description', $fileData['description'])
+            ->set('title', $fileData['title'] ?? null)
+            ->set('description', $fileData['description'] ?? null)
             ->set('showinpreview', (int)$showinpreview)
             ->executeStatement();
     }

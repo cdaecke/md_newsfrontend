@@ -1,0 +1,3 @@
+"sys_file_storage"
+,"uid","name","driver","configuration","is_public","is_online","is_writable","is_browsable"
+,1,"Fileadmin","Local","{""basePath"":""fileadmin/"",""pathType"":""relative""}",1,1,1,1

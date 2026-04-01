@@ -39,7 +39,9 @@
         "tomasvotruba/type-coverage": "^2.0",
         "typo3/cms-fluid": "^13.4",
         "typo3/cms-frontend": "^13.4",
-        "typo3/coding-standards": "^0.8"
+        "typo3/coding-standards": "^0.8",
+        "typo3/cms-fluid-styled-content": "^13.4 || ^14.0",
+        "typo3/testing-framework": "^8.0"
     },
     "autoload": {
         "psr-4": {
@@ -83,7 +85,8 @@
         "ci:php:lint": "find .*.php *.php Classes Configuration -name '*.php' -print0 | xargs -r -0 -n 1 -P 4 php -l",
         "ci:php:rector": "./.Build/bin/rector process --config ./rector.php --dry-run",
         "ci:php:stan": "phpstan --no-progress",
-        "ci:php:unit": "./.Build/bin/phpunit --testdox",
+        "ci:php:functional": "./.Build/bin/phpunit -c Build/phpunit/FunctionalTests.xml --testdox",
+        "ci:php:unit": "./.Build/bin/phpunit -c Build/phpunit/UnitTests.xml --testdox",
         "ci:static": [
             "@ci:composer:normalize",
             "@ci:php:cs-fixer",
@@ -103,6 +106,7 @@
         "ci:php:lint": "Check PHP files for syntax errors",
         "ci:php:rector": "Check for pending Rector transformations (dry-run, manual use only)",
         "ci:php:stan": "Run static analysis with PHPStan",
+        "ci:php:functional": "Run PHPUnit functional tests",
         "ci:php:unit": "Run PHPUnit unit tests",
         "ci:static": "Run all static analysis checks (composer normalize, CS Fixer, Lint, PHPStan)",
         "fix:php:cs": "Fix coding style issues with PHP CS Fixer",
