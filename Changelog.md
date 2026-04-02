@@ -1,3 +1,32 @@
+# Version 6.0.0 (2026-04-02)
+This version comes with some breaking changes. Please follow the upgrade instructions.
+
+## Upgrade guide
+- Run upgrade wizard `EXT:md_newsfrontend: Migrate plugin list_type to CType`
+- If `plugin.tx_mdnewsfrontend_newsfe.uploadPath` was configured, it needs to be changed to a FAL combined identifier:
+  - OLD: uploadPath = `user_upload/md_newsfrontend`
+  - NEW: uploadPath = `1:/user_upload/md_newsfrontend`
+- Adapt partial `News/FormFields.html` if you use your own!
+  - falMedia[title] => falMediaMeta[title]
+  - falMedia[description] => falMediaMeta[description]
+  - falMedia[showinpreview] => falMediaMeta[showinpreview]
+  - falRelatedFiles[title] => falRelatedFilesMeta[title]
+  - falRelatedFiles[description] => falRelatedFilesMeta[description]
+  - falMedia[delete] => falMediaDelete
+  - falRelatedFiles[delete] => falRelatedFilesDelete
+- Adapt partial `FooterAssets` if you use your own! It needs to support new version of `tinymce`
+
+## Main changes
+- [!!!][FEATURE] TYPO3 v14 compatibility (TYPO3 v12 support dropped)
+- [!!!][TASK] migration: list_type plugins to CType -> run migration wizard!
+- [!!!][TASK] refactoring/modernizing file upload -> adapt partial `News/FormFields.html` if you use your own!
+- [!!!][TASK] update JS libraris by integrating them via npm. FooterAssets needed to be adapted to tinymce v7!
+- [FEATURE] implement configuration as site set with fallback to legacy setups with classic typoscript config.
+- [TASK] add CI tools and automated testing
+
+All changes
+https://github.com/cdaecke/md_newsfrontend/compare/5.0.5...6.0.0
+
 # Version 5.0.5 (2026-03-27)
 - [BUGFIX] add `is_array($requestArguments[$fieldName])` check and fix error in `CheckFileUpload`. Thanks to [phlei](https://github.com/philipp-leichtweis)!
 
