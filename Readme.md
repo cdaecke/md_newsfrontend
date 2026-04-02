@@ -6,14 +6,20 @@ Templates are ready to use with the [bootstrap framework](https://getbootstrap.c
 
 ## Requirements
 
-- TYPO3 ^12.4 || ^13.4
+- TYPO3 ^13.4 || ^14.0
 - ext:news ^11.0 || ^12.0 || ^13.0 || ^14.0
 
 ## Installation
 
-- Install the extension by using the extension manager or use composer
-- Include the static TypoScript of the extension
-- Configure the extension by setting your own constants
+- Install the extension via Composer or the Extension Manager
+- Add the Site Set **"News Frontend" (`mediadreams/md-newsfrontend`)** to your site configuration (`config/sites/<yoursite>/config.yaml`)
+- Configure the extension settings directly in the site configuration GUI or via `settings.yaml`
+
+> **Important:** If a TypoScript template record exists on your root page, make sure the checkboxes **"Clear constants"** and **"Clear setup"** are **unchecked**. When checked, they wipe all TypoScript loaded by Site Sets before the template record is processed, which results in empty extension settings.
+
+### Legacy TypoScript include
+
+If you prefer the classic approach, you can still include the TypoScript manually from `EXT:md_newsfrontend/Configuration/TypoScript/` and override constants as needed.
 
 ## Usage
 
@@ -25,10 +31,11 @@ Templates are ready to use with the [bootstrap framework](https://getbootstrap.c
 
 Following PSR-14 events are available:
 
-- `Mediadreams\MdNewsfrontend\Event\CreateActionBeforeSave`: Called just before saving a new record
-- `Mediadreams\MdNewsfrontend\Event\CreateActionAfterPersist`: Called after a new record was saved (new record Id is available)
-- `Mediadreams\MdNewsfrontend\Event\UpdateActionBeforeSave`: Called just before an existig record will be updated
-- `Mediadreams\MdNewsfrontend\Event\DeleteActionBeforeDelete`: Called just before a record will be deleted
+- `Mediadreams\MdNewsfrontend\Event\CreateActionBeforeSaveEvent`: Called just before saving a new record
+- `Mediadreams\MdNewsfrontend\Event\CreateActionAfterPersistEvent`: Called after a new record was saved (new record Id is available)
+- `Mediadreams\MdNewsfrontend\Event\UpdateActionBeforeSaveEvent`: Called just before an existing record will be updated
+- `Mediadreams\MdNewsfrontend\Event\DeleteActionBeforeDeleteEvent`: Called just before a record will be deleted
+- `Mediadreams\MdNewsfrontend\Event\ModifyAllowedMimeTypesEvent`: Called during file upload validation to modify the allowed MIME types for a given file extension
 
 ### Register an event
 
@@ -63,8 +70,47 @@ final class MyListener
         $newsController = $obj->getNewsController();
     }
 }
-
 ```
+
+### ModifyAllowedMimeTypesEvent
+
+The `ModifyAllowedMimeTypesEvent` is dispatched during file upload validation and allows you to extend or override the built-in MIME type map. This is useful when you need to permit file extensions that are not covered by the default configuration (e.g. `svg`, `heic`, `odt`).
+
+The event provides the following methods:
+
+- `getExtension(): string` — the file extension being validated (lowercase, e.g. `'svg'`)
+- `getMimeTypes(): array` — the current list of allowed MIME types for this extension
+- `setMimeTypes(array $mimeTypes): void` — replace the entire list of allowed MIME types
+- `addMimeType(string $mimeType): void` — append a single MIME type to the existing list
+
+**Example:** Allow SVG uploads by adding a listener in `Configuration/Services.yaml`:
+
+```yaml
+services:
+  Vendor\Extension\EventListener\AddSvgMimeType:
+    tags:
+      - name: event.listener
+        identifier: 'my-extension/add-svg-mime-type'
+        event: Mediadreams\MdNewsfrontend\Event\ModifyAllowedMimeTypesEvent
+```
+
+```php
+namespace Vendor\Extension\EventListener;
+
+use Mediadreams\MdNewsfrontend\Event\ModifyAllowedMimeTypesEvent;
+
+final class AddSvgMimeType
+{
+    public function __invoke(ModifyAllowedMimeTypesEvent $event): void
+    {
+        if ($event->getExtension() === 'svg') {
+            $event->setMimeTypes(['image/svg+xml']);
+        }
+    }
+}
+```
+
+> **Note:** Extensions not present in the MIME type map skip the MIME check entirely. To enforce MIME validation for a new extension, add it via this event. To disable MIME validation for an existing extension, call `$event->setMimeTypes([])` for that extension.
 
 ## Bugs and Known Issues
 If you find a bug, it would be nice if you add an issue on [Github](https://github.com/cdaecke/md_newsfrontend/issues).

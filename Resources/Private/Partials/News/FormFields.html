@@ -46,7 +46,7 @@
                     <div>
                         <f:image image="{news.firstFalMedia}" alt="" maxWidth="100"/>
                     </div>
-                    <f:form.checkbox name="falMedia[delete]" checked="0" value="1" id="falMediaDelete" />
+                    <f:form.checkbox name="falMediaDelete" value="1" id="falMediaDelete" />
                     <label for="falMediaDelete"><f:translate key="image_delete" /></label>
                 </div>
             </f:if>
@@ -54,17 +54,17 @@
 
         <div class="form-group">
             <label for="falMediaTitle"><f:translate key="image_title" /></label>
-            <f:form.textfield name="falMedia[title]" id="falMediaTitle" value="{news.firstFalMedia.title}" class="form-control" />
+            <f:form.textfield name="falMediaMeta[title]" id="falMediaTitle" value="{news.firstFalMedia.title}" class="form-control" />
         </div>
         <div class="form-group">
             <label for="falMediaDescription"><f:translate key="image_description" /></label>
-            <f:form.textfield name="falMedia[description]" value="{news.firstFalMedia.description}" id="falMediaDescription" class="form-control" />
+            <f:form.textfield name="falMediaMeta[description]" value="{news.firstFalMedia.description}" id="falMediaDescription" class="form-control" />
         </div>
         <div class="form-group">
             <label for="showinpreview"><f:translate key="image_showinpreview" /></label>
 
             <f:form.select
-                name="falMedia[showinpreview]"
+                name="falMediaMeta[showinpreview]"
                 options="{showinpreviewOptions}"
                 value="{news.firstFalMedia.showinpreview}"
                 id="showinpreview"
@@ -91,7 +91,7 @@
                         <f:translate key="document_current" />
                         <f:link.typolink parameter="{news.firstFalRelatedFiles.originalResource.originalFile.publicUrl}" target="_blank">{news.firstFalRelatedFiles.originalResource.originalFile.name}</f:link.typolink>
                     </div>
-                    <f:form.checkbox name="falRelatedFiles[delete]" checked="0" value="1" id="falRelatedFilesDelete" />
+                    <f:form.checkbox name="falRelatedFilesDelete" value="1" id="falRelatedFilesDelete" />
                     <label for="falRelatedFilesDelete"><f:translate key="document_delete" /></label>
                 </div>
             </f:if>
@@ -99,11 +99,11 @@
 
         <div class="form-group">
             <label for="falRelatedFilesTitle"><f:translate key="document_title" /></label>
-            <f:form.textfield name="falRelatedFiles[title]" id="falRelatedFilesTitle" value="{news.firstFalRelatedFiles.title}" class="form-control" />
+            <f:form.textfield name="falRelatedFilesMeta[title]" id="falRelatedFilesTitle" value="{news.firstFalRelatedFiles.title}" class="form-control" />
         </div>
         <div class="form-group">
             <label for="falRelatedFilesDescription"><f:translate key="document_description" /></label>
-            <f:form.textfield name="falRelatedFiles[description]" value="{news.firstFalRelatedFiles.description}" id="falRelatedFilesDescription" class="form-control" />
+            <f:form.textfield name="falRelatedFilesMeta[description]" value="{news.firstFalRelatedFiles.description}" id="falRelatedFilesDescription" class="form-control" />
         </div>
     </fieldset>
 

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mediadreams\MdNewsfrontend\Domain\Model;
 
 /**
- *
  * This file is part of the "News frontend" Extension for TYPO3 CMS.
  *
  * For the full copyright and license information, please read the
@@ -14,7 +13,6 @@ namespace Mediadreams\MdNewsfrontend\Domain\Model;
  * Original code was taken from TYPO3 v11 (sysext/extbase/Classes/Domain/Model/FrontendUser.php)
  *
  * (c) 2023 Christoph Daecke <typo3@mediadreams.org>
- *
  */
 
 use TYPO3\CMS\Extbase\Domain\Model\FileReference;
@@ -26,23 +24,35 @@ use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
  */
 class FrontendUser extends AbstractEntity
 {
-    protected string $username = '';
-    protected string $password = '';
     protected string $name = '';
+
     protected string $firstName = '';
+
     protected string $middleName = '';
+
     protected string $lastName = '';
+
     protected string $address = '';
+
     protected string $telephone = '';
+
     protected string $fax = '';
+
     protected string $email = '';
+
     protected string $title = '';
+
     protected string $zip = '';
+
     protected string $city = '';
+
     protected string $country = '';
+
     protected string $www = '';
+
     protected string $company = '';
-    protected ?\DateTime $lastlogin;
+
+    protected ?\DateTime $lastlogin = null;
 
     /**
      * @var ObjectStorage<FrontendUserGroup>
@@ -60,10 +70,8 @@ class FrontendUser extends AbstractEntity
      * @param string $username
      * @param string $password
      */
-    public function __construct(string $username = '', string $password = '')
+    public function __construct(protected string $username = '', protected string $password = '')
     {
-        $this->username = $username;
-        $this->password = $password;
         $this->usergroup = new ObjectStorage();
         $this->image = new ObjectStorage();
     }
@@ -71,10 +79,10 @@ class FrontendUser extends AbstractEntity
     /**
      * Called again with initialize object, as fetching an entity from the DB does not use the constructor
      */
-    public function initializeObject()
+    public function initializeObject(): void
     {
-        $this->usergroup = $this->usergroup ?? new ObjectStorage();
-        $this->image = $this->image ?? new ObjectStorage();
+        $this->usergroup ??= new ObjectStorage();
+        $this->image ??= new ObjectStorage();
     }
 
     /**
@@ -384,7 +392,7 @@ class FrontendUser extends AbstractEntity
      *
      * @param string $country
      */
-    public function setCountry(string $country)
+    public function setCountry(string $country): void
     {
         $this->country = $country;
     }

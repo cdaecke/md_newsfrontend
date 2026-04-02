@@ -1,0 +1,8 @@
+# =============================================================================
+# Site Set constants for EXT:md_newsfrontend
+#
+# Imports the legacy constants as a fallback for any constant that is not
+# overridden via Site Settings (settings.definitions.yaml).
+# =============================================================================
+
+@import 'EXT:md_newsfrontend/Configuration/TypoScript/constants.typoscript'

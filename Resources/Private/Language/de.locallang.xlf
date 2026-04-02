@@ -205,6 +205,26 @@
                 <source>You are not allowed to edit this record.</source>
                 <target>Sie sind nicht berechtigt diesen Beitrag zu bearbeiten.</target>
             </trans-unit>
+            <trans-unit id="controller.file_extension_not_allowed">
+                <source>The file extension is not allowed.</source>
+                <target>Diese Dateiendung ist nicht erlaubt.</target>
+            </trans-unit>
+            <trans-unit id="controller.file_too_large">
+                <source>The file exceeds the maximum allowed file size.</source>
+                <target>Die Datei überschreitet die maximale erlaubte Dateigröße.</target>
+            </trans-unit>
+            <trans-unit id="controller.file_upload_not_configured">
+                <source>File upload is not configured. Please define allowed file extensions in TypoScript.</source>
+                <target>Der Datei-Upload ist nicht konfiguriert. Bitte erlaubte Dateiendungen im TypoScript definieren.</target>
+            </trans-unit>
+            <trans-unit id="controller.file_mime_type_not_allowed">
+                <source>The file content does not match the file extension.</source>
+                <target>Der Dateiinhalt stimmt nicht mit der Dateiendung überein.</target>
+            </trans-unit>
+            <trans-unit id="controller.file_upload_storage_not_found">
+                <source>The configured upload storage could not be found. Please check the uploadPath setting.</source>
+                <target>Der konfigurierte Upload-Speicher wurde nicht gefunden. Bitte die uploadPath-Einstellung prüfen.</target>
+            </trans-unit>
 
             <trans-unit id="validator.allowed_file_extensions">
                 <source>Only the following file extensions are allowed:</source>

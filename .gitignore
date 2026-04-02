@@ -1,1 +1,7 @@
-/vendor/
+.Build/
+.idea/
+/composer.lock
+/.php-cs-fixer.cache
+Public/
+/node_modules/
+/.phpunit.cache/

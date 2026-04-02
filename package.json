@@ -1,0 +1,14 @@
+{
+    "name": "md_newsfrontend",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "build": "node build.mjs"
+    },
+    "dependencies": {
+        "flatpickr": "^4.6.13",
+        "jquery": "^3.7.1",
+        "parsleyjs": "^2.9.2",
+        "tinymce": "^7.0.0"
+    }
+}

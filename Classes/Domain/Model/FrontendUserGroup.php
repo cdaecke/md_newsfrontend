@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mediadreams\MdNewsfrontend\Domain\Model;
 
 /**
- *
  * This file is part of the "News frontend" Extension for TYPO3 CMS.
  *
  * For the full copyright and license information, please read the
@@ -14,7 +13,6 @@ namespace Mediadreams\MdNewsfrontend\Domain\Model;
  * Original code was taken from TYPO3 v11 (sysext/extbase/Classes/Domain/Model/FrontendUserGroup.php)
  *
  * (c) 2023 Christoph Daecke <typo3@mediadreams.org>
- *
  */
 
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
@@ -26,6 +24,7 @@ use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
 class FrontendUserGroup extends AbstractEntity
 {
     protected string $title = '';
+
     protected string $description = '';
 
     /**

@@ -1,8 +1,8 @@
 {
     "name": "mediadreams/md_newsfrontend",
-    "type": "typo3-cms-extension",
     "description": "This TYPO3 extension enables frontend users to created news records.",
     "license": "GPL-2.0-or-later",
+    "type": "typo3-cms-extension",
     "keywords": [
         "TYPO3",
         "extension",
@@ -10,30 +10,107 @@
         "frontend",
         "fe_users"
     ],
-    "homepage": "http://www.mediadreams.org",
     "authors": [
         {
             "name": "Christoph Daecke",
-            "role": "Developer",
-            "homepage": "http://www.mediadreams.org"
+            "homepage": "http://www.mediadreams.org",
+            "role": "Developer"
         }
     ],
+    "homepage": "http://www.mediadreams.org",
     "support": {
         "issues": "https://github.com/cdaecke/md_newsfrontend/issues",
         "source": "https://github.com/cdaecke/md_newsfrontend"
     },
     "require": {
-        "typo3/cms-core": "^12.4 || ^13.4",
-        "georgringer/news": "^11.0 || ^12.0 || ^13.0 || ^14.0"
-	},
+        "georgringer/news": "^11.0 || ^12.0 || ^13.0 || ^14.0",
+        "typo3/cms-core": "^13.4 || ^14.0"
+    },
+    "require-dev": {
+        "ergebnis/composer-normalize": "^2.28",
+        "friendsofphp/php-cs-fixer": "^3.48",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "phpunit/phpunit": "^11.0",
+        "rector/rector": "^2.0",
+        "saschaegerer/phpstan-typo3": "^2.1",
+        "ssch/typo3-rector": "^3.0",
+        "tomasvotruba/type-coverage": "^2.0",
+        "typo3/cms-fluid": "^13.4",
+        "typo3/cms-fluid-styled-content": "^13.4 || ^14.0",
+        "typo3/cms-frontend": "^13.4",
+        "typo3/coding-standards": "^0.8",
+        "typo3/testing-framework": "^8.0"
+    },
     "autoload": {
         "psr-4": {
             "Mediadreams\\MdNewsfrontend\\": "Classes"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Mediadreams\\MdNewsfrontend\\Tests\\": "Tests"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "ergebnis/composer-normalize": true,
+            "phpstan/extension-installer": true,
+            "typo3/class-alias-loader": true,
+            "typo3/cms-composer-installers": true
+        },
+        "bin-dir": ".Build/bin",
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true,
+        "vendor-dir": ".Build/vendor"
+    },
     "extra": {
         "typo3/cms": {
             "extension-key": "md_newsfrontend"
         }
-   }
+    },
+    "scripts": {
+        "build:assets": "npm install && npm run build",
+        "ci:composer:normalize": "@composer normalize --no-check-lock --dry-run",
+        "ci:composer:psr-verify": "@composer dumpautoload --optimize --strict-psr --no-plugins",
+        "ci:php": [
+            "@ci:php:cs-fixer",
+            "@ci:php:lint",
+            "@ci:php:stan"
+        ],
+        "ci:php:cs-fixer": "php-cs-fixer fix --config .php-cs-fixer.php -v --dry-run --diff",
+        "ci:php:functional": "./.Build/bin/phpunit -c Build/phpunit/FunctionalTests.xml --testdox",
+        "ci:php:lint": "find .*.php *.php Classes Configuration -name '*.php' -print0 | xargs -r -0 -n 1 -P 4 php -l",
+        "ci:php:rector": "./.Build/bin/rector process --config ./rector.php --dry-run",
+        "ci:php:stan": "phpstan --no-progress",
+        "ci:php:unit": "./.Build/bin/phpunit -c Build/phpunit/UnitTests.xml --testdox",
+        "ci:static": [
+            "@ci:composer:normalize",
+            "@ci:php:cs-fixer",
+            "@ci:php:lint",
+            "@ci:php:stan"
+        ],
+        "fix:php:cs": "php-cs-fixer fix --config .php-cs-fixer.php",
+        "fix:php:rector": "./.Build/bin/rector process --config ./rector.php",
+        "update:assets": "npm update && npm run build"
+    },
+    "scripts-descriptions": {
+        "build:assets": "Install npm dependencies and copy assets to Resources/Public/",
+        "ci:composer:normalize": "Check composer.json is normalized (dry-run)",
+        "ci:composer:psr-verify": "Verify PSR-4 autoloading is correct",
+        "ci:php": "Run all PHP checks (CS Fixer, Lint, PHPStan)",
+        "ci:php:cs-fixer": "Check coding style with PHP CS Fixer (dry-run)",
+        "ci:php:functional": "Run PHPUnit functional tests",
+        "ci:php:lint": "Check PHP files for syntax errors",
+        "ci:php:rector": "Check for pending Rector transformations (dry-run, manual use only)",
+        "ci:php:stan": "Run static analysis with PHPStan",
+        "ci:php:unit": "Run PHPUnit unit tests",
+        "ci:static": "Run all static analysis checks (composer normalize, CS Fixer, Lint, PHPStan)",
+        "fix:php:cs": "Fix coding style issues with PHP CS Fixer",
+        "fix:php:rector": "Apply Rector transformations (run manually when dropping a TYPO3 version)",
+        "update:assets": "Update npm dependencies to latest versions and copy assets to Resources/Public/"
+    }
 }
