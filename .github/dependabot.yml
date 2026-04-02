@@ -6,3 +6,8 @@ updates:
       interval: monthly
     commit-message:
       prefix: "[TASK]"
+    ignore:
+      - dependency-name: "jquery"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "tinymce"
+        update-types: ["version-update:semver-major"]
