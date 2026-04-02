@@ -10,6 +10,14 @@ use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
 abstract class AbstractControllerTestCase extends FunctionalTestCase
 {
+    /**
+     * Additional TypoScript setup files appended to the root page template.
+     * Override in subclasses before calling parent::setUp() to inject test-specific settings.
+     *
+     * @var list<non-empty-string>
+     */
+    protected array $additionalSetupTypoScript = [];
+
     protected function setUp(): void
     {
         $this->testExtensionsToLoad = [
@@ -41,11 +49,14 @@ abstract class AbstractControllerTestCase extends FunctionalTestCase
                 'EXT:fluid_styled_content/Configuration/TypoScript/constants.typoscript',
                 'EXT:md_newsfrontend/Configuration/TypoScript/constants.typoscript',
             ],
-            'setup' => [
-                'EXT:fluid_styled_content/Configuration/TypoScript/setup.typoscript',
-                'EXT:md_newsfrontend/Configuration/TypoScript/setup.typoscript',
-                'EXT:md_newsfrontend/Tests/Functional/Controller/Fixtures/TypoScript/Setup/Rendering.typoscript',
-            ],
+            'setup' => array_merge(
+                [
+                    'EXT:fluid_styled_content/Configuration/TypoScript/setup.typoscript',
+                    'EXT:md_newsfrontend/Configuration/TypoScript/setup.typoscript',
+                    'EXT:md_newsfrontend/Tests/Functional/Controller/Fixtures/TypoScript/Setup/Rendering.typoscript',
+                ],
+                $this->additionalSetupTypoScript,
+            ),
         ]);
     }
 
