@@ -232,29 +232,4 @@ final class NewsControllerUpdateFileTest extends AbstractControllerTestCase
         return base64_decode('R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==');
     }
 
-    private function getTrustedPropertiesFromEditForm(int $newsUid, InternalRequestContext $context): string
-    {
-        $request = (new InternalRequest())
-            ->withPageId(self::UID_OF_PAGE)
-            ->withQueryParameters([
-                'tx_mdnewsfrontend_newsfe[action]' => 'edit',
-                'tx_mdnewsfrontend_newsfe[controller]' => 'News',
-                'tx_mdnewsfrontend_newsfe[news]' => (string)$newsUid,
-            ]);
-
-        $html = (string)$this->executeFrontendSubRequest($request, $context)->getBody();
-
-        return $this->getTrustedPropertiesFromHtml($html);
-    }
-
-    private function getTrustedPropertiesFromHtml(string $html): string
-    {
-        $matches = [];
-        preg_match('/__trustedProperties\]" value="([a-zA-Z0-9&{};:,_\[\]\\\\]+)"/', $html, $matches);
-        if (!isset($matches[1])) {
-            throw new \RuntimeException('Could not fetch trustedProperties from returned HTML.', 1744028933);
-        }
-
-        return html_entity_decode($matches[1]);
-    }
 }

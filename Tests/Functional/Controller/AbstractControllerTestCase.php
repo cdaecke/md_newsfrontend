@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mediadreams\MdNewsfrontend\Tests\Functional\Controller;
 
+use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
+use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequestContext;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
 abstract class AbstractControllerTestCase extends FunctionalTestCase
@@ -45,5 +47,40 @@ abstract class AbstractControllerTestCase extends FunctionalTestCase
                 'EXT:md_newsfrontend/Tests/Functional/Controller/Fixtures/TypoScript/Setup/Rendering.typoscript',
             ],
         ]);
+    }
+
+    protected function getTrustedPropertiesFromEditForm(int $newsUid, InternalRequestContext $context, int $pageId = 1): string
+    {
+        $request = (new InternalRequest())
+            ->withPageId($pageId)
+            ->withQueryParameters([
+                'tx_mdnewsfrontend_newsfe[action]' => 'edit',
+                'tx_mdnewsfrontend_newsfe[controller]' => 'News',
+                'tx_mdnewsfrontend_newsfe[news]' => (string)$newsUid,
+            ]);
+        $html = (string)$this->executeFrontendSubRequest($request, $context)->getBody();
+        return $this->getTrustedPropertiesFromHtml($html);
+    }
+
+    protected function getTrustedPropertiesFromNewForm(InternalRequestContext $context, int $pageId = 1): string
+    {
+        $request = (new InternalRequest())
+            ->withPageId($pageId)
+            ->withQueryParameters([
+                'tx_mdnewsfrontend_newsfe[action]' => 'new',
+                'tx_mdnewsfrontend_newsfe[controller]' => 'News',
+            ]);
+        $html = (string)$this->executeFrontendSubRequest($request, $context)->getBody();
+        return $this->getTrustedPropertiesFromHtml($html);
+    }
+
+    protected function getTrustedPropertiesFromHtml(string $html): string
+    {
+        $matches = [];
+        preg_match('/__trustedProperties\]" value="([a-zA-Z0-9&{};:,_\[\]\\\\]+)"/', $html, $matches);
+        if (!isset($matches[1])) {
+            throw new \RuntimeException('Could not fetch trustedProperties from returned HTML.', 1744028933);
+        }
+        return html_entity_decode($matches[1]);
     }
 }
