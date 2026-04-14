@@ -89,31 +89,42 @@ class FileUploadService
         $tmpFile = $this->createTempFile();
         $uploadedFile->moveTo($tmpFile);
 
-        // Validate actual MIME type from file content — prevents disguised file uploads
-        $allowedMimeTypes = $this->getAllowedMimeTypesForExtension($ext);
-        if ($allowedMimeTypes !== []) {
-            $actualMimeType = $this->detectMimeType($tmpFile);
-            if (!in_array($actualMimeType, $allowedMimeTypes, true)) {
-                unlink($tmpFile);
-                throw new FileUploadException('controller.file_mime_type_not_allowed');
-            }
-        }
-
-        // Resolve FAL upload folder, create it if necessary
-        $uploadPath = rtrim((string)$settings['uploadPath'], '/') . '/' . $feUserUid . '/';
-
         try {
-            $folder = $this->resourceFactory->getFolderObjectFromCombinedIdentifier($uploadPath);
-        } catch (FolderDoesNotExistException) {
-            [$storageUid, $folderPath] = explode(':', $uploadPath, 2);
-            $storage = $this->storageRepository->findByUid((int)$storageUid);
-            if ($storage === null) {
-                throw new FileUploadException('controller.file_upload_storage_not_found');
+            // Validate actual MIME type from file content — prevents disguised file uploads
+            $allowedMimeTypes = $this->getAllowedMimeTypesForExtension($ext);
+            if ($allowedMimeTypes !== []) {
+                $actualMimeType = $this->detectMimeType($tmpFile);
+                if (!in_array($actualMimeType, $allowedMimeTypes, true)) {
+                    throw new FileUploadException('controller.file_mime_type_not_allowed');
+                }
             }
-            $folder = $storage->createFolder(ltrim($folderPath, '/'));
-        }
 
-        $file = $folder->addFile($tmpFile, $safeFilename, DuplicationBehavior::RENAME);
+            // Resolve FAL upload folder, create it if necessary
+            $uploadPath = rtrim((string)$settings['uploadPath'], '/') . '/' . $feUserUid . '/';
+
+            try {
+                $folder = $this->resourceFactory->getFolderObjectFromCombinedIdentifier($uploadPath);
+            } catch (FolderDoesNotExistException) {
+                $parts = explode(':', $uploadPath, 2);
+                if (count($parts) !== 2) {
+                    throw new FileUploadException('controller.file_upload_storage_not_found');
+                }
+                [$storageUid, $folderPath] = $parts;
+                $storage = $this->storageRepository->findByUid((int)$storageUid);
+                if ($storage === null) {
+                    throw new FileUploadException('controller.file_upload_storage_not_found');
+                }
+                $folder = $storage->createFolder(ltrim($folderPath, '/'));
+            }
+
+            $file = $folder->addFile($tmpFile, $safeFilename, DuplicationBehavior::RENAME);
+        } finally {
+            // Remove temp file if it still exists. addFile() uses rename() on success, so the
+            // file is already gone in the happy path — this only cleans up on exception paths.
+            if (file_exists($tmpFile)) {
+                unlink($tmpFile);
+            }
+        }
 
         // Create sys_file_reference record
         $connection = $this->connectionPool->getConnectionForTable('sys_file_reference');

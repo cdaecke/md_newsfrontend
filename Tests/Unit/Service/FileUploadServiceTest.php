@@ -18,11 +18,12 @@ use Mediadreams\MdNewsfrontend\Service\FileUploadService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Http\UploadedFile;
+use TYPO3\CMS\Core\Resource\Exception\FolderDoesNotExistException;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\StorageRepository;
+use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 #[CoversClass(FileUploadService::class)]
 final class FileUploadServiceTest extends UnitTestCase
@@ -147,6 +148,29 @@ final class FileUploadServiceTest extends UnitTestCase
             1,
             42,
             ['allowed_falMedia' => 'jpg', 'allowed_falMedia_size' => '1024', 'uploadPath' => '1:/uploads/']
+        );
+    }
+
+    #[Test]
+    public function processUploadedFileThrowsWhenUploadPathContainsNoStorageUid(): void
+    {
+        $this->expectException(FileUploadException::class);
+        $this->expectExceptionMessage('controller.file_upload_storage_not_found');
+
+        $this->eventDispatcher->method('dispatch')->willReturnArgument(0);
+
+        $this->resourceFactory
+            ->method('getFolderObjectFromCombinedIdentifier')
+            ->willThrowException(new FolderDoesNotExistException());
+
+        $this->createServiceWithMimeOverride('image/jpeg')->processUploadedFile(
+            $this->createUploadedFileMock('photo.jpg'),
+            'falMedia',
+            'fal_media',
+            1,
+            1,
+            42,
+            ['allowed_falMedia' => 'jpg', 'uploadPath' => 'user_upload/md_newsfrontend']
         );
     }
 
