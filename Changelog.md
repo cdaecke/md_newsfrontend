@@ -1,3 +1,10 @@
+# Version 6.0.1 (2026-04-14)
+- [BUGFIX] make sure, that temporary files gets deleted. Thanks to [phlei](https://github.com/philipp-leichtweis)!
+- [BUGFIX] check `$folderPath` correctly. Thanks to [phlei](https://github.com/philipp-leichtweis)!
+
+All changes
+https://github.com/cdaecke/md_newsfrontend/compare/6.0.0...6.0.1
+
 # Version 6.0.0 (2026-04-02)
 This version comes with some breaking changes. Please follow the upgrade instructions.
 
