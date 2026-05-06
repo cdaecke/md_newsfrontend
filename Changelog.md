@@ -1,3 +1,9 @@
+# Version 6.0.2 (2026-05-06)
+- [BUGFIX] add missing JS and CSS of thir party libraries
+
+All changes
+https://github.com/cdaecke/md_newsfrontend/compare/6.0.1...6.0.2
+
 # Version 6.0.1 (2026-04-14)
 - [BUGFIX] make sure, that temporary files gets deleted. Thanks to [phlei](https://github.com/philipp-leichtweis)!
 - [BUGFIX] check `$folderPath` correctly. Thanks to [phlei](https://github.com/philipp-leichtweis)!
