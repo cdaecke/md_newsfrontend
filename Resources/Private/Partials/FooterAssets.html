@@ -21,7 +21,7 @@
                         suffix: '.min',
                         license_key: 'gpl',
                         selector: 'textarea.tinymce',
-                        language: '{settings.tinymceLang}', // get language files here: https://www.tiny.cloud/get-tiny/language-packages/
+                        <f:if condition="{settings.tinymceLang}">language: '{settings.tinymceLang}',</f:if>
                         height: 400,
                         paste_as_text: true,
                         plugins: ['lists', 'link', 'wordcount'],
