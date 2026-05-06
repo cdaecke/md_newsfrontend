@@ -2,6 +2,6 @@
 .idea/
 /composer.lock
 /.php-cs-fixer.cache
-Public/
+/Public/
 /node_modules/
 /.phpunit.cache/
