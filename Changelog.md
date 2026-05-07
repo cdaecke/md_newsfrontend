@@ -1,3 +1,9 @@
+# Version 6.0.3 (2026-05-07)
+- [TASK] refactor TinyMCE build: copy only minified files and add language packs via tinymce-i18n
+
+All changes
+https://github.com/cdaecke/md_newsfrontend/compare/6.0.2...6.0.3
+
 # Version 6.0.2 (2026-05-06)
 - [BUGFIX] add missing JS and CSS of thir party libraries
 
