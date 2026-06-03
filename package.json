@@ -10,6 +10,6 @@
         "jquery": "^3.7.1",
         "parsleyjs": "^2.9.2",
         "tinymce": "^7.0.0",
-        "tinymce-i18n": "^26.4.6"
+        "tinymce-i18n": "^26.5.18"
     }
 }
