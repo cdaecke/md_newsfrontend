@@ -1,3 +1,9 @@
+# Version 6.0.4 (2026-07-02)
+- [SECURITY] update TinyMCE to 7.9.3 (XSS fixes)
+
+All changes
+https://github.com/cdaecke/md_newsfrontend/compare/6.0.3...6.0.4
+
 # Version 6.0.3 (2026-05-07)
 - [TASK] refactor TinyMCE build: copy only minified files and add language packs via tinymce-i18n
 
